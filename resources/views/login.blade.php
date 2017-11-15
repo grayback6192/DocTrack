@@ -9,7 +9,7 @@
 
     <meta name="description" content="">
     <meta name="author" content="">
-    <title>SB Admin - Start Bootstrap Template</title>
+    <title>Login | DocTrack</title>
 
     <!-- Bootstrap core CSS -->
     <link href="homecss/cssnav/bootstrap.min.css" rel="stylesheet">
@@ -58,6 +58,8 @@
         </div>
       </div>
     </div>
+    <br>
+    <h1 align = "center">DocTrack</h1>
 
     <!-- Bootstrap core JavaScript -->
    <script src="homejs/homejquery/jquery.min.js"></script>

@@ -11,7 +11,7 @@ use Session;
 
 class User extends Controller
 {
-    public function editFile($id)
+    public function editFile($id) //Edit Template File, GET
     {
         $user = Auth::user();
         $request = \DB::table("template")->where("template_id","=",$id)->get();
@@ -58,7 +58,7 @@ class User extends Controller
                                         "gid"=>$gid,
                                         "tempid"=>$id]);
     }
-    public function editToAddFile($tempid)
+    public function editToAddFile($tempid) //Template Creation, Post
     {
         $user = request()->all();
         $title = str_replace(" ", "_", $user['title']);
@@ -75,7 +75,6 @@ class User extends Controller
         file_put_contents("pdf/".$title.".pdf", $output);
         //Delete Files
         unlink('temp/'.$title.'.html');
-
         \DB::table('template')->where('template_id','=',$tempid)->update(['templatename'=>$title,
                                                                             'group_group_id'=>$user['group'],
                                                                             'workflow_w_id'=>$user['wf']]);
@@ -186,12 +185,8 @@ class User extends Controller
         $output = $dompdf->output();
         file_put_contents("pdf/".$doc->doc_id.".pdf", $output);
         }
-        
-
          $var = $this->getWorkflow($groupid,$id);
           return $this->insertTransaction($rand,$var);
-        // echo "<pre>";
-        // var_dump($groupid);
     }
 
     public function insertTransaction($docid,$array)
@@ -288,7 +283,6 @@ class User extends Controller
         $workflow = DB::table('template')->where('template_id','=',$templateid)
                     ->join('workflow','template.workflow_w_id','=','workflow.w_id')
                     ->join('workflowsteps','workflow.w_id','=','workflowsteps.workflow_w_id')
-                    // ->select('template.templatename','workflow.workflowName','workflowsteps.position_pos_id','workflowsteps.order')
                     ->get();
 
                     $flowlist = array();

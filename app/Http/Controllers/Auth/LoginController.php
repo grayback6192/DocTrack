@@ -41,6 +41,10 @@ class LoginController extends Controller
     {
         return "email";
     }
+    public function getBusinessKey()
+    {
+        return response()->json("Data"); //Ajax Test
+    }
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
@@ -58,11 +62,6 @@ class LoginController extends Controller
            $upgid = $roles->upg_id;
            $clientid = $roles->client_id;
         }
-
-        //  if(isset($group))
-        //     \Session::put('group',$group); //$_SESSION['group'] = $group;
-        // if(isset($upgid))
-        //      \Session::put('upg',$upgid);
              \Session::put('client',$clientid);
 
         if($title == "Admin")
@@ -72,10 +71,6 @@ class LoginController extends Controller
         else{
             $redirect = "/groups/".$id->user_id;
             return $redirect;
-            // return "/home";
-            // return redirect()->route('viewInbox',['id'=>$id->user_id]);
-            // $redirect = "/inbox/".$id->user_id;
-            // return $redirect;
         }
     }
     public function logout(Request $request)

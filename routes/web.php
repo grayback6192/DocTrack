@@ -23,6 +23,7 @@ Route::post('/register','Auth\RegisterController@register')->name('ClientRegiste
 Route::get('/logout',"Auth\LoginController@logout")->name('Logout');
 Route::get("/registeruser","Auth\RegisterUserController@showRegistrationForm")->name("RegisterUser");
 Route::post("/registeruser","Auth\RegisterUserController@register")->name("UserRegister");
+Route::get("/key","Auth\LoginController@getBusinessKey");
 
 //User routes
 Route::get('/home', function(){
@@ -232,8 +233,6 @@ Route::get("admin/template/edit={id}","user@editFile");
 Route::get("admin/template/delete={id}","user@deleteFile");
 
 Route::post("admin/templateInsert/{id}","user@insertFile")->name("postDoc");
-
-Route::post("admin/templateEdit/create/{tempid}","user@editToAddFile");
 
 Route::post("admin/templateEdit/create/{tempid}","user@editToAddFile");
 //end template management

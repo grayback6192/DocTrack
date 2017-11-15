@@ -128,7 +128,7 @@
 		                                      <div class="col-sm-7 col-sm-offset-1">
 		                                    	<div class="form-group">
 		                                            <label>School Key</label>
-		                                            <input type="text" name = "business" class="form-control" placeholder="Business Key">
+		                                            <input type="text" id = "businessKey" name = "business" class="form-control" placeholder="Business Key">
 		                                        </div>
 		                                    </div>
 
@@ -186,7 +186,6 @@
 	        </div>
 	    </div>
 	</div>
-
 </body>
 
 	<!--   Core JS Files   -->
@@ -199,5 +198,30 @@
 
 	<!--  More information about jquery.validate here: http://jqueryvalidation.org/	 -->
 	<script src="logincss/js/jquery.validate.min.js" type="text/javascript"></script>
+
+
+{{-- Ajax --}}
+<script type = "text/javascript"></script>
+<script>
+$("#businessKey").keypress(function()
+{
+	$.ajax(
+	{
+		url: "/key",
+		type: "GET",
+		success:function(data)
+		{
+			// alert(data);
+		}
+	});
+})
+
+</script>
+
+
+
+
+
+
 
 </html>

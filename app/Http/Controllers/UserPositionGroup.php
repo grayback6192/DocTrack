@@ -86,10 +86,9 @@ class UserPositionGroup extends Controller
         return redirect()->route('gotogroup',['groupid'=>$request['groupid']]);
     }
 
-
     public function removeAssignment($upgid)
     {
-        DB::table('userpositiongroup')->where('upg_id',$upgid)->delete();
+        DB::table("userpositiongroup")->where("upg_id",$upgid)->update(['position_pos_id'=>NULL]);
         return redirect()->route('viewAssignments');
     } //set it to inactive
 }
