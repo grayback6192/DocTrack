@@ -6,10 +6,10 @@
     "type": "project",
     "require": {
         "php": ">=5.6.4",
-        "PhpOffice/phpword": "^0.13.0",
         "dompdf/dompdf": "^0.8.1",
         "laravel/framework": "5.4.*",
-        "laravel/tinker": "~1.0"
+        "laravel/tinker": "~1.0",
+        "phpoffice/phpword": "dev-develop"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
