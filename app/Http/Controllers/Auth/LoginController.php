@@ -62,7 +62,7 @@ class LoginController extends Controller
            $upgid = $roles->upg_id;
            $clientid = $roles->client_id;
         }
-             \Session::put('client',$clientid);
+            \Session::put('client',$clientid);
 
         if($title == "Admin")
             return "/admin";

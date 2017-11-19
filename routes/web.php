@@ -213,7 +213,7 @@ Route::get('admin/template/workflow/{wid}',function($wid){
 	return response()->json($results);
 });
 
-Route::post("admin/template/create","user@addFile")->name('CreateTemplate');
+Route::post("admin/template/create","TemplateController@addTemplate")->name('CreateTemplate');
 
 Route::get('admin/template/upload',function(){
 	$user =Auth::user();
@@ -226,15 +226,15 @@ Route::get('admin/template/upload',function(){
 	return view('admin/uploadtemplate',['User'=>$user, 'workflow'=>$workflow, 'groups'=>$groups]);
 })->name('UploadTemplate');
 
-Route::post('admin/template/upload','user@uploadfile')->name('uploadTemplate');
+Route::post('admin/template/upload','TemplateController@uploadfile')->name('uploadTemplate');
 
-Route::get("admin/template/edit={id}","user@editFile");
+Route::get("admin/template/edit={id}","TemplateController@editFile");
 
-Route::get("admin/template/delete={id}","user@deleteFile");
+Route::get("admin/template/delete={id}","TemplateController@deleteTemplate");
 
-Route::post("admin/templateInsert/{id}","user@insertFile")->name("postDoc");
+Route::post("admin/templateInsert/{id}","DocumentController@insertFileVariables")->name("postDoc");
 
-Route::post("admin/templateEdit/create/{tempid}","user@editToAddFile");
+Route::post("admin/templateEdit/create/{tempid}","TemplateController@addEditedTemplate");
 //end template management
 
 //workflow management
@@ -262,7 +262,6 @@ Route::get('admin/workflow',function(){
 Route::get('admin/workflow/add/{wfid}','WorkflowStepsController@openSteps')->name('AddWf');
 Route::post('admin/workflow/addworkflow','WorkflowController@addWF')->name('postAddWf');
 Route::get('admin/workflow/delete/{wfid}','WorkflowController@deleteWf')->name('DelWf');
-// Route::post('admin/workflow/edit/{wfid}','WorkflowController@editWf')->name('EditWf');
 Route::get('admin/workflow/edit/{wfid}','WorkflowController@setPrev')->name('EditWf');
 Route::get('admin/viewPath','WorkflowStepsController@getWorkflow');
 
@@ -278,11 +277,8 @@ Route::get('/groups/{userid}/choose','Department@viewGroups')->name('addGroup');
 Route::get('/{groupid}','User@goToGroup')->name('gotogroup');
 Route::get('/viewTemplate','Template@viewTemplate')->name('viewTemplate');
 Route::post('/entergroup','UserPositionGroup@enterGroup')->name('enterGroup');
-
 Route::get('/createDoc',"user@readFile");
-
 Route::get('{groupid}/send','Department@viewServiceOwners')->name('serviceowners');
-
 Route::get('/{gid}/template',function($gid)//needed fixing
 {
 	$name = Auth::user();
@@ -295,7 +291,7 @@ Route::get('/{gid}/template',function($gid)//needed fixing
 	return view("user/templatefillup",["template"=>$template,"User"=>$name]);
 })->name("Template");
 
-Route::get('/templateInput/{docid}',"user@readfile");
+Route::get('/templateInput/{docid}',"DocumentController@readfile");
 
 Route::get('/groups/{userid}/{groupid}',function($userid,$groupid){
 // Route::get('/groups/{$groupid}/home',function($userid,$groupid){
@@ -321,22 +317,17 @@ Route::get("createfile",function()
 
 Route::get("/viewWorkflow","user@loadWorkflow");
 
-Route::post("templateEdit/create","user@editToAddFile");
+Route::post("templateEdit/create","TemplateController@addEditedTemplate");
 
-Route::post("/templateInsert/{id}","user@insertFile")->name("postDoc");
+Route::post("/templateInsert/{id}","DocumentController@insertFileVariables")->name("postDoc");
 
-Route::post("/templateView/{id}","user@viewFile");
+Route::post("/templateView/{id}","DocumentController@viewFile");
 
-Route::get("/templateEdit/{id}","user@editFile");
+Route::get("/templateEdit/{id}","TemplateController@editFile");
 
-// Route::get("/document",function(){
-// 	$user = Auth::user();
-// 	$documentinnername= DB::table("inbox")->join("document","document_id","=","doc_id")->select("inbox.*","document.docname","document.doc_id")->where("user_id","=","1")->get();
-// 	return view("user/test",["documentinnername"=>$documentinnername]);
-// });
 Route::get('/number','User@countAllApproved');
 
-Route::get("/documentView/{id}","user@viewdocs")->name('docView');
+Route::get("/documentView/{id}","DocumentController@viewdocs")->name('docView');
 
 Route::get("{groupid}/inbox","user@viewInbox")->name('viewInbox');
 
@@ -351,7 +342,3 @@ Route::get('track/{id}','user@track')->name('tracking');
 Route::get('{gourpid}/complete','user@complete')->name('complete');
 
 //End User
-
-
-Route::get('{groupid}/wf','TestController@getWorkflow');
-Route::get('/prev','TestController@setPrev');
