@@ -195,9 +195,12 @@ DROP TABLE IF EXISTS `orgstructure`;
 CREATE TABLE `orgstructure` (
   `orgstruct_id` int(11) NOT NULL,
   `pos_id` int(11) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
   `level` int(11) DEFAULT NULL,
   PRIMARY KEY (`orgstruct_id`),
   KEY `position_id_idx` (`pos_id`),
+  KEY `org_group_id_idx` (`group_id`),
+  CONSTRAINT `org_group_id` FOREIGN KEY (`group_id`) REFERENCES `group` (`group_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `position_id` FOREIGN KEY (`pos_id`) REFERENCES `position` (`pos_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -493,4 +496,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-11-21 16:22:55
+-- Dump completed on 2017-11-21 16:33:59
