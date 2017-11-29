@@ -90,39 +90,75 @@ class DocumentController extends Controller
                                        "doc_path"=>$path,
                                        "template_template_id"=>$id,
                                        "userpositiongroup_upg_id"=>$upgId,
-                                        "sentDate"=>$date,
-                                        "sentTime"=>$time]);
+                                       "sentDate"=>$date,
+                                       "sentTime"=>$time]);
         $template->saveAs('file/'.$rand.'.docx');
         
         $docs = DB::table("document")->where('doc_id','=',$rand)->get();
         foreach ($docs as $doc) {
-            //convert doc to pdf
-         $dompdf= new Dompdf();
+        //convert doc to pdf
+        $dompdf= new Dompdf();
         $dompdf->loadHtml($doc->doc_id);
         $dompdf->render();
         $output = $dompdf->output();
         file_put_contents("pdf/".$doc->doc_id.".pdf", $output);
         }
-        $var = getWorkflow($groupid,$id); //Problem
+        $var = getWorkflow($groupid,$id);
         return insertTransaction($rand,$var);
     }
-
-     public function viewdocs(Request $request,$id){
+     public function viewdocs(Request $request,$id)
+     {
         $upgid = $request->session()->get('upgid');
         $user = Auth::user();
         $userid = $user->user_id;
-        $upg_user = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$upgid)->where('upg.user_user_id','=',$userid)->get();
-        foreach ($upg_user as $key){
+        $upg_user = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$upgid)
+                                                         ->where('upg.user_user_id','=',$userid)
+                                                         ->get();
+
+        $signature = DB::table('transaction as t')
+                                             ->where('t.document_doc_id','=',$id)
+                                             ->where("t.status","=","approved")
+                                             ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
+                                             ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
+                                             ->get(); //Added
+        $position = DB::table("position")->get();
+
+        $upg= session()->get('upgid');
+
+
+
+        $templateProcessorOld = new \PhpOffice\PhpWord\TemplateProcessorOld('file/'.$id.'.docx');
+        $templateProcessorOld->saveAs('file/'.$id.'.docx');
+
+        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$id.'.docx');
+        $variable = $templateProcessor->getVariables();
+
+        foreach($variable as $variables)
+        {
+            foreach($signature as $signatures)
+            {
+                if($variables == $signatures->posName)
+                {
+                    $templateProcessor->setImg($variables, [
+                                                          "src"=>"splash.png",
+                                                          "swh"=>"100"
+                                                         ]);
+                }
+            }
+        }
+        $templateProcessor->saveAs('temp/'.$id.'.docx');
+
+        foreach ($upg_user as $key)
+        {
             $recid = $key->user_user_id;
         }
-
         $templateRequest = request()->all();
         $request = \DB::table("document")->where("doc_id","=",$id)->get();
         foreach($request as $requests)
         $name = $requests->docname;
         //Save file as HTML
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
-        $phpWord = \PhpOffice\PhpWord\IOFactory::load('file/'.$id.'.docx'); 
+        $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$id.'.docx'); 
         $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
         $htmlWriter->save('temp/'.$id.'.html');
 
