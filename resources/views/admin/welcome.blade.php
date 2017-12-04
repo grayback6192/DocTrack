@@ -117,6 +117,11 @@
     #btn-add-nodes { margin-left: 20px; }
   </style>
 
+<select name="org-group" id="group-org">
+      @foreach($groups as $group)
+      <option value="{{$group->group_id}}">{{$group->groupName}}</option>
+      @endforeach
+    </select>
  <div id="chart-container"></div>
   <div id="edit-panel" class="view-state">
     <span id="chart-state-panel" class="radio-panel">
@@ -136,11 +141,6 @@
       <input type="radio" name="node-type" id="rd-child" value="children"><label for="rd-child">Child</label>
       <input type="radio" name="node-type" id="rd-sibling" value="siblings"><label for="rd-sibling">Sibling</label>
     </span>
-    <select name="org-group" id="group-org">
-      @foreach($groups as $group)
-      <option value="{{$group->group_id}}">{{$group->groupName}}</option>
-      @endforeach
-    </select>
     <button type="button" id="btn-add-nodes">Add</button>
     <button type="button" id="btn-delete-nodes">Delete</button>
     <button type="button" id="btn-reset">Reset</button>
