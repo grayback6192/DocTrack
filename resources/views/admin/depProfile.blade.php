@@ -141,6 +141,36 @@
       <div class="m-3">
         <h3>Organizational Chart</h3>
         {{--Org Chart Here--}}
+        @if($deporgchart!=="none")
+          <div id="chart-container">
+            <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.min.js') }}" ></script>
+            <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.mockjax.min.js') }}" ></script>
+            <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.orgchart.min.js') }}" ></script>
+            <script type="text/javascript">
+
+            $(function() {
+                $.mockjax({
+                    url: '/orgchart/initdata',
+                    responseTime: 1000,
+                    contentType: 'application/json',
+                    responseText:   
+                  <?php echo $deporgchart; ?>
+         
+              });
+
+                $('#chart-container').orgchart({
+                  'data' : '/orgchart/initdata',
+                  'depth': 2,
+                  'nodeContent': 'title'
+                });
+
+             });
+          </script>
+
+          </div>
+        @else
+          <a class="btn btn-primary" href="{{route('AddOrgChart')}}">Add Organizational Chart</a>
+        @endif
       </div>
     </div>
   </div>

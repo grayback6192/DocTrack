@@ -28,14 +28,20 @@ class OrgChart extends Controller
         $user = Auth::user();
         $datasourceget= \DB::table('orgchart')->where('group_id','=',$groupid)->select('path')->get();
         // $datasourceget= \DB::table('orgchart')->select('path')->get();
-        foreach ($datasourceget as $datasource) {
-            $orgfile = $datasource->path;
+        if((count($datasourceget))>0){
+
+        	foreach ($datasourceget as $datasource) {
+            	$orgfile = $datasource->path;
+        	}
+        	$file=fopen($orgfile,"r");
+        	$files=fread($file,filesize($orgfile));	
         }
-        $file=fopen($orgfile,"r");
-        $files=fread($file,filesize($orgfile));
+        else
+        	$files="none";
+        
         // return response()->json($datasourceget);
-        return view('admin/read',['files'=>$files,'User'=>$user]);
-        //var_dump($files);
+        //return view('admin/read',['files'=>$files,'User'=>$user]);
+        return $files;
 
     }
 

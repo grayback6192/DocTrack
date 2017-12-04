@@ -6,6 +6,7 @@ use File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Http\Controllers\OrgChart;
 
 
 class Department extends Controller
@@ -48,7 +49,9 @@ class Department extends Controller
         $name = Auth::user(); 
     	$depInfo = DB::table('group')->where(['group_id'=>$depid])->get();
         $subgroups = DB::table('group')->where('group_group_id','=',$depid)->get();
-        return view('admin/depProfile',['depid'=>$depid, 'depinfos'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups]);
+        $orgchart = new OrgChart;
+        $deporgchart = $orgchart->show($depid);
+        return view('admin/depProfile',['depid'=>$depid, 'depinfos'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups, 'deporgchart'=>$deporgchart]);
     }
 
     function showDepInfo($depid)

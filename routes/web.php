@@ -368,7 +368,7 @@ Route::get('/admin/addOrgChart', function () {
 	$departments = \DB::table('group')->where('client_id','=','44079')->get();
 	//$department = \DB::table('group')->get();
     return view('admin/welcome',['groups'=>$departments,'User'=>$user]);
-});
+})->name('AddOrgChart');
 
 Route::get('/admin/addorg','OrgChart@store');
 
