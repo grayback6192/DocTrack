@@ -1,7 +1,10 @@
 @extends('mastertemplate')
+
+
+
 @section('menu')
-<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -47,13 +50,13 @@
                   Archive</span>
               </a>
  </li>
+
 @endsection
 
 @section('main_content')
-
-  <div class="row" style="margin-left: 60px;">
-
-    <script src="{{URL::asset('js/jquery-3.2.1.min.js')}}"></script>
+<div class="container">
+  <div class="media">
+ <script src="{{URL::asset('js/jquery-3.2.1.min.js')}}"></script>
     <script type="text/javascript">
       $(document).ready(function(){
 
@@ -79,7 +82,6 @@
 
       });
     </script>
-
 <script src = "{{ URL::asset("js/tinymce/tinymce.min.js") }}"></script>
 <script>
   tinymce.init({
@@ -91,41 +93,37 @@
 </script>
 
 @if(!isset($title))  
-
-<div style="float:right;margin-left:800px;border: 1px solid black;" id="pos">
-    Positions:
-</div>
 <form method = "post" action = "{{route('CreateTemplate')}}">
 {{csrf_field()}}
-<table>
-<tr>
-  <td>Title:</td><td><input type = "text" placeholder = "Title" name = "title"> <input class="btn btn-primary" type = "submit" value = "Save" name = "submit">&nbsp;&nbsp;<a class="btn btn-primary" href="{{route('AdminTemplate')}}">Back</a></td><br>
-  </tr>
 
-  <tr>
-    <td>Workflow:</td>
-    <td><select name="wf" id="workflow">
+<div class="form-group">
+ Title: <input type = "text" placeholder = "Title" name = "title" class="form-control"> 
+ </div>
+
+<div class="form-group">
+    Workflow:
+    <select name="wf" id="workflow" class="form-control">
       <option value="none">--Select Workflow--</option>
     @foreach($workflow as $flow)
       <option value="{{$flow->w_id}}">{{$flow->workflowName}}</option>
     @endforeach
     </select>
-  </td>
+</div>
 
-  </tr>
-  <tr>
-    <td>Service Owner:</td>
-    <td><select name="group">
+ <div class="form-group"> 
+    Service Owner</td>
+    <select name="group" class="form-control">
       <option value="none">--Select Service Owner--</option>
     @foreach($groups as $group)
       <option value="{{$group->group_id}}">{{$group->groupName}}</option>
     @endforeach
     </select>
-  </td>
-
-  </tr>
-</table><br><br>  
-  <textarea name = "text" id = "textarea"></textarea><br>
+ </div>
+  <textarea name = "text" id = "textarea"></textarea>
+  <div class="btn-group mt-3">
+    <input class="btn btn-primary" type = "submit" value = "Save" name = "submit">
+    <a class="btn btn-primary" href="{{route('AdminTemplate')}}">Back</a><br>
+  </div>
  
 </form> 
 @else
@@ -144,7 +142,15 @@
   <input type = "submit" formaction = "/templateEdit/create" value = "Send" name = "submit">
 </form> 
 
+
+
+
 </div>
 @endif
- 
+<div class="media-body">
+<div id="pos" class="ml-5">
+    Positions:
+</div>
+</div>
+</div>
 @endsection

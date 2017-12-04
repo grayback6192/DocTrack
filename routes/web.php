@@ -47,17 +47,21 @@ Route::get('admin/user/{status}', function($status){
             $users = \DB::table('user')->where('user.status','=',$status)
                     ->join('userpositiongroup as upg','user.user_id','=','upg.user_user_id')
                     ->where('client_id','=',$clientid)
-                    ->get();
+                    ->orderBy('lastname','asc')
+                    //->paginate(7); //change
+                     ->get();
         }
         else if($status=='all')
         {
              $users = \DB::table('user')
                     ->join('userpositiongroup as upg','user.user_id','=','upg.user_user_id')
                     ->where('client_id','=',$clientid)
-                    ->get();
+                    ->orderBy('lastname','asc')
+                     //change
+                     ->get();
         }
 
-        return Response::json($users);
+        return response()->json($users);
 
 })->name('filterStatus');
 
@@ -66,7 +70,6 @@ Route::get('admin/usermanagement/userprofile/{id}','User@show')->name('UserProfi
 Route::post('admin/usermanagement/userprofile/{id}','User@update')->name('Update');
 
 Route::get('admin/usermanagement/userprofile/{id}/edit', 'User@showForEdit')->name('EditProfile');
-
 
 Route::get('admin/usermanagement/adduser', function(){
 	return view('admin/addUser');
@@ -80,6 +83,9 @@ Route::post('admin/usermanagement/depID={depid}', function($depid){
 	$results = DB::table('user')->where(['department_depId'=>$depid])->get();
 	return Response::json($results);
 });
+
+Route::get('admin/user/group/{userid}','User@showUserGroups')->name('UserShowGroups');
+Route::get('admin/user/account/{userid}','User@showUserAccount')->name('UserShowAccount');
 //End User Management
 
 //Department Management
@@ -90,11 +96,12 @@ Route::get('admin/department/status/{status}', function($status){
 $clientid = \Session::get('client');
 
 	if($status=='inactive' || $status=='active')
-		$list = DB::table('group')->where('client_id','=',$clientid)->where(['status'=>$status])->get();
+		$list = DB::table('group')->where('client_id','=',$clientid)->where('status','=',$status)->get();
 	else if($status=='all')
 		$list = DB::table('group')->where('client_id','=',$clientid)->get();
 
-	return Response::json($list);
+	 return Response::json($list);
+	//return Response::json($clientid);
 
 })->name('PostTest');
 
@@ -115,6 +122,9 @@ Route::get('admin/department/add',function(){
 })->name('regDep');
 Route::post('admin/department/add', 'Department@addDep')->name('addDep');
 Route::get('admin/department/{id}','Department@deleteDep')->name('deleteDep');
+
+Route::get('admin/depactive/{depid}','Department@setToActive');
+Route::get('admin/depinactive/{depid}','Department@setToInactive');
 //End Department Management
 
 //roles
@@ -172,7 +182,17 @@ Route::get('admin/assignment/{depid}', function($depid){
 Route::get('admin/assignment/delete/{upgid}','UserPositionGroup@removeAssignment');
 //end role
 
+//template management
+
+// Route::get('admin/template/add', function(){
+// 	return view('admin/addTemplate');
+// })->name('AddTemplate');
+
 Route::post('admin/template', 'Template@addTemplate')->name('SubmitTemplate');
+
+Route::get('admin/template1', 'Template@viewTemplateOwners')->name('viewOwners'); //testUI
+
+Route::get('admin/template/{groupid}', 'Template@viewTemplates')->name('getGroupTemplates'); //new
 
 Route::get('admin/template',function()
 {
@@ -186,7 +206,7 @@ Route::get('admin/template',function()
 	return view("admin/templatepage",["template"=>$template, 'User'=>$user]);
 })->name("AdminTemplate");
 
-Route::get('admin/template/add', function(){
+Route::get('admin/addtemplate', function(){
 	$user = Auth::user();
 	$clientid = \Session::get('client');
 	$usergroup = DB::table('userpositiongroup')->where('user_user_id','=',$user->user_id)->get();
@@ -194,9 +214,10 @@ Route::get('admin/template/add', function(){
 		$group = $ug->client_id;
 	}
 	$workflow = DB::table('workflow')->where('client_id','=',$clientid)->where('status','=','active')->get();
+	// $groups = DB::table('group')->where('group_group_id','=',$group)->where('client_id','=',$clientid)->where('status','=','active')->get();
 	$groups = DB::table('group')->where('client_id','=',$clientid)->where('status','=','active')->get();
-	return view('admin/createTemplate',['User'=>$user, 'workflow'=>$workflow, 'groups'=>$groups]);
-})->name('AddTemplate2');
+	return view('admin/addTemplate',['User'=>$user, 'workflow'=>$workflow, 'groups'=>$groups]);
+})->name('AddTemplate');
 
 Route::get('admin/template/workflow/{wid}',function($wid){
 	$results = \DB::table('workflowsteps as ws')->where('ws.workflow_w_id','=',$wid)
@@ -222,7 +243,7 @@ Route::get('admin/template/upload',function(){
 
 Route::post('admin/template/upload','TemplateController@uploadfile')->name('uploadTemplate');
 
-Route::get("admin/template/edit={id}","TemplateController@editFile");
+Route::get("admin/template/edit/{id}","TemplateController@editFile")->name('openTemplate');
 
 Route::get("admin/template/delete={id}","TemplateController@deleteTemplate");
 
@@ -315,7 +336,7 @@ Route::post("templateEdit/create","TemplateController@addEditedTemplate");
 
 Route::post("/templateInsert/{id}","DocumentController@insertFileVariables")->name("postDoc");
 
-Route::post("/templateView/{id}","DocumentController@viewFile");
+Route::post("/templateView/{id}","DocumentController@viewFile")->name('viewfile');
 
 Route::get("/templateEdit/{id}","TemplateController@editFile");
 
@@ -323,7 +344,7 @@ Route::get('/number','User@countAllApproved');
 
 Route::get("/documentView/{id}","DocumentController@viewdocs")->name('docView');
 
-Route::get("{groupid}/inbox","user@viewInbox")->name('viewInbox');
+ Route::get("user/{groupid}/inbox","user@viewInbox")->name('viewInbox');
 
 Route::post("/approve/{id}","user@approvedoc")->name('approve');
 
@@ -335,4 +356,28 @@ Route::get('track/{id}','user@track')->name('tracking');
 
 Route::get('{gourpid}/complete','user@complete')->name('complete');
 
+//Route::get('test/{sentStatus}','InboxController@filterInbox')->name('filterInbox');
+
+Route::get('/sent/{status}','InboxController@filterSent');
+
+Route::get('/inbox/{status}','InboxController@filterInbox');
+
+//Org Chart
+Route::get('/admin/addOrgChart', function () {
+	$user = Auth::user();
+	$departments = \DB::table('group')->where('client_id','=','44079')->get();
+	//$department = \DB::table('group')->get();
+    return view('admin/welcome',['groups'=>$departments,'User'=>$user]);
+});
+
+Route::get('/admin/addorg','OrgChart@store');
+
+//Route::get("/Fuck","User@test");
+
+//Route::get("/read","orgchartupload@edit");
+
+ Route::get("admin/{groupid}/readOrgChart","OrgChart@show");
+ Route::get('admin/{groupid}/editOrgChart','OrgChart@edit');
+
 //End User
+

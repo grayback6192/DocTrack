@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('AdminTemplate')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -51,9 +51,9 @@
 @endsection
 
 @section('main_content')
-{{-- <script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}" ></script>
+<script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}" ></script>
 
-   <script> 
+   <script type="text/javascript"> 
          $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -63,28 +63,28 @@
       
         $('#useroption').change(function(){
           var value = $(this).val();
-          console.log(value);
+          //console.log(value);
           $.ajax({
             type: 'GET',
             url: 'http://localhost:8000/admin/department/status/'+value,
-            data: value,
             success: function(data){
-              $("#depList").empty();
-              console.log(data);
+               $("#depList").empty();
+              console.log(value);
              
               for(var i=0;i<data.length;i++){
-              var html = "<div class='row' style='margin-left: 60px;'>";
-              var html="<div class='col-sm-6' style='margin-top: 15px;'>";
+              // var html = "<div class='row' style='margin-left: 60px;'>";
+              var html="<div class='col-sm-6' style='margin-top: 15px; text-align:center'>";
               html+="<a href=http://localhost:8000/admin/department/depID="+data[i].group_id+">";
               html+="<div class='card' style='width: 15rem; border:none;'><i class='fa fa-5x fa-building'></i>";
               html+="<div class='card-block'>";
               html+= "<h3 class='card-title' style='margin-top: 1rem;'><h4>"+data[i].groupName+"</h3>";
               html+="</div>";
               html+= "</div></a></div></div>";
-           
-            console.log(html);
+
+              //$html+=data[i].groupName;
             $("#depList").append(html);
           }
+          console.log(data);
             }
           });
         });
@@ -92,7 +92,7 @@
 
       });
 
-  </script> --}}
+  </script>
 
 <div class="row" style="margin-left: 60px;">
 <input type="button" class="btn btn-primary" id="adddep" value="Add Department" onclick="window.location='{{ route('regDep') }}'">
@@ -106,17 +106,19 @@
 </form>
 </div>
 
-<div class="content-div" id="depList">
-<div class="row" style="margin-left: 60px;">
+<div class="content-div">
+<div class="row" style="margin-left: 60px;" id="depList">
 @if(isset($departments))
 @foreach($departments as $department)
- <div class="col-sm-3" style="margin-top: 15px;text-align:center;">
-    <a href="{{route('showDep',['depid'=>$department->group_id])}}"><div class="card" style="width: 15rem; border: none;">
+ <div class="col-sm-6" style="margin-top: 15px;text-align:center;">
+    <a href="{{route('showDep',['depid'=>$department->group_id])}}">
+      <div class="card" style="width: 15rem; border: none;">
        <i class="fa fa-5x fa-building"></i>
       <div class="card-block">
         <h3 class="card-title" style="margin-top: 1rem">{{$department->groupName}}</h3>
       </div>
-    </div></a>
+    </div>
+  </a>
   </div>
 @endforeach
 @endif

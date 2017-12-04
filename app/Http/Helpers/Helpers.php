@@ -2,6 +2,11 @@
 
 //Global methods to be used by other controllers
 
+function getUserUPG($upgid)
+{
+    $userupg = DB::table('userpositiongroup')->where('upg_id','=',$upgid)->get();
+    return $userupg;
+}
 
 function getClientId($userid)
 {
@@ -128,7 +133,7 @@ function insertInbox($docid,$node){
                     ->get();
 
         foreach($send as $sends){
-            DB::table('inbox')->insert(["status"=>"unread",
+            DB::table('inbox')->insert(["istatus"=>"unread",
                                         "user_id"=>$sends->user_id,
                                         "doc_id"=>$sends->document_doc_id,
                                         "time"=>$time,

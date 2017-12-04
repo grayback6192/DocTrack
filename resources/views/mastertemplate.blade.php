@@ -3,24 +3,28 @@
 <head>
   <title>ONCINUE</title>
   <!-- Bootstrap core CSS -->
-    {{-- <link href="../homecss/cssnav/bootstrap.css" rel="stylesheet"> --}}
+  
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/cssnav/bootstrap.css')}}">
      
     <!-- Custom fonts for this template -->
-    {{-- <link href="../homecss/fonts/font-awesome.min.css" rel="stylesheet" type="text/css"> --}}
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/fonts/font-awesome.min.css')}}">
 
     <!-- Plugin CSS -->
-    {{-- <link href="../homecss/datatables/dataTables.bootstrap4.css" rel="stylesheet"> --}}
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/datatables/dataTables.bootstrap4.css')}}">
 
     <!-- Custom styles for this template -->
-    {{-- <link href="../homecss/css/sb-admin.css" rel="stylesheet"> --}}
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/css/sb-admin.css')}}">
+
+    <!--Org Chart-->
+    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/orgchart/css/font-awesome.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/orgchart/css/jquery.orgchart.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/orgchart/css/style.css')}}">
+
+    
 </head>
   <body class="fixed-nav sticky-footer " id="page-top">
-    <nav class="navbar navbar-expand-lg navbar-light bg-dark fixed-top" id="mainNav">
-      <a class="navbar-brand" href="#">DocTrack</a>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white" id="mainNav">
+      <div class="navbar-brand bg-dark" href="#">DocTrack</div>
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -40,7 +44,7 @@
 
         <!-- SIDE MENU BAR -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle mr-lg-2" href="#" id="messagesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle mr-lg-2 top-nav-item" href="#" id="messagesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-fw fa-envelope"></i>
               <span class="d-lg-none">Messages
                 <span class="badge badge-pill badge-primary">12 New</span>
@@ -51,8 +55,9 @@
 
 
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle mr-lg-2" href="javascript:opendrop()" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle mr-lg-2 top-nav-item" href="javascript:opendrop()" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {{-- <input type="button" class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> --}}
+              {{$User->lastname}}
               <i class="fa fa-fw fa-user"></i>
               <span class="d-lg-none">Alerts
                 <span class="badge badge-pill badge-warning">6 New</span>
@@ -60,7 +65,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="alertsDropdown" id="drop">
               <a class="dropdown-item" href="{{route('chooseGroups',['userid'=>$User->user_id])}}">
-                <div class="dropdown-message small">Go to groups list</div>
+                <div class="dropdown-message small">Exit Group</div>
               </a>
             </div>
             <script type="text/javascript">
@@ -72,12 +77,13 @@
             </script>
           </li>
           <li class = "nav-item">
-            <div class="nav-link">{{$User->lastname}} | {{Session::get('upgid')}}</div> {{-- Authentication Name --}}
+           {{--  <div class="nav-link">{{$User->lastname}} | {{Session::get('upgid')}}</div> --}} {{-- Authentication Name --}}
           </li>
           <li class="nav-item">
-            <a href="{{route('Logout')}}" class="nav-link">
+            <a href="{{route('Logout')}}" class="nav-link top-nav-item">
+                Logout
               <i class="fa fa-fw fa-sign-out"></i>
-              Logout</a>
+            </a>
           </li>
         </ul>
       </div>

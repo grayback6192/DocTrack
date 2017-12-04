@@ -17,15 +17,28 @@ class Department extends Controller
             return $clientgroup;
     }
   
-    function viewDep()
+    // function viewDep()           //pls don't delete this function
+    // {
+    //     $name = Auth::user();
+    //     $clients = $this->getClientId($name->user_id);
+    //     foreach ($clients as $client) {
+    //         $clientId = $client->client_id;
+    //     }
+    // 	   $listDep = DB::table('group')->where('client_id','=',$clientId)->where(['status'=>'active'])->orderBy('groupName','asc')->get();
+    //         //$listDep = DB::table('group')->where('group_group_id','=',$clientId)->where(['status'=>'active'])->get();
+        
+    //         return view('admin/depPage',['departments'=>$listDep,'User'=>$name]);
+    //     }
+
+     function viewDep()
     {
         $name = Auth::user();
         $clients = $this->getClientId($name->user_id);
         foreach ($clients as $client) {
             $clientId = $client->client_id;
         }
-    	   $listDep = DB::table('group')->where('client_id','=',$clientId)->where(['status'=>'active'])->get();
-            //$listDep = DB::table('group')->where('group_group_id','=',$clientId)->where(['status'=>'active'])->get();
+            $listDep = DB::table('group')->where('client_id','=',$clientId)->where(['status'=>'active'])->orderBy('groupName','asc')->get();
+            //$listDep = DB::table('group')->where('group_group_id','=',$clientId)->where(['status'=>'active'])->orderBy('groupName','asc')->get();
         
             return view('admin/depPage',['departments'=>$listDep,'User'=>$name]);
         }
@@ -35,7 +48,7 @@ class Department extends Controller
         $name = Auth::user(); 
     	$depInfo = DB::table('group')->where(['group_id'=>$depid])->get();
         $subgroups = DB::table('group')->where('group_group_id','=',$depid)->get();
-        return view('admin/depInfo',['depid'=>$depid, 'dep'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups]);
+        return view('admin/depProfile',['depid'=>$depid, 'depinfos'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups]);
     }
 
     function showDepInfo($depid)
@@ -47,13 +60,14 @@ class Department extends Controller
             $clientId = $client->client_id;
         }
 
-        $motherGroups = DB::table('group')->where('status','=','active')->where('client_id','=',$clientId)->get();
-        return view('admin/depInfoEdit',['depId'=>$depid],
+        $motherGroups = DB::table('group')->where('status','=','active')->where('client_id','=',$clientId)->orderBy('groupName','asc')->get();
+        return view('admin/depProfileEdit',['depId'=>$depid],
                                             ['depInfos'=>$dep, 'User'=>$name, 'motherGroups'=>$motherGroups]);
     }
 
     function editDep($depid)
     {
+        $user = Auth::user();
          $depInfo = request()->all();
 
         if($depInfo['mothergroup']==''){
@@ -138,7 +152,7 @@ class Department extends Controller
            return view('user/addGroup',['groups'=>$listDep,'User'=>$name]);
     }
 
-    function viewServiceOwners($groupid)
+    function viewServiceOwners($groupid) //for user side
     {
         $name = Auth::user();
         $clients = $this->getClientId($name->user_id);
@@ -161,6 +175,20 @@ class Department extends Controller
             return view('user/groups',['departments'=>$deps,'User'=>$name]);
            // echo "<pre>";
            // var_dump($deps);
+        }
+
+        function setToActive($depid)
+        {
+            DB::table('group')->where('group_id','=',$depid)->update(['status'=>'active']);
+
+            return response()->json('successfully updated to active');
+        }
+
+        function setToInactive($depid)
+        {
+            DB::table('group')->where('group_id','=',$depid)->update(['status'=>'inactive']);
+
+            return response()->json('successfully updated to inactive');
         }
 
 }

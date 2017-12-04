@@ -71,7 +71,7 @@
 <input class="btn btn-primary" type = "submit" value = "Create Template" name = "submit">&nbsp;&nbsp;&nbsp;
 {{-- <a class="btn btn-primary" href="{{route('uploadTemplate')}}">Upload Template</a> --}}
 </div>
-</form>
+</form> 
 @endif
 
 {{-- Input Type --}}

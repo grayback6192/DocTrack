@@ -67,10 +67,9 @@ class RegisterUserController extends Controller
      * @return \App\User
      */
     protected function create(array $data)
-    { 
+    {
         $rand = rand(100000,999999);
-        Storage::putFileAs("signature",$data['sign'],$rand.".png");
-        
+         Storage::putFileAs("signature",$data['sign'],$rand.".png");
         $user = User::create([
             'user_id' => $rand,
             'email' => $data['email'],
@@ -82,6 +81,7 @@ class RegisterUserController extends Controller
             'signature'=>"signature/".$rand.".png",
             'status'=> 'Active',
         ]);
+            
         $businessKey = \DB::table("group")->where("businessKey","=",$data['business'])->get();
 
         foreach($businessKey as $businessKeys)

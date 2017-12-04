@@ -37,7 +37,7 @@ class RegisterController extends Controller
      * @return void
      */
 
-public function showRegistrationForm()
+    public function showRegistrationForm()
     {
         $sub = \DB::table("subscription")->get();
         return view('registerclient',["subscription"=>$sub]);

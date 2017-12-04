@@ -41,14 +41,11 @@ class LoginController extends Controller
     {
         return "email";
     }
-    public function getBusinessKey()
-    {
-        return response()->json("Data"); //Ajax Test
-    }
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
     }
+    
     protected function redirectTo()
     {
         $id = Auth::user();
@@ -73,6 +70,12 @@ class LoginController extends Controller
             return $redirect;
         }
     }
+
+    public function getBusinessKey()
+    {
+        return response()->json("Data"); //Ajax Test
+    }
+    
     public function logout(Request $request)
     {
         $this->guard()->logout();

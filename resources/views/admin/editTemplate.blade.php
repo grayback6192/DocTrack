@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('AdminTemplate')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -62,6 +62,7 @@ tinymce.init({
 });
 </script>
 
+<div class="container">
 <div class="row" style="margin-left: 60px;">
 @if(!isset($title))
 <form method = "post" action = "create">
@@ -81,6 +82,12 @@ tinymce.init({
 {{-- {{ $content }} --}}
 <form method = "post">
 {{csrf_field()}}
+<div class="row justify-content-end mr-2">
+ <label class="switch">
+    <input type="checkbox" name="userstatus" checked>
+    <span class="slider round"></span>
+  </label>
+</div>
 <table>
 <tr>
   <td>Title:</td><td><input type = "text" value = "{{ $title }}" placeholder = "Title" name = "title"></td>
@@ -117,9 +124,12 @@ tinymce.init({
 </table>
   <textarea name = "text" id = "textarea">{{ $content }}</textarea>
   <input class="btn btn-primary" type = "submit" formaction = "/admin/templateEdit/create/{{$tempid}}" value = "Save" name = "submit">&nbsp;&nbsp;&nbsp;
-  <a class="btn btn-primary" href="{{route('AdminTemplate')}}">Back</a>
+  @foreach($tempInfos as $tempInfo)
+  <a class="btn btn-primary" href="{{route('getGroupTemplates',['groupid'=>$tempInfo->group_group_id])}}">Back</a>
+  @endforeach
 </form> 
 </div>
 @endif
+</div>
 
 @endsection

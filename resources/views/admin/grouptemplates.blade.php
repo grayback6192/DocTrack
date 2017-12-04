@@ -1,7 +1,9 @@
 @extends('mastertemplate')
 
+
+
 @section('menu')
- <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
               <a class="nav-link" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
@@ -33,7 +35,7 @@
               </a>
  </li>
 
- <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+ <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
               <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
@@ -52,61 +54,44 @@
 @endsection
 
 @section('main_content')
+<div class="container">
+    <div class="row justify-content-start ml-2">
+      <a class="btn btn-primary" href="{{route('viewOwners')}}">Back</a>
+    </div>
+  <div class="row" style="margin-left: 60px; margin-top: 20px;">
+    @if(isset($templates))
+      @foreach($templates as $template)
+        <div class="col-sm-6" style="margin-top: 15px;">
+            <a href="{{route('openTemplate',['id'=>$template->template_id])}}"><div class="card" style="width: 15rem; border: none;">
+            <i class="fa fa-5x fa-file-o"></i>
+          <div class="card-block">
+            <h3 class="card-title" style="margin-top: 1rem">{{$template->templatename}}</h3>
+          </div>
+        </div></a>
+        </div>
+      @endforeach
+    @endif
 
+    {{-- Input Type --}}
+@if(isset($variable))
+<form method = "post">
+<object data="../pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350" style = "float:right"></object><br>
+{{ csrf_field() }}
+@foreach($variable as $variables)
+<input type = "text" name = "{{ $variables }}" placeholder = "{{ $variables }}"><br>
+@endforeach
+<!-- UI na langg ug further testing XD -->
+@for($i=0;$i<(count($var));$i++)
+@for($j=0;$j<(count($i));$j++)
+{{$var[$i][$j]['ws_id']}}
+@endfor
+@endfor
+<br><br>
+<input type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
+<input type = "submit" formaction = '/templateView/{{ $id->template_id }}' value = "View">
 
-<div class="mr-2 row justify-content-end">
-
-<script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}" ></script>
-<script type="text/javascript" src="{{ URL::asset('js/doctrack.js') }}" ></script>
-
-{{--Dropdown filter--}}
-<form id="choice" name="choice">
-<input type="hidden" name="_token" value="{{csrf_token()}}">
-     <select id="status" name="dept" class="form-control">
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-        <option value="all">All</option>
-  </select> 
-   </form>
-
-   {{--Search Bar--}}
-   <div class="col-sm-6">
-    <form class="ml-1" action="#" method="post">
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search user..." name="search">
-        <span class="input-group-btn">
-          <input type="submit" name="searchuser" class="btn btn-primary" value="Search">
-        </span>
-      </div> 
-    </form>
-   </div>
-</div>
-
-{{--Users List--}}
-<div class="content-div mr-2 mt-3">
-    <table class="table" id="users-table">
-        <thead class="thead-default">
-            <tr>
-    	       <th>Last Name</th>
-    	       <th>First Name</th>
-    	       <th colspan="2">Actions</th>
-            </tr>
-    </thead>
-    <tbody>
-      @foreach ($users as $user) 
-            <tr>
-            <td>{{$user->lastname}}</td>
-            <td>{{$user->firstname}}</td>
-            <td><a href="{{route('UserProfile',['id' => $user->user_id])}}">View</a></td>
-            <td><a href="{{route('Delete',['id' => $user->user_id])}}">Delete</a></td>
-            </tr>
-        @endforeach
-    </tbody>
- 
-      
-  
-    </table><br>
-    {{$users->links()}}
+</form>
+@endif
   </div>
-
+</div>
 @endsection

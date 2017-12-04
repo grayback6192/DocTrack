@@ -23,7 +23,7 @@ class Role extends Controller
          foreach ($clients as $client) {
             $clientId = $client->client_id;
         }
-    	$roles = DB::table('position')->where('status','=','active')->where('client_id','=',$clientId)->get();
+    	$roles = DB::table('position')->where('status','=','active')->where('client_id','=',$clientId)->paginate(5);
         $deps = DB::table('group')->get();
 
     	return view('admin/roleView',['roles'=>$roles,'deps'=>$deps, 'User'=>$user]);

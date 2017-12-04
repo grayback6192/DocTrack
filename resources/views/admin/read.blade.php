@@ -1,3 +1,4 @@
+
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
@@ -8,8 +9,8 @@
               </a>
  </li>
 
- <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{'viewDep',['status'=>'active']}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -32,7 +33,7 @@
               </a>
  </li>
 
- <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
               <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
@@ -47,75 +48,32 @@
                   Archive</span>
               </a>
  </li>
+
 @endsection
 
 @section('main_content')
+<div id="chart-container"></div>
+ <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.min.js') }}" ></script>
+ <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.mockjax.min.js') }}" ></script>
+ <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.orgchart.min.js') }}" ></script>s
+  <script type="text/javascript">
 
-<div class="row" style="margin-left: 60px;">
+    $(function() {
+          $.mockjax({
+        url: '/orgchart/initdata',
+        responseTime: 1000,
+        contentType: 'application/json',
+        responseText:   
+          <?php echo $files; ?>
+         
+      });
 
-<script src = "{{ URL::asset("js/tinymce/tinymce.min.js") }}"></script>
-<script>
-tinymce.init({
-  selector: "#textarea",
-  branding:false,
-  height:350,
-  width:750
-});
-</script>
+      $('#chart-container').orgchart({
+        'data' : '/orgchart/initdata',
+        'depth': 2,
+        'nodeContent': 'title'
+      });
 
-@if(!isset($title))
-<form method = "post" action = "{{route('uploadTemplate')}}" enctype="multipart/form-data">
-{{csrf_field()}}
-<table>
-<tr>
-  <td>Title:</td><td><input type = "text" placeholder = "Title" name = "title"> <input class="btn btn-primary" type = "submit" value = "Save" name = "submit">&nbsp;&nbsp;<a class="btn btn-primary" href="{{route('AdminTemplate')}}">Back</a></td><br>
-  </tr>
-  <tr>
-    <td>Workflow:</td>
-    <td><select name="wf">
-    @foreach($workflow as $flow)
-      <option value="{{$flow->w_id}}">{{$flow->workflowName}}</option>
-    @endforeach
-    </select>
-  </td>
-
-  </tr>
-  <tr>
-    <td>Group:</td>
-    <td><select name="group">
-    @foreach($groups as $group)
-      <option value="{{$group->group_id}}">{{$group->groupName}}</option>
-    @endforeach
-    </select>
-  </td>
-
-  </tr>
-</table>
-  
-<br>
-<br>
-  <input type="file" name="UploadFile">
-  
-</form> 
-@else
-{{ $content }}
-<form method = "post" enctype="multipart/form-data">
-{{csrf_field()}}
-<table>
-<tr>
-  <td>Title:</td><td><input type = "text" value = "{{ $title }}" placeholder = "Title" name = "title"></td>
-  </tr>
-  <tr>
-  <td>Subject:</td><td><input type = "text" placeholder = "Subject" name = "subject"></td>
-  </tr>
-</table>
-  <input type="file" name="uploadFile">
-  <br>
-  <br>
-  <input type = "submit" formaction = "/templateEdit/create" value = "Send" name = "submit">
-</form> 
-</div>
-@endif
-
-
+    });
+  </script>
 @endsection

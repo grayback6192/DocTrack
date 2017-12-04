@@ -62,7 +62,8 @@ class TemplateController extends Controller
 	                                      "groups"=>$groups,
 	                                      "wid"=>$wid,
 	                                      "gid"=>$gid,
-	                                      "tempid"=>$id]);
+	                                      "tempid"=>$id,
+                                          "tempInfos"=>$request]);
     }
 
     public function addEditedTemplate($tempid) //Template Creation, Post
@@ -119,7 +120,7 @@ class TemplateController extends Controller
         $dompdf->render();
         $output = $dompdf->output();
         file_put_contents("pdf/".$title.".pdf", $output);
-        return redirect()->route("AdminTemplate");
+        return redirect()->route("viewOwners"); //pls change
     }
     public function uploadfile(Request $request)
     {

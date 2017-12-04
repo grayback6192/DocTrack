@@ -96,11 +96,6 @@ class WorkflowStepsController extends Controller
         //return $p;
     }
 
-    public function changeOrder($wsid,$wfid)
-    {
-        
-    }
-
     public function setPrev($wsid,$wfid) //transfer
     {
         $prev = array();
