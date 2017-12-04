@@ -110,6 +110,7 @@ class DocumentController extends Controller
      {
         $upgid = $request->session()->get('upgid');
         $user = Auth::user();
+        $authSignature = $user->signature;
         $userid = $user->user_id;
         $upg_user = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$upgid)
                                                          ->where('upg.user_user_id','=',$userid)
@@ -120,28 +121,25 @@ class DocumentController extends Controller
                                              ->where("t.status","=","approved")
                                              ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
                                              ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
+                                             ->join("user as u","upg.user_user_id","=","u.user_id")
                                              ->get(); //Added
         $position = DB::table("position")->get();
 
         $upg= session()->get('upgid');
 
 
-
-        $templateProcessorOld = new \PhpOffice\PhpWord\TemplateProcessorOld('file/'.$id.'.docx');
-        $templateProcessorOld->saveAs('file/'.$id.'.docx');
-
         $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$id.'.docx');
         $variable = $templateProcessor->getVariables();
 
-        foreach($variable as $variables)
+        foreach($signature as $signatures)
         {
-            foreach($signature as $signatures)
+            foreach($variable as $variables)
             {
                 if($variables == $signatures->posName)
                 {
                     $templateProcessor->setImg($variables, [
-                                                          "src"=>"splash.png",
-                                                          "swh"=>"100"
+                                                          "src"=>"signature/".$signatures->user_id.".png",
+                                                          "swh"=>"150"
                                                          ]);
                 }
             }
@@ -182,6 +180,5 @@ class DocumentController extends Controller
         \DB::table('inbox')->where('doc_id','=',$id)->where('user_id','=',$recid)->update(['status'=>'read']);
 
         return view("user/viewDocs",["pdf"=>$id, 'User'=>$user, 'status'=>$status, 'time'=>$time, 'date'=>$date]);
-        
     }
 }

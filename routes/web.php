@@ -172,11 +172,6 @@ Route::get('admin/assignment/{depid}', function($depid){
 Route::get('admin/assignment/delete/{upgid}','UserPositionGroup@removeAssignment');
 //end role
 
-//template management
-// Route::get('admin/template/add', function(){
-// 	return view('admin/addTemplate');
-// })->name('AddTemplate');
-
 Route::post('admin/template', 'Template@addTemplate')->name('SubmitTemplate');
 
 Route::get('admin/template',function()
@@ -199,7 +194,6 @@ Route::get('admin/template/add', function(){
 		$group = $ug->client_id;
 	}
 	$workflow = DB::table('workflow')->where('client_id','=',$clientid)->where('status','=','active')->get();
-	// $groups = DB::table('group')->where('group_group_id','=',$group)->where('client_id','=',$clientid)->where('status','=','active')->get();
 	$groups = DB::table('group')->where('client_id','=',$clientid)->where('status','=','active')->get();
 	return view('admin/createTemplate',['User'=>$user, 'workflow'=>$workflow, 'groups'=>$groups]);
 })->name('AddTemplate2');

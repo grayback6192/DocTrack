@@ -26,7 +26,7 @@ class User extends Controller
          return view("user/test",['inbox'=>$inbox,'User'=>$user]);
                    // return $groupid;
     }
-   
+    
     public function approvedoc($docid){
         date_default_timezone_set('Asia/Manila');
         $user = Auth::user();
@@ -77,39 +77,6 @@ class User extends Controller
                 //..codes
                  $poss= session()->get('upgid');
 $docs = DB::table("document")->where('doc_id','=',$docid)->get();
-
-    foreach ($docs as $doc) {
-       $low = new\PhpOffice\PhpWord\PhpWord();
-       $section =   $low->addSection();
-       $section->addText('${Chairman}');
-       $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$doc->doc_id.'.docx');
-       }
-       $signing= DB::table('userpositiongroup')->where('userpositiongroup.upg_id','=',$poss)
-                                               ->join('position','userpositiongroup.position_pos_id','=','position.pos_id')
-                                               ->get();
-            
-foreach($signing as $signs){
-    $name=$signs->posName;
-}
-$variable=$templateProcessor->getVariables();
-
-$user = DB::table('user')->where('user_id','=',Auth::user()->user_id)->get();
-foreach ($user as $value) {
-    $sign = $value->signature;
-    $compname = $value->lastname.", ".$value->firstname;
-}
-$signblock = $sign."<br>".$compname;
-foreach($variable as $variables)
-        {
-            if($variables == $name){
-                $templateProcessor->setValue($name, "".$sign." ".Auth::user()->lastname.", ".Auth::user()->firstname);
-           }
-}
-//mao ni ang file ang output
-$templateProcessor->saveAs('file/'.$docid.'.docx');
-               
-
-
                 
 
            $allnxt = $this->countAllNext($docid,$nexts);
