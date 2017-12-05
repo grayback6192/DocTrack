@@ -49,9 +49,14 @@ class Department extends Controller
         $name = Auth::user(); 
     	$depInfo = DB::table('group')->where(['group_id'=>$depid])->get();
         $subgroups = DB::table('group')->where('group_group_id','=',$depid)->get();
+
+        //get org chart file only
         $orgchart = new OrgChart;
         $deporgchart = $orgchart->show($depid);
-        return view('admin/depProfile',['depid'=>$depid, 'depinfos'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups, 'deporgchart'=>$deporgchart]);
+
+        //get org chart info
+        $orgchartInfos = DB::table('orgchart')->where('group_id','=',$depid)->get();
+        return view('admin/depProfile',['depid'=>$depid, 'depinfos'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups, 'deporgchart'=>$deporgchart, 'orgchartInfos'=>$orgchartInfos]);
     }
 
     function showDepInfo($depid)

@@ -63,16 +63,7 @@
     <div class="card border-0" style="width: 60rem">
        <div class="card-block">
         <div class="row justify-content-end mr-2">
-          <div class="fa fa-2x mt-2 mr-3">
-          <label class="switch">
-            <input type="checkbox" name="userstatus" id="depSlider" <?php 
-                                                                      if($depinfo->status=="active")
-                                                                        echo "checked";
-                                                                      else
-                                                                        echo "";
-                                                                       ?>>
-            <span class="slider round"></span>
-          </label>
+        
 
            <script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}" ></script>
   <script type="text/javascript">
@@ -106,7 +97,7 @@
 
   </script>
 
-          </div>
+         
           <a href="{{route('deleteDep',['id'=>$depinfo->group_id])}}"><i class="fa fa-trash fa-2x mt-2" data-toggle="collapse" data-placement="right" title="Delete"></i></a>
           <a href="{{route('editDep',['id'=>$depinfo->group_id])}}"><i class="fa fa-cogs fa-2x mt-2 ml-3" data-toggle="collapse" data-placement="right" title="Edit"></i></a>
         </div>
@@ -139,7 +130,16 @@
       </div>
 
       <div class="m-3">
-        <h3>Organizational Chart</h3>
+        <div class="row justify-content-between">
+          <div class="ml-3">
+            <h3>Organizational Chart</h3>
+          </div>
+          <div class="mr-5">
+            @foreach($orgchartInfos as $orgchartInfo)
+            <a class="btn btn-primary" href="{{route('editOrgChart',['groupid'=>$orgchartInfo->group_id])}}">Edit</a>
+            @endforeach
+          </div>
+        </div>
         {{--Org Chart Here--}}
         @if($deporgchart!=="none")
           <div id="chart-container">
