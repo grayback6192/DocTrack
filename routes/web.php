@@ -363,12 +363,12 @@ Route::get('/sent/{status}','InboxController@filterSent');
 Route::get('/inbox/{status}','InboxController@filterInbox');
 
 //Org Chart
-Route::get('/admin/addOrgChart', function () {
+Route::get('/admin/addOrgChart/{groupid}', function ($groupid) {
 	$user = Auth::user();
 	$clientid = Session::get('client');
 	$departments = \DB::table('group')->where('client_id','=',$clientid)->where('status','=','active')->get();
 	//$department = \DB::table('group')->get();
-    return view('admin/welcome',['groups'=>$departments,'User'=>$user]);
+    return view('admin/welcome',['groups'=>$departments,'User'=>$user,'groupid'=>$groupid]);
 })->name('AddOrgChart');
 
 Route::get('/admin/addorg','OrgChart@store');

@@ -61,7 +61,7 @@
       @endforeach
     </div>
 
-    <div class="container">
+    <div class="container mt-3">
 
       <style type="text/css">
     #chart-container { background-color: #eee; height: 300px; }

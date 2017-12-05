@@ -169,7 +169,7 @@
 
           </div>
         @else
-          <a class="btn btn-primary" href="{{route('AddOrgChart')}}">Add Organizational Chart</a>
+          <a class="btn btn-primary" href="{{route('AddOrgChart',['groupid'=>$depid])}}">Add Organizational Chart</a>
         @endif
       </div>
     </div>

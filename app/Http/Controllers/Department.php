@@ -56,7 +56,7 @@ class Department extends Controller
 
         //get org chart info
         $orgchartInfos = DB::table('orgchart')->where('group_id','=',$depid)->get();
-        return view('admin/depProfile',['depid'=>$depid, 'depinfos'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups, 'deporgchart'=>$deporgchart, 'orgchartInfos'=>$orgchartInfos]);
+        return view('admin/depProfile',['depid'=>$depid, 'depinfos'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups, 'deporgchart'=>$deporgchart, 'orgchartInfos'=>$orgchartInfos,'depid'=>$depid]);
     }
 
     function showDepInfo($depid)

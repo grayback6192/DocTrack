@@ -53,6 +53,11 @@
 @endsection
 
 @section('main_content')
+
+ <div class="row justify-content-start mt-2 ml-2">
+      <a class="btn btn-primary" href="{{route('showDep',['id'=>$groupid])}}">Back</a>
+    </div>
+
 <style type="text/css">
     #chart-container { background-color: #eee; height: 300px; }
     .orgchart { background: #fff; }
@@ -117,9 +122,13 @@
     #btn-add-nodes { margin-left: 20px; }
   </style>
 
-<select name="org-group" id="group-org">
+  <select name="org-group" id="group-org">
       @foreach($groups as $group)
+      @if($group->group_id==$groupid)
+      <option value="{{$group->group_id}}" selected>{{$group->groupName}}</option>
+      @else
       <option value="{{$group->group_id}}">{{$group->groupName}}</option>
+      @endif
       @endforeach
     </select>
  <div id="chart-container"></div>
