@@ -19,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/css/sb-admin.css')}}">
 </head>
   <body class="fixed-nav sticky-footer " id="page-top">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top" id="mainNav">
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark fixed-top" id="mainNav">
       <a class="navbar-brand" href="#" style="color:black;">DocTrack</a>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">

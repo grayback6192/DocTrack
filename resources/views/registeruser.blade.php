@@ -114,6 +114,8 @@
 </label>
 												</div>
 												<div class="form-group">
+													{{-- <label>Signature code<small>(required)</small></label>
+													<input name="sign" type="text" class="form-control" placeholder="Signature Code" value="<?php echo str_random(5); ?>"> --}}
 													<label>Signature<small> (required)</small></label>
 													<input name="sign" accept = "image/x-png, image/jpeg" type="file" class="form-control" placeholder="Signature">
 
