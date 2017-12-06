@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Dompdf\Dompdf;
 use Session;
 use App\Http\Controllers\User;
+use \CloudConvert\Api;
 
 class DocumentController extends Controller
 {
@@ -139,7 +140,7 @@ class DocumentController extends Controller
                 if($variables == $signatures->posName)
                 {
                     $templateProcessor->setImg($variables, [
-                                                         "src"=>"signature/".$signatures->signature,
+                                                         "src"=>$signatures->signature,
                                                         //"src"=>"{{url('./signature/'.$signatures->signature)}}",
                                                           "swh"=>"150"
                                                          ]);
@@ -157,18 +158,33 @@ class DocumentController extends Controller
         foreach($request as $requests)
         $name = $requests->docname;
         //Save file as HTML
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
-        $phpWord = \PhpOffice\PhpWord\IOFactory::load('file/'.$id.'.docx'); 
-        $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
-        $htmlWriter->save('temp/'.$id.'.html');
+        // $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        // $phpWord = \PhpOffice\PhpWord\IOFactory::load('file/'.$id.'.docx'); 
+    // $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
+        // $htmlWriter->save('temp/'.$id.'.html');
+
+        $api = new Api("F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw");
+
+        $api->convert
+        ([
+            'inputformat' => 'docx',
+            'outputformat' => 'pdf',
+            'input' => 'upload',
+            'file' => fopen('temp/'.$id.'.docx', 'r'),
+        ])
+        ->wait()
+        ->download('temp/'.$id.'.pdf');
+
+
+
 
         //View using DOMPDF
-        $dompdf = new Dompdf();
-        $dompdf->set_option("chroot","temp/");
-        $dompdf->load_html_file('temp/'.$id.'.html');
-        $dompdf->render();
-        $output = $dompdf->output();
-        file_put_contents("temp/".$id.".pdf", $output);
+        // $dompdf = new Dompdf();
+        // $dompdf->set_option("chroot","temp/");
+        // $dompdf->load_html_file('temp/'.$id.'.html');
+        // $dompdf->render();
+        // $output = $dompdf->output();
+        // file_put_contents("temp/".$id.".pdf", $output);
 
         // see if document has been approved
         $approved = DB::table('transaction')->where('upg_id','=',$upgid)->where('document_doc_id','=',$id)

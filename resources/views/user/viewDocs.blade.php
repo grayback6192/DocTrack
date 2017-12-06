@@ -30,7 +30,7 @@
 </div>
 
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
-  <input type="button" class="btn btn-primary" id="back" value="Back" onclick="window.location='{{route('viewInbox',['groupid'=>Session::get('groupid')])}}'">&nbsp;&nbsp;&nbsp;
+  <input type="button" class="btn btn-primary" id="back" value="Back" onclick="window.location='{{route('viewInbox',['groupid'=>Session::get('groupid')])}}'">
   <input type="button" class="btn btn-primary" id="back" value="Download" onclick="window.location='/temp/{{$pdf}}.docx'">
 </div>
 @foreach($docInfos as $docInfo)
