@@ -324,7 +324,7 @@ var getdex = function(){
    // $('#btn-save').after('<pre>').next().append(JSON.stringify(hierarchy, null, 2));
    var res= JSON.stringify(hierarchy,null,2);
    $('#result').html(res);
-  var blob = new Blob([res], {type: "text/plain"});
+  // var blob = new Blob([res], {type: "text/plain"});
   var group = $('#group-org').val();
   // saveAs(blob, filename+".txt");
   // var request = $.get('/uploadorgchart');
