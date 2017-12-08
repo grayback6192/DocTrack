@@ -1,9 +1,10 @@
-
-
 @extends('mastertemplate')
+
+
+
 @section('menu')
-<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -53,12 +54,16 @@
 @endsection
 
 @section('main_content')
-
- <div class="row justify-content-start mt-2 ml-2">
-      <a class="btn btn-primary" href="{{route('showDep',['id'=>$groupid])}}">Back</a>
+<div class="container">
+  <div class="row justify-content-start mt-2 ml-2">
+    @foreach($readchart as $data)
+      <a class="btn btn-primary" href="{{route('showDep',['id'=>$data->group_id])}}">Back</a>
+      @endforeach
     </div>
 
-<style type="text/css">
+    <div class="container mt-3">
+
+      <style type="text/css">
     #chart-container { background-color: #eee; height: 300px; }
     .orgchart { background: #fff; }
     .orgchart.view-state .edge { display: none; }
@@ -122,16 +127,19 @@
     #btn-add-nodes { margin-left: 20px; }
   </style>
 
+
+      @foreach($readchart as $rc)
   <select name="org-group" id="group-org">
       @foreach($groups as $group)
-      @if($group->group_id==$groupid)
+      @if($group->group_id==$rc->group_id)
       <option value="{{$group->group_id}}" selected>{{$group->groupName}}</option>
       @else
       <option value="{{$group->group_id}}">{{$group->groupName}}</option>
       @endif
       @endforeach
     </select>
- <div id="chart-container"></div>
+    @endforeach
+  <div id="chart-container"></div>
   <div id="edit-panel" class="view-state">
     <span id="chart-state-panel" class="radio-panel">
       <input type="radio" name="chart-state" id="rd-view" value="view" checked="true"><label for="rd-view">View</label>
@@ -153,32 +161,19 @@
     <button type="button" id="btn-add-nodes">Add</button>
     <button type="button" id="btn-delete-nodes">Delete</button>
     <button type="button" id="btn-reset">Reset</button>
-    <button type="button" id="btn-saves">Save</button>
+    <button type="button" id="btn-save">Save</button>
   </div>
   
-  {{-- <script type="text/javascript" src="{{url('')}}js/jquery.min.js"></script> --}}
   <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.min.js') }}"></script>
-  {{-- <script type="text/javascript" src="js/html2canvas.min.js"></script> --}}
   <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/html2canvas.min.js') }}"></script>
-  {{-- <script type="text/javascript" src="js/jquery.orgchart.js"></script> --}}
   <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.orgchart.js') }}"></script>
   <script type="text/javascript">
-    $(function() {
+     $(function() {
 
-    var datascource = {
-      'name': 'President',
-    };
+    var datascource = <?php
+    echo $files;
+    ?>;
 
-var getdex = function(){
-  $.ajax({
-       url : 'serv.php', // my php file
-       type : 'GET', // type of the HTTP request
-       success : function(result){ 
-          var obj = jQuery.parseJSON(result);
-          console.log(obj);
-       }
-    });
-};
     var getId = function() {
       return (new Date().getTime()) * 1000 + Math.floor(Math.random() * 1001);
     };
@@ -327,46 +322,34 @@ var getdex = function(){
       $('#node-type-panel').find('input').prop('checked', false);
     });
 
- $('#btn-saves').on('click', function() {
+ $('#btn-save').on('click', function() {
   var filename= Math.floor(Math.random() * 10000);
+
    var hierarchy = oc.getHierarchy();
    // $('#btn-save').after('<pre>').next().append(JSON.stringify(hierarchy, null, 2));
    var res= JSON.stringify(hierarchy,null,2);
    $('#result').html(res);
-  // var blob = new Blob([res], {type: "text/plain"});
   var group = $('#group-org').val();
   // saveAs(blob, filename+".txt");
   // var request = $.get('/uploadorgchart');
   $.ajax({
-    url:'/admin/addorg',
-    method:'GET',
+    url:'/admin/updateOrgChart',
+    type:'GET',
     data:{id:res,
           group_id: group},
-    success:function(data)
-    {
-      console.log(data);
-    }
-   
+   success: function(data)
+   {
+    console.log(data);
+   }
   });
 });
 
 
 
-
-// $('#btn-save').on('click', function () {
-//         $('pre').empty();
-//             var hierarchy = $('#chart-container').orgchart('getHierarchy');
-//             var tree = JSON.stringify(hierarchy, null, 2);
-//             $.ajax({
-//                 type: "POST",
-//                 url: "chart.html?tree=" + tree,
-//                 success: function (data) {
-//                 },
-//                 dataType: "json",
-//                 traditional: true
-//             });
     });
 
 
   </script>
+    </div>
+</div>
 @endsection

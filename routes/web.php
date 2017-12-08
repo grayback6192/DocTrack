@@ -363,21 +363,19 @@ Route::get('/sent/{status}','InboxController@filterSent');
 Route::get('/inbox/{status}','InboxController@filterInbox');
 
 //Org Chart
-Route::get('/admin/addOrgChart', function () {
+Route::get('/admin/addOrgChart/{groupid}', function ($groupid) {
 	$user = Auth::user();
-	$departments = \DB::table('group')->where('client_id','=','44079')->get();
+	$clientid = Session::get('client');
+	$departments = \DB::table('group')->where('client_id','=',$clientid)->where('status','=','active')->get();
 	//$department = \DB::table('group')->get();
-    return view('admin/welcome',['groups'=>$departments,'User'=>$user]);
+    return view('admin/welcome',['groups'=>$departments,'User'=>$user,'groupid'=>$groupid]);
 })->name('AddOrgChart');
 
 Route::get('/admin/addorg','OrgChart@store');
 
-//Route::get("/Fuck","User@test");
-
-//Route::get("/read","orgchartupload@edit");
-
- Route::get("admin/{groupid}/readOrgChart","OrgChart@show");
- Route::get('admin/{groupid}/editOrgChart','OrgChart@edit');
+ Route::get("admin/readOrgChart/{groupid}","OrgChart@show");
+ Route::get('admin/editOrgChart/{groupid}','OrgChart@edit')->name('editOrgChart');
+ Route::get('/admin/updateOrgChart','OrgChart@update');
 
 //End User
 
