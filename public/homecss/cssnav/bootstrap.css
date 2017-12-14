@@ -1558,18 +1558,8 @@ pre code {
   background-image: none;
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-}
-
-.form-blank /*new*/
-{
-  border-color: white!important;
-  border-bottom: 2px solid black !important;
-}
-
-.form-blank:focus /*new*/
-{
-  border-bottom-color: blue!important;
 }
 
 .form-control::-ms-expand {
