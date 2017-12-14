@@ -1,0 +1,13 @@
+{
+  "name": "President",
+  "children": [
+    {
+      "name": "Vice President Finance",
+      "children": [
+        {
+          "name": "Treasurer"
+        }
+      ]
+    }
+  ]
+}

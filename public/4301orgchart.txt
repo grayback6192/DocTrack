@@ -1,0 +1,14 @@
+{
+  "name": "President",
+  "children": [
+    {
+      "name": "VP-Welfare"
+    },
+    {
+      "name": "VP-Academics"
+    },
+    {
+      "name": "VP-Finance"
+    }
+  ]
+}
