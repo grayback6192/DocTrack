@@ -1,21 +1,21 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Send File</span>
               </a>
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Inbox</span>
               </a>
  </li>
 
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Sent</span>
               </a>
@@ -39,7 +39,7 @@
 @if(isset($template))
 <div class="container">
 <div class="row justify-content-start ml-2 mb-2">
-  <a class="btn btn-primary" href="{{route('serviceowners',['groupid'=>Session::get('groupid')])}}">  Back</a>
+  <a class="btn btn-primary" href="{{route('serviceowners',['upgid'=>$upgid])}}">  Back</a>
   </div>
 {{-- <div class="row justify-content-center mr-4 ml-2">
 <table class="table">
@@ -59,7 +59,7 @@
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
       @foreach($template as $templates)
         <div class="col-sm-6" style="margin-top: 15px;">
-            <a href="/templateInput/{{ $templates->template_id }}"><div class="card" style="width: 15rem; border: none;">
+            <a href="/user/{{$upgid}}/send/{{$gid}}/templateInput/{{ $templates->template_id }}"><div class="card" style="width: 15rem; border: none;">
             <i class="fa fa-5x fa-file-o"></i>
           <div class="card-block">
             <h3 class="card-title" style="margin-top: 1rem">{{$templates->templatename}}</h3>
@@ -74,7 +74,7 @@
 @if(isset($variable))
 <div class="container">
 <div class="row justify-content-start ml-2">
-    <a class="btn btn-primary" href="{{route('Template',['gid'=>Session::get('groupid')])}}">Back</a>
+    <a class="btn btn-primary" href="{{route('Template',['upgid'=>$upgid,'gid'=>$gid])}}">Back</a>
 </div>
 <div class="media">
 <div class="row justify-content-center mr-4 ml-2">
@@ -112,7 +112,7 @@ function closeInstructions()
 </script>
 
 <div style="float:right;margin-left: 290px;"> 
-<object data="../pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350" style="float: right;"></object><br>
+<object data="/pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350" style="float: right;"></object><br>
 </div>
 </div>
 

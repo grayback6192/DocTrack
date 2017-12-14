@@ -1,14 +1,27 @@
 @extends('mastertemplate')
+<script
+  src="https://code.jquery.com/jquery-1.11.2.min.js"
+  integrity="sha256-Ls0pXSlb7AYs7evhd+VLnWsZ/AqEHcXBeMZUycz/CcA="
+  crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css"
+        href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css" />
+    <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#inbox-table').DataTable();
+        });
+    </script>
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Send File</span>
               </a>
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <div class="row justify-content-between ml-1 mr-2">
                 <span class="nav-link-text">
                   Inbox</span>
@@ -22,7 +35,7 @@
  </li>
 
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Sent</span>
               </a>
@@ -45,7 +58,6 @@
   </select>
 </form>
 
-<script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}"></script>
 <script type="text/javascript">
   $.ajaxSetup({
     headers: {
@@ -83,8 +95,9 @@
 
 </div>
 
-<div class="row justify-content-center mr-2 ml-2">
+<div class="panel-body">
 <table class="table" id="inbox-table">
+  <thead>
 <tr>
 <th style="text-align: center">Date</th>
 <th style="text-align: center">Document Name</th>
@@ -92,6 +105,8 @@
 <th style="text-align: center">Department</th>
 <th style="text-align: center"></th>
 </tr>
+</thead>
+<tbody>
 @foreach($inbox as $inboxes)
 @if($inboxes->istatus=="unread")
 <tr style="background-color: #e6e6e6">
@@ -107,7 +122,7 @@
 <td style="text-align: center; font-weight: bold">{{ $inboxes->docname }}</td>
 <td style="text-align: center; font-weight: bold">{{ $inboxes->lastname }}, {{$inboxes->firstname}}</td>
 <td style="text-align: center; font-weight: bold">{{ $inboxes->groupName }}</td>
-<td style="text-align: center"><a href="{{URL::route('docView',['id'=>$inboxes->doc_id])}}">View</a></td>
+<td style="text-align: center"><a href="{{URL::route('docView',['upgid'=>$upgid,'id'=>$inboxes->doc_id])}}">View</a></td>
 {{-- <td style = "text-align:center"><a href="/documentView/{{ $inboxes->$doc_id }}"</td> --}}
 </tr> 
 @else
@@ -124,12 +139,13 @@
 <td style="text-align: center">{{ $inboxes->docname }}</td>
 <td style="text-align: center">{{ $inboxes->lastname }}, {{$inboxes->firstname}}</td>
 <td style="text-align: center">{{ $inboxes->groupName }}</td>
-<td style="text-align: center"><a href="{{URL::route('docView',['id'=>$inboxes->doc_id])}}">View</a></td>
+<td style="text-align: center"><a href="{{URL::route('docView',['upgid'=>$upgid,'id'=>$inboxes->doc_id])}}">View</a></td>
 {{-- <td style = "text-align:center"><a href="/documentView/{{ $inboxes->$doc_id }}"</td> --}}
 </tr>
 @endif
 
 @endforeach
+</tbody>
 </table>
 
 

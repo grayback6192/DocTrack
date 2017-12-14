@@ -4,7 +4,7 @@
 
 @section('menu')
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -12,7 +12,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -20,7 +20,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -28,7 +28,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -36,7 +36,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -58,7 +58,7 @@
 
 @foreach($userinfos as $userinfo)
   <div class="row justify-content-start ml-2">
-    <a class="btn btn-primary" href="{{route('UserManage')}}">Back</a>
+    <a class="btn btn-primary" href="{{route('UserManage',['upgid'=>$upgid])}}">Back</a>
   </div>
 
   <div class="row justify-content-center">
@@ -71,7 +71,7 @@
             <span class="slider round"></span>
           </label>
           </div>
-          <a href="{{route('EditProfile',['id'=>$userinfo->user_id])}}"><i class="fa fa-cogs fa-2x mt-2" data-toggle="collapse" data-placement="right" title="Edit"></i></a>
+          <a href="{{route('EditProfile',['upgid'=>$upgid,'id'=>$userinfo->user_id])}}"><i class="fa fa-cogs fa-2x mt-2" data-toggle="collapse" data-placement="right" title="Edit"></i></a>
         </div>
         <div class="card-title m-2">
           <div class="media mt-5">

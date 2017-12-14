@@ -1,21 +1,34 @@
 @extends('mastertemplate')
+<script
+  src="https://code.jquery.com/jquery-1.11.2.min.js"
+  integrity="sha256-Ls0pXSlb7AYs7evhd+VLnWsZ/AqEHcXBeMZUycz/CcA="
+  crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css"
+        href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css" />
+    <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#sent-table').DataTable();
+        });
+    </script>
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Send File</span>
               </a>
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Inbox</span>
               </a>
  </li>
 
 <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Sent</span>
               </a>
@@ -28,57 +41,17 @@
 
 <div class="container">
 
-<div class="row justify-content-end mr-2 mb-2">
-<form id="choosesentstatus" name="sentstatusdrop">
-  <input type="hidden" name="_token" value="{{csrf_token()}}">
-  <select id="sentstatus" name="sentStatus" class="form-control">
-    <option value="all">All</option>
-    <option value="approved">Completed</option>
-    <option value="pending">Ongoing</option>
-    <option value="rejected">Rejected</option>
-  </select>
-</form>
 
-<script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}"></script>
-<script type="text/javascript">
-  $.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-});
-  $(document).ready(function(){
-    $('#sentstatus').change(function(){
-      var statusSent = $(this).val();
-      console.log(statusSent);
-      $.ajax({
-        type: 'GET',
-        url: "http://localhost:8000/sent/"+statusSent,
-        success: function(data){
-          console.log(data);
-          $('#sent-table tr:not(:first)').remove();
-                    for(var i=0;i<data.length;i++){
-                    var html = "<tr>";
-                    html+= "<td></td>";
-                    html+="<td>"+data[i].docname+"</td>";
-                    html+="<td><a href=http://localhost:8000/track/"+data[i].doc_id+">View</a></td>";
-                    html+="</tr>";
-                    console.log(html);
-                    $('#sent-table').append(html);
-          }
-        }
-      });
-    });
-  });
-</script>
-</div>
-
-<div class="row" style="margin-left: 60px; margin-top: 20px;">
+<div class="panel-body">
     <table class="table" id="sent-table">
+      <thead>
   <tr>
     <th>Date</th>
     <th>Document Name</th>
     <th></th>
   </tr>
+  </thead>
+  <tbody>
   @foreach($documentname as $docs)
   <tr>
     <td>
@@ -91,9 +64,10 @@
         ?>     
     </td>
     <td>{{$docs->docname}}</td>
-    <td><a href="/track/{{$docs->doc_id}}">View</a></td>
+    <td><a href="/user/{{$upgid}}/track/{{$docs->doc_id}}">View</a></td>
   </tr>
   @endforeach
+  </tbody>
 </table>      
 </div>
 </div>

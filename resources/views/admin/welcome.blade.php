@@ -3,7 +3,7 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -11,7 +11,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -19,7 +19,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -27,7 +27,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -35,7 +35,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -55,7 +55,7 @@
 @section('main_content')
 
  <div class="row justify-content-start mt-2 ml-2">
-      <a class="btn btn-primary" href="{{route('showDep',['id'=>$groupid])}}">Back</a>
+      <a class="btn btn-primary" href="{{route('showDep',['upgid'=>$upgid,'id'=>$groupid])}}">Back</a>
     </div>
 
 <style type="text/css">
@@ -333,12 +333,12 @@ var getdex = function(){
    // $('#btn-save').after('<pre>').next().append(JSON.stringify(hierarchy, null, 2));
    var res= JSON.stringify(hierarchy,null,2);
    $('#result').html(res);
-  // var blob = new Blob([res], {type: "text/plain"});
+  var blob = new Blob([res], {type: "text/plain"});
   var group = $('#group-org').val();
   // saveAs(blob, filename+".txt");
   // var request = $.get('/uploadorgchart');
   $.ajax({
-    url:'/admin/addorg',
+    url:'/admin/{{$upgid}}/addorg',
     method:'GET',
     data:{id:res,
           group_id: group},
