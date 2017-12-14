@@ -15,7 +15,7 @@
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/css/sb-admin.css')}}">
 </head>
   <body class="fixed-nav sticky-footer " id="page-top">
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-dark" id="mainNav">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
       <div class="navbar-brand bg-dark">DocTrack</div>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
@@ -59,7 +59,7 @@
 
    <div class="row mt-5"> <!--First Row-->
   <div class="col-sm-6">
-    <a href="{{route('UserManage',['upgid'=>$upgid])}}">
+    <a href="{{route('UserManage')}}">
     <div class="card text-center border-0 hvr-underline-from-center" style="width:15rem">
       <i class="fa fa-5x fa-user"></i>
       <div class="card-block">
@@ -68,7 +68,7 @@
     </div></a>
   </div>
   <div class="col-sm-6">
-    <a href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}">
+    <a href="{{route('viewDep')}}">
       <div class="card text-center border-0 hvr-underline-from-center" style="width: 15rem;">
        <i class="fa fa-5x fa-building"></i>
       <div class="card-block">
@@ -78,7 +78,7 @@
   </div>
 
   <div class="col-sm-6">
-    <a href="{{route('viewRolePage',['upgid'=>$upgid])}}">
+    <a href="{{route('viewRolePage')}}">
     <div class="card text-center border-0 hvr-underline-from-center" style="width: 15rem;">
        <i class="fa fa-5x fa-star"></i>
       <div class="card-block">
@@ -90,7 +90,7 @@
 
 <div class="row" style="margin-top: 10%;"> <!--Second Row-->
 <div class="col-sm-6">
-    <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}">
+    <a href="{{route('viewWorkflow')}}">
       <div class="card text-center border-0 hvr-underline-from-center" style="width: 15rem;">
        <i class="fa fa-5x fa-group"></i>
       <div class="card-block">
@@ -100,7 +100,7 @@
   </div>
 
   <div class="col-sm-6">
-    <a href="{{route('viewOwners',['upgid'=>$upgid])}}">
+    <a href="{{route('viewOwners')}}">
       <div class="card text-center border-0 hvr-underline-from-center" style="width: 15rem;">
        <i class="fa fa-5x fa-file-o"></i>
       <div class="card-block">

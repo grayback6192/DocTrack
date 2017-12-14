@@ -19,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/css/sb-admin.css')}}">
 </head>
   <body class="fixed-nav sticky-footer " id="page-top">
-    <nav class="navbar navbar-expand-lg navbar-light bg-dark fixed-top" id="mainNav">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top" id="mainNav">
       <a class="navbar-brand" href="#" style="color:black;">DocTrack</a>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
@@ -67,11 +67,10 @@
   @if(isset($usergroups))
   @foreach($usergroups as $usergroup)
   <div class="col-sm-6">
-    <a href="{{route('gotogroup',['groupid'=>$usergroup->group_id,'rightid'=>$usergroup->rights_rights_id])}}">
-      <div class="card" style="width: 15rem; border: none;">
+    <a href="{{route('gotogroup',['groupid'=>$usergroup->group_id])}}"><div class="card" style="width: 15rem; border: none;">
       <i class="fa fa-5x fa-building"></i>
       <div class="card-block">
-        <h3 class="card-title" style="margin-top: 1rem;">{{$usergroup->groupName}} ({{$usergroup->rightsName}})</h3>
+        <h3 class="card-title" style="margin-top: 1rem;">{{$usergroup->groupName}}</h3>
       </div>
     </div></a>
   </div>

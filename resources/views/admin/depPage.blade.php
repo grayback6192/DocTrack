@@ -1,7 +1,7 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -9,7 +9,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{'viewDep',['upgid'=>$upgid,'status'=>'active']}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{'viewDep',['status'=>'active']}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -17,7 +17,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -25,7 +25,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -95,15 +95,15 @@
   </script>
 
 <div class="row" style="margin-left: 60px;">
-<input type="button" class="btn btn-primary" id="adddep" value="Add Department" onclick="window.location='{{ route('regDep',['upgid'=>$upgid]) }}'">
-{{-- <form id="choice" action="#" style="margin-left: 10px;">
+<input type="button" class="btn btn-primary" id="adddep" value="Add Department" onclick="window.location='{{ route('regDep') }}'">
+<form id="choice" action="#" style="margin-left: 10px;">
 <input type="hidden" name="_token" value="{{csrf_token()}}">
   <select class="btn btn-secondary dropdown-toggle" style="color: black; background-color: white;" name="view" id="useroption">
     <option value="active">Active</option>
     <option value="inactive">Inactive</option>
     <option value="all">All</option>
   </select>
-</form> --}}
+</form>
 </div>
 
 <div class="content-div">
@@ -111,7 +111,7 @@
 @if(isset($departments))
 @foreach($departments as $department)
  <div class="col-sm-6" style="margin-top: 15px;text-align:center;">
-    <a href="{{route('showDep',['upgid'=>$upgid,'depid'=>$department->group_id])}}">
+    <a href="{{route('showDep',['depid'=>$department->group_id])}}">
       <div class="card" style="width: 15rem; border: none;">
        <i class="fa fa-5x fa-building"></i>
       <div class="card-block">

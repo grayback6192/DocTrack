@@ -1,21 +1,21 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Send File</span>
               </a>
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Inbox</span>
               </a>
  </li>
 
 <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['groupid'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <span class="nav-link-text">
                   Sent</span>
               </a>
@@ -27,13 +27,13 @@
 
 <div class="container">
   <div class="row justify-content-start ml-2">
-    <a class="btn btn-primary" href="{{route('viewSent',['upgid'=>$upgid])}}">Back</a>
+    <a class="btn btn-primary" href="{{route('viewSent',['groupid',Session::get('groupid')])}}">Back</a>
   </div>
   @foreach($docinfos as $docinfo)
     File Sent on {{$docinfo->sentDate}} {{$docinfo->sentTime}}
   @endforeach
   <div class="row justify-content-center mt-4 mb-4">
-<object data="/temp/{{ $pdf }}.pdf" type="application/pdf" width="750" height="350"></object>
+<object data="../temp/{{ $pdf }}.pdf" type="application/pdf" width="750" height="350"></object>
 </div>
 
 <div class="row justify-content-center">

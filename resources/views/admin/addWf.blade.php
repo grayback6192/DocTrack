@@ -1,7 +1,7 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -9,7 +9,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -17,7 +17,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -25,7 +25,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -52,7 +52,7 @@
 
 @section('main_content')
 <div class="row" style="margin-left: 60px; margin-top: 20px">
-  <a class="btn btn-primary" href="{{route('viewWorkflow',['upgid'=>$upgid])}}">Back</a>
+  <a class="btn btn-primary" href="{{route('viewWorkflow')}}">Back</a>
 </div>
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
     @foreach($workflow as $flow)
@@ -110,7 +110,7 @@
         </button>
       </div>
       <div class="modal-body">
-    <form method="post" action="{{route('postAddStep',['upgid'=>$upgid])}}">
+    <form method="post" action="{{route('postAddStep')}}">
     {{csrf_field()}}
     <input type="hidden" name="wid" value="{{$flow->w_id}}"><br>
     Position: <select id="pos" name="pos">
@@ -173,7 +173,7 @@
         <h5 class="modal-title" id="exampleModalLabel">Edit Workflow</h5>
       </div>
       <div class="modal-body">
-    <form method="post" action="{{route('UpdateWs',['upgid'=>$upgid,'wsid'=>$steps2[$a][$b]['ws_id'],'wfid'=>$steps2[$a][$b]['workflow_w_id']])}}">
+    <form method="post" action="{{route('UpdateWs',['wsid'=>$steps2[$a][$b]['ws_id'],'wfid'=>$steps2[$a][$b]['workflow_w_id']])}}">
     {{csrf_field()}}
     <input type="hidden" name="wsid" value="{{$steps2[$a][$b]['ws_id']}}"><br>
     <input type="hidden" name="wfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
@@ -259,7 +259,7 @@ function closeModal(wsid) {
         <p class="modal-title">Remove Step?</p>
       </div>
       <div class="modal-body">
-        <form method="post" action="{{route('RemoveWs',['upgid'=>$upgid,'wsid'=>$steps2[$a][$b]['ws_id']])}}">
+        <form method="post" action="{{route('RemoveWs',['wsid'=>$steps2[$a][$b]['ws_id']])}}">
             {{csrf_field()}}
           
             <input type="hidden" name="wsid" value="{{$steps2[$a][$b]['ws_id']}}">
@@ -306,7 +306,7 @@ function closeModal(wsid) {
         </button>
       </div>
       <div class="modal-body">
-    <form method="post" action="{{route('postAddStep',['upgid'=>$upgid])}}">
+    <form method="post" action="{{route('postAddStep')}}">
     {{csrf_field()}}
     <input type="hidden" name="wid" value="{{$flow->w_id}}"><br>
     Position: <select id="pos" name="pos">
@@ -316,7 +316,7 @@ function closeModal(wsid) {
                 @endforeach
                 </select><br><br>
             <div class="modal-footer">
-                <input class="btn btn-primary" type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
+                <input type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
                {{-- <a class="btn btn-primary" href="javascript:openWsModal({{}})"></a> --}}
             </div>
     </form>
