@@ -1,7 +1,7 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -9,7 +9,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -17,7 +17,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -25,7 +25,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -68,7 +68,7 @@
       </button>
     </div>
     <div class="modal-body">
-    <form method="post" action="{{route('postAddWf')}}">
+    <form method="post" action="{{route('postAddWf',['upgid'=>$upgid])}}">
     {{csrf_field()}}
     <div class="form-group">
   <label for="example-text-input">Workflow Name</label>
@@ -120,7 +120,7 @@ window.onclick = function(event) {
 @if(isset($workflows))
 @foreach($workflows as $workflow)
  <div class="col-sm-6" style="margin-top: 20px;">
-    <a href="{{route('AddWf',['id'=>$workflow->w_id])}}"><div class="card" style="width: 15rem; border: none;">
+    <a href="{{route('AddWf',['upgid'=>$upgid,'id'=>$workflow->w_id])}}"><div class="card" style="width: 15rem; border: none;">
        <i class="fa fa-5x fa-group"></i>
       <div class="card-block">
         <h3 class="card-title" style="margin-top: 1rem">{{$workflow->workflowName}}</h3>
@@ -131,7 +131,7 @@ window.onclick = function(event) {
               <input type="button" class="btn btn-primary" name="editWf" id="editWf-{{$workflow->w_id}}" value="Edit" onclick="openEditModal({{$workflow->w_id}})">
           </div>
           <div class="btn-group mr-2" role="group" aria-label="First group">
-              <input type="button" class="btn btn-primary" name="delWf" value="Delete" onclick="window.location='{{route('DelWf',['id'=>$workflow->w_id])}}'">
+              <input type="button" class="btn btn-primary" name="delWf" value="Delete" onclick="window.location='{{route('DelWf',['upgid'=>$upgid,'id'=>$workflow->w_id])}}'">
           </div>
         </div>
         <!-- The Modal -->
@@ -142,7 +142,7 @@ window.onclick = function(event) {
       <h5 class="modal-title" id="exampleModalLabel">Edit Workflow</h5>
     </div>
     <div class="modal-body">
-    <form method="post" action="{{route('EditWf',['wfid'=>$workflow->w_id])}}">
+    <form method="post" action="{{route('EditWf',['upgid'=>$upgid,'wfid'=>$workflow->w_id])}}">
     {{csrf_field()}}
     <input type="hidden" name="id" value="{{$workflow->w_id}}"><br>
     Workflow Name: <input type="text" name="wfname" value="{{$workflow->workflowName}}"><br><br>

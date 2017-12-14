@@ -114,6 +114,7 @@
 </label>
 												</div>
 												<div class="form-group">
+					
 													<label>Signature<small> (required)</small></label>
 													<input name="sign" accept = "image/x-png, image/jpeg" type="file" class="form-control" placeholder="Signature">
 

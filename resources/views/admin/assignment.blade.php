@@ -1,7 +1,7 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -9,7 +9,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -17,7 +17,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -25,7 +25,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -131,7 +131,18 @@
 					}
 				}
 			});
-		});		
+		});	
+
+    // $('#user-role').change(function(){
+    //   var value = $(this).val();
+    //   if(value=="1")
+    //   {
+    //     console.log(value);
+    //     var text1 = "Admin";
+
+    //     $('#user-position option:contains('+text1+')').prop('selected',true);
+    //   }
+    // });	
 	});
 </script>
 
@@ -178,7 +189,7 @@
   		 </button>
   	</div>
   	<div class="modal-body">
-    <form method="post" action="{{route('newAssign')}}">
+    <form method="post" action="{{route('newAssign',['upgid'=>$upgid])}}">
     {{csrf_field()}}
     <div class="form-group row">
     	<label class="col-2 col-form-label">Department</label>
@@ -195,7 +206,7 @@
     <div class="form-group row">
     	<label class="col-2 col-form-label">Position</label>
     	<div class="col-10">
-    	 	<select class="form-control" name="position">
+    	 	<select class="form-control" name="position" id="user-position">
           <option value="none">--Select a position--</option>
     				@foreach($positions as $position)
     					<option value="{{$position->pos_id}}">{{$position->posName}}</option>
@@ -270,9 +281,9 @@
     </div>
 
     <div class="form-group row">
-   	<label class="col-2 col-form-label">Right</label>
-   	<div class="col-10">
-    			<select name="role">
+   	<label class="col-2 col-form-label">Right:</label>
+   	<div class="my-lg-auto">
+    			{{-- <select name="role" id="user-role">
     				@foreach($roles as $role)
             @if($role->rightsName=="User")
     					<option value="{{$role->rights_id}}" selected="selected">{{$role->rightsName}}</option>
@@ -280,7 +291,9 @@
               <option value="{{$role->rights_id}}">{{$role->rightsName}}</option>
             @endif
     				@endforeach
-    			</select><br><br>
+    			</select><br><br> --}}
+          <input type="text" name="role" value="2" style="display: none">
+          User
     </div>
     </div>
 
