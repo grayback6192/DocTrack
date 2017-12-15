@@ -5,29 +5,41 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\SessionController;
 use Dompdf\Dompdf;
 use Session;
 
 
 class User extends Controller
 {
-    public function viewInbox($groupid)
+    public function countUnread($upgid) //new-- count unread docs in inbox
+    {
+        $numUnread = DB::table('inbox')->where('inbox.upg_id','=',$upgid)
+                    ->where('istatus','=','unread')
+                    ->count();
+
+        return $numUnread;
+    }
+
+    public function viewInbox(Request $request,$upgid)
     {
         $user = Auth::user();
-        $inbox = \DB::table('inbox')->where('inbox.user_id','=',$user->user_id)
+        $inbox = \DB::table('inbox')->where('inbox.upg_id','=',$upgid)
                     ->join('document','inbox.doc_id','=','document.doc_id')
-                    ->join('userpositiongroup as upg','document.userpositiongroup_upg_id','=','upg_id')
+                    ->join('userpositiongroup as upg','document.userpositiongroup_upg_id','=','upg.upg_id')
                     ->join('user as u','upg.user_user_id','=','u.user_id')
                     ->join('group as g', 'upg.group_group_id','=','g.group_id')
                     ->orderBy('inbox.date','desc')
                     ->orderBy('inbox.time','desc')
                     ->get();
 
-         return view("user/test",['inbox'=>$inbox,'User'=>$user]);
-                   // return $groupid;
+        $numunread = $this->countUnread($upgid);
+
+          return view("user/test",['inbox'=>$inbox,'User'=>$user,'numUnread'=>$numunread,'upgid'=>$upgid]);
     }
    
-    public function approvedoc($docid){
+    public function approvedoc($upgid,$docid){
         date_default_timezone_set('Asia/Manila');
         $user = Auth::user();
         $date = date('m-d-Y');
@@ -77,40 +89,7 @@ class User extends Controller
                 //..codes
                  $poss= session()->get('upgid');
 $docs = DB::table("document")->where('doc_id','=',$docid)->get();
-
-    foreach ($docs as $doc) {
-       $low = new\PhpOffice\PhpWord\PhpWord();
-       $section =   $low->addSection();
-       $section->addText('${Chairman}');
-       $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$doc->doc_id.'.docx');
-       }
-       $signing= DB::table('userpositiongroup')->where('userpositiongroup.upg_id','=',$poss)
-                                               ->join('position','userpositiongroup.position_pos_id','=','position.pos_id')
-                                               ->get();
-            
-foreach($signing as $signs){
-    $name=$signs->posName;
-}
-$variable=$templateProcessor->getVariables();
-
-$user = DB::table('user')->where('user_id','=',Auth::user()->user_id)->get();
-foreach ($user as $value) {
-    $sign = $value->signature;
-    $compname = $value->lastname.", ".$value->firstname;
-}
-$signblock = $sign."<br>".$compname;
-foreach($variable as $variables)
-        {
-            if($variables == $name){
-                $templateProcessor->setValue($name, "".$sign." ".Auth::user()->lastname.", ".Auth::user()->firstname);
-           }
-}
-//mao ni ang file ang output
-$templateProcessor->saveAs('file/'.$docid.'.docx');
                
-
-
-                
 
            $allnxt = $this->countAllNext($docid,$nexts);
             $allapproved = $this->countAllApproved($docid,$nexts);
@@ -118,22 +97,22 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
             $currentNumApprove = $this->getTotalApprove($docid); 
 
             if($totalTrans == $currentNumApprove){
-                return $this->archive($docid);
+                return $this->archive($u_id,$docid);
             }
 
 //return $allnxt." == ".$allapproved;
             //return $nexts;
              if($allnxt==$allapproved)
-                   return $this->insertInboxAfterApprove($docid,$nxt2);
+                   return $this->insertInboxAfterApprove($docid,$nxt2,$u_id);
 
               else
-                return redirect()->route('docView',['id'=>$docid]);
+                return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
                 
              
 
     }
 
-    public function rejectdoc($docid){
+    public function rejectdoc($upgid,$docid){
         $user = Auth::user();
         $rand = rand(100,1000);
         date_default_timezone_set('Asia/Manila');
@@ -155,16 +134,16 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
             
             \DB::table('archive')->insert(['idarchive'=>$rand, 'docid'=>$docid]);
          // return redirect()->route("viewInbox",['groupid'=>Session::get('groupid')]);
-         return redirect()->route('docView',['id'=>$docid]);  
+         return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);  
     }
 
-    public function archive($docid)
+    public function archive($upgid,$docid)
     {
         $rand = rand(100,10000);
         \DB::table('archive')->insert(['idarchive'=>$rand, 'docid'=>$docid]);
 
          // return redirect()->route("viewInbox",['groupid'=>Session::get('groupid')]);
-        return redirect()->route('docView',['id'=>$docid]);
+        return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
     }
 
     public function getTotalTrans($docid){
@@ -185,7 +164,7 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
         return $clientgroup;
     }
 
-    public function insertInboxAfterApprove($docid,$node)
+    public function insertInboxAfterApprove($docid,$node,$upgid)
     {
         $user = Auth::user();
          date_default_timezone_set('Asia/Manila');
@@ -200,14 +179,13 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
                     ->get();
 
         foreach($send as $sends){
-            DB::table('inbox')->insert(["status"=>"unread",
-                                        "user_id"=>$sends->user_id,
+            DB::table('inbox')->insert(["istatus"=>"unread",
+                                        "upg_id"=>$sends->upg_id,
                                         "doc_id"=>$sends->document_doc_id,
                                         "time"=>$time,
                                         "date"=>$date]);
             $send = json_decode(json_encode($send),TRUE);
-            $rec[] = $send;
-                    
+            $rec[] = $send;    
 
           }
          
@@ -215,7 +193,7 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
          }
         
          //return redirect()->route("viewInbox",['groupid'=>Session::get('groupid')]);
-         return redirect()->route('docView',['id'=>$docid]);
+         return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
     }
 
 
@@ -245,7 +223,7 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
          return $appCount;
     }
 
-    public function sent($groupid)
+    public function sent($upgid)
     {
             $user = Auth::user();
     $userid = $user->user_id;
@@ -255,9 +233,8 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
     ->get();
     foreach($view as $views){
         $upgID= $views->upg_id;
+     }
 
-
-    }
     $view1 =\DB::table('transaction')->where('upg_id','=',$upgID)->get();
 
     $documentname =\DB::table('document')
@@ -271,7 +248,7 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
         //$datetime = \DB::table('inbox')->where('doc_id','=',$docid)->first();    
     }
     
-        return view('user/sentDocs',['documentname'=>$documentname,'User'=>$user]);
+        return view('user/sentDocs',['documentname'=>$documentname,'User'=>$user,'upgid'=>$upgid]);
                  
     }
 
@@ -296,8 +273,8 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
 
     }
 
-    public function track($id){
-        //$test = \DB::table("transaction")->get();
+    public function track($upgid,$id){
+        
         $arr = array();
         $user = Auth::user();
         $name= \DB::table("transaction")
@@ -309,7 +286,6 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
 
      $statuss=\DB::table("transaction")
      ->where('transaction.document_doc_id','=',$id)
-     //->where('transaction.document_doc_id','=',16784)
     ->join('document','transaction.document_doc_id','=','document.doc_id')
     ->join('userpositiongroup','transaction.upg_id','=','userpositiongroup.upg_id')
     ->join('user','userpositiongroup.user_user_id','=','user.user_id')
@@ -317,8 +293,9 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
     ->get();
 
    //order statuss 
+    $docInfo = \DB::table("document")->where("doc_id",'=',$id)->get();
 
-    return view("user/fileStatus",["name"=>$name],["statuss"=>$statuss,'User'=>$user]);
+    return view("user/fileStatus",["name"=>$name],["statuss"=>$statuss,'User'=>$user,"pdf"=>$id,'docinfos'=>$docInfo,'upgid'=>$upgid]);
 }
 
     public function addFile(Request $request)
@@ -363,60 +340,98 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
         $name = Auth::user();
         $groups = DB::table('userpositiongroup as upg')->where('upg.user_user_id','=',$userid)
                     ->join('group as g','upg.group_group_id','=','g.group_id')
+                    ->join('rights as r','upg.rights_rights_id','=','r.rights_id')
                     ->get();
         return view('user/chooseGroup',['User'=>$name,'usergroups'=>$groups]);
     }
     
-    public function index()
+    public function index($upgid)
     {
         $clientid = \Session::get('client');
+        $admingroup = getAdminGroup($upgid);
         $name = Auth::user();
-    	$users = DB::table('user')->where('user.status','=','active')
+
+        if($clientid==$admingroup)
+        {
+            $users = DB::table('user')->where('user.status','=','active')
                 ->join('userpositiongroup as upg','user.user_id','=','upg.user_user_id')
+               // ->distinct()
                 ->where('upg.client_id','=',$clientid)
                 ->orderBy('lastname','asc')
-                ->get();
+                ->paginate(7); //change
+                // ->get();
+        }
+        else
+        {
+            $users = DB::table('user')->where('user.status','=','active')
+                ->join('userpositiongroup as upg','user.user_id','=','upg.user_user_id')
+               // ->distinct()
+                ->where('upg.group_group_id','=',$admingroup)
+                ->orderBy('lastname','asc')
+                ->paginate(7); //change
+                // ->get();
+        }
+    	
         
-    	return view('admin/usermngmt',['users'=>$users,'User'=>$name]);
+    	return view('admin/usermngmt',['users'=>$users,'User'=>$name,'upgid'=>$upgid]);
+                
     }
 
-    public function show($id)
+    public function show($upgid,$id)
     {
         $name = Auth::user();
-    	$user = DB::table('user')->where('user_id', $id)->get();
-    	return view('admin/userprofile',['userid' => $id],
-    									 ['user' => $user],
-                                         ['User'=>$name->firstname]);
+    	$userinfos = DB::table('user')->where('user_id', $id)->get();
+
+        $usergroups = DB::table('userpositiongroup as upg')->where('upg.user_user_id','=',$id)
+                                                    ->join('position as p','upg.position_pos_id','p.pos_id')
+                                                    ->join('group as g','upg.group_group_id','g.group_id')
+                                                    ->join('rights as r','upg.rights_rights_id','r.rights_id')
+                                                    ->get();
+
+    	return view('admin/userprofpage',['userid' => $id,
+    									 'userinfos' => $userinfos,
+                                         'User'=>$name,
+                                          'usergroups'=>$usergroups,
+                                        'upgid'=>$upgid]);
        
     }
 
-    public function showForEdit($id)
+    public function showForEdit($upgid,$id)
     {
         $name = Auth::user();
-        $user = DB::table('user')->where('user_id', $id)->get();
-        return view('admin/editprofile',['userid' => $id],
-                                         ['user' => $user],
-                                         ['User'=>$name->firstname]);
+        $userinfos = DB::table('user')->where('user_id', $id)->get();
+        return view('admin/userprofedit',['userid' => $id,
+                                         'userinfos' => $userinfos,
+                                         'User'=>$name,
+                                        'upgid'=>$upgid]);
     }
 
-    public function update(Request $request,$id)
+    public function update(Request $request,$upgid,$id)
     {
         $name = Auth::user();
-        if($request->image){
-            $path = $request->image->store('users/pictures');
-            $image = $request->image->hashName();
+         if($request->profpic){
+            $path = $request->profpic->store('users/pictures');
+            $image = $request->profpic->hashName();
             DB::table('user')->where('user_id',$id)->update(['profilepic'=>$image]);
+        }
+
+        if($request->sign){
+            // $path = $request->sign->store('users/signatures');
+            // $signature = $request->sign->hashName();
+            $rand = rand(100000,999999);
+            Storage::putFileAs("signature",$request['sign'],$rand.".png");
+            $signpath = $rand.".png";
+            DB::table('user')->where('user_id',$id)->update(['signature'=>$signpath]);
         }
         
         DB::table('user')->where('user_id',$id)->update(['firstname'=>$request['fname'],
                                                         'lastname'=>$request['lname'],
                                                         'email'=>$request['email'],
                                                         'gender'=>$request['gender'],
-                                                        'address'=>$request['address'],
-                                                        'password'=>bcrypt($request['password_confirmation']),
-                                                        'signature'=>$request['sign']]);
+                                                        'address'=>$request['address']]);
+                                                        // 'password'=>bcrypt($request['userpassword'])]);
                                                                    
-        return $this->show($id);
+        return $this->show($upgid,$id);
     }
 
     public function add(Request $request)
@@ -444,28 +459,60 @@ $templateProcessor->saveAs('file/'.$docid.'.docx');
         return response()->json($users);
     }
 
-    public function delete($id)
+    public function delete($upgid,$id)
     {
         $name = Auth::user();
         // DB::table('user')->where('userId',$id)->delete();
         DB::table('user')->where('user_id',$id)->update(['status'=>'inactive']);
-        return $this->index();
+        return $this->index($upgid);
     }
 
-    public function goToGroup($groupid)
+    public function goToGroup($groupid,$rightid)
     {
         $user = Auth::user();
-        $userUpg = DB::table('userpositiongroup')->where('user_user_id','=',$user->user_id)->where('group_group_id','=',$groupid)
+        $userUpg = DB::table('userpositiongroup as upg')->where('upg.user_user_id','=',$user->user_id)->where('upg.group_group_id','=',$groupid)
+                    ->where('upg.rights_rights_id','=',$rightid)
+                    ->join('rights as r','upg.rights_rights_id','=','r.rights_id')
                     ->get();
 
         foreach ($userUpg as $usersUpg) {
             $upgID = $usersUpg->upg_id;
+            $rightid = $usersUpg->rights_rights_id;
+            $right = $usersUpg->rightsName;
         }
+
         \Session::put('groupid',$groupid);
         \Session::put('upgid',$upgID);
+        \Session::put('rightid',$rightid);
+        //\Session::save();
 
         $gid = \Session::get('groupid');
+        $upgid = \Session::get('upgid');
+    
+        if($right=="User")
+            return redirect()->route('viewInbox',['upgid'=>$upgid]);
+          // return $right;
+        else if($right=="Admin")
+           return redirect()->route('AdminDash',['upgid'=>$upgid]);
 
-        return redirect()->route('viewInbox',['groupid'=>$gid]);
+        // return $upgid;
+    }
+
+    public function showUserGroups($userid)
+    {
+        $groups = DB::table('userpositiongroup as upg')->where('upg.user_user_id','=',$userid)
+                                                    ->join('position as p','upg.position_pos_id','p.pos_id')
+                                                    ->join('group as g','upg.group_group_id','g.group_id')
+                                                    ->join('rights as r','upg.rights_rights_id','r.rights_id')
+                                                    ->get();
+
+        return response()->json($groups);
+    }
+
+    public function showUserAccount($userid)
+    {
+        $userinfos = DB::table('user')->where('user_id','=',$userid)->get();
+
+        return response()->json($userinfos);
     }
 }

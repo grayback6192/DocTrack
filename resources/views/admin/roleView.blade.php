@@ -1,7 +1,7 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -9,7 +9,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -17,7 +17,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -25,7 +25,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('AdminTemplate')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -103,7 +103,7 @@ $.ajaxSetup({
 	</div> --}}
 <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups" style="margin-left: 60px;">
 <div class="btn-group" role="group" aria-label="First Group">
-	<form method="post" action="{{route('AddRole')}}">
+	<form method="post" action="{{route('AddRole',['upgid'=>$upgid])}}">
 	<input type="hidden" name="_token" value="{{csrf_token()}}">
 	<div class="form-group">
 		<input type="text" name="newrole" placeholder="Role Name"> <input type="submit" class="btn btn-primary" name="addRole" value="Add Role">
@@ -113,7 +113,7 @@ $.ajaxSetup({
 </div>
 
 <div class="btn-group" role="group" aria-label="Second Group" style="margin-right: 60px;">
-	<a class="btn btn-primary" href="{{route('viewAssignments')}}">Position Assignments</a>
+	<a class="btn btn-primary" href="{{route('viewAssignments',['upgid'=>$upgid])}}">Position Assignments</a>
 </div> 
 </div>
 
@@ -125,7 +125,7 @@ $.ajaxSetup({
 	</tr>
 	@foreach($roles as $role)
 	<tr id="{{$role->pos_id}}">
-		<form method="post" action="{{route('UpdateRole',['roleid'=>$role->pos_id])}}">
+		<form method="post" action="{{route('UpdateRole',['upgid'=>$upgid,'roleid'=>$role->pos_id])}}">
 		<input type="hidden" name="_token" value="{{csrf_token()}}">
 		<td><input readonly style="border: none;" name="role" id="{{$role->pos_id}}-name" value="{{$role->posName}}"></td>
 
@@ -168,6 +168,10 @@ $.ajaxSetup({
 	</tr>
 	@endforeach
 	</table>
+	<div class="justify-content-center">
+		{{$roles->links()}}
+	</div>
+
 	</div>
 
 @endsection

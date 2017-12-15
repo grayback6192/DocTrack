@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class WorkflowStepsController extends Controller
 {
     //
-    public function addStep(Request $request)
+    public function addStep(Request $request,$upgid)
     {
         $prevVals = array();
 
@@ -42,11 +42,11 @@ class WorkflowStepsController extends Controller
                                             'prev'=>$previous,
                                             'next'=>""]);
 
-        return redirect()->route('AddWf',['id'=>$request['wid']]);
+        return redirect()->route('AddWf',['id'=>$request['wid'],'upgid'=>$upgid]);
     }
 
     //edit
-    public function editStep(Request $request,$wsid)
+    public function editStep(Request $request,$upgid,$wsid)
     {
 
 
@@ -92,13 +92,8 @@ class WorkflowStepsController extends Controller
             \DB::table('workflowsteps')->where('ws_id','=',$flow->ws_id)->update(['prev'=>$prevValue,'next'=>$nextValue]);
        }
        
-         return redirect()->route('AddWf',['id'=>$request['wfid']]);
+         return redirect()->route('AddWf',['upgid'=>$upgid, 'id'=>$request['wfid']]);
         //return $p;
-    }
-
-    public function changeOrder($wsid,$wfid)
-    {
-        
     }
 
     public function setPrev($wsid,$wfid) //transfer
@@ -216,12 +211,12 @@ class WorkflowStepsController extends Controller
         }
         return $prev;
     }
-    public function openSteps($wfid)
+    public function openSteps($upgid,$wfid)
     {
        $prevarr = array();
         $prevarr2 = array();
         $user = Auth::user();
-     $upgid = \Session::get('upg');
+     //$upgid = \Session::get('upg');
         $client = DB::table('userpositiongroup')->where('upg_id','=',$upgid)->get();
         // foreach ($client as $value) {
         //     $clientid = $value->client_id;
@@ -257,7 +252,7 @@ class WorkflowStepsController extends Controller
             
         $steps2 = $this->sortStep($wfid);
         
-          return view("admin/addWf",['User'=>$user, 'positions'=>$positions, 'workflow'=>$workflow, 'steps'=>$steps, 'steps2'=>$steps2, 'prevarr'=>$prevarr,'prevarr2'=>$prevarr2]);
+          return view("admin/addWf",['User'=>$user, 'positions'=>$positions, 'workflow'=>$workflow, 'steps'=>$steps, 'steps2'=>$steps2, 'prevarr'=>$prevarr,'prevarr2'=>$prevarr2,'upgid'=>$upgid]);
         
         // echo "<pre>";
         // var_dump($prevarr2);
@@ -316,7 +311,7 @@ class WorkflowStepsController extends Controller
     }
 
 //remove
-    public function removeStep($wsid)
+    public function removeStep($upgid,$wsid)
     {
         $wfid = DB::table('workflowsteps')->where('ws_id','=',$wsid)->get();
         foreach ($wfid as $wf) {
@@ -332,7 +327,7 @@ class WorkflowStepsController extends Controller
             $nextValue = $this->setNext($flow->ws_id,$wfid);
             \DB::table('workflowsteps')->where('ws_id','=',$flow->ws_id)->update(['prev'=>$prevValue,'next'=>$nextValue]);
        }
-        return redirect()->route('AddWf',['wfid'=>$wid]);
+        return redirect()->route('AddWf',['upgid'=>$upgid,'wfid'=>$wid]);
     }
     
   

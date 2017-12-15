@@ -18,12 +18,14 @@ class UserPositionGroup extends Controller
         return $users;
     }
 
-    public function addNewAssignment(Request $request)
+    public function addNewAssignment(Request $request,$upgid)
     {
         $clientid = \Session::get('client');
         $user = Auth::user();
     	$rand = rand(100,9999);
         $found = $this->findNull($request['userid']);
+
+
 
          if(count($found)==1){
              DB::table('userpositiongroup')->where('user_user_id','=',$request['userid'])
@@ -38,8 +40,11 @@ class UserPositionGroup extends Controller
                                                 'client_id'=>$clientid,
                                                 'upg_status'=>'active']);
     }
-
-    	 return redirect()->route('viewAssignments');
+    
+        if($request['role']==2)
+    	   return redirect()->route('viewAssignments',['upgid'=>$upgid]);
+        else
+            return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$request['group']]);
         //return count($users);
     }
 
@@ -83,7 +88,7 @@ class UserPositionGroup extends Controller
         }
         }
 
-        return redirect()->route('gotogroup',['groupid'=>$request['groupid']]);
+        return redirect()->route('gotogroup',['groupid'=>$request['groupid'],'rightid'=>2]);
     }
 
     public function removeAssignment($upgid)

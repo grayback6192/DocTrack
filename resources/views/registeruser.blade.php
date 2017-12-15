@@ -38,7 +38,7 @@
 		            <div class="wizard-container">
 
 		                <div class="card wizard-card" data-color="azure" id="wizardProfile">
-		                    <form action="{{Route("UserRegister")}}" method="post">
+		                    <form action="{{Route("UserRegister")}}" method="post" enctype="multipart/form-data">
 		                <!--        You can switch " data-color="orange" "  with one of the next bright colors: "blue", "green", "orange", "red", "azure"          -->
 		                	{{csrf_field()}}
 		                    	<div class="wizard-header text-center">
@@ -114,8 +114,10 @@
 </label>
 												</div>
 												<div class="form-group">
-													<label>Signature code<small>(required)</small></label>
-													<input name="sign" type="text" class="form-control" placeholder="Signature Code" value="<?php echo str_random(5); ?>">
+					
+													<label>Signature<small> (required)</small></label>
+													<input name="sign" accept = "image/x-png, image/jpeg" type="file" class="form-control" placeholder="Signature">
+
 												</div>
 											</div>
 										

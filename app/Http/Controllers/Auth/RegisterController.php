@@ -104,7 +104,7 @@ class RegisterController extends Controller
         'position_pos_id'=>$posrand,
         'user_user_id'=>$userRand,
         'rights_rights_id'=>'1',
-        'group_group_id'=>NULL,
+        'group_group_id'=>$rand,
         'client_id'=> $rand,
         ]);
 

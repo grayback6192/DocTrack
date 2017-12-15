@@ -7,6 +7,7 @@ use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Storage;
 
 class RegisterUserController extends Controller
 {
@@ -68,6 +69,7 @@ class RegisterUserController extends Controller
     protected function create(array $data)
     {
         $rand = rand(100000,999999);
+         Storage::putFileAs("signature",$data['sign'],$rand.".png");
         $user = User::create([
             'user_id' => $rand,
             'email' => $data['email'],
@@ -76,10 +78,12 @@ class RegisterUserController extends Controller
             'firstname'=> $data['fname'],
             'address'=> $data['address'],
             'gender'=> $data['gender'],
-            'signature'=>$data['sign'],
+            'signature'=>"signature/".$rand.".png",
             'status'=> 'Active',
         ]);
+            
         $businessKey = \DB::table("group")->where("businessKey","=",$data['business'])->get();
+
         foreach($businessKey as $businessKeys)
             $group = $businessKeys->group_id;
 

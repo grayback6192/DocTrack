@@ -17,7 +17,7 @@ class TemplateController extends Controller
         DB::table('template')->where('template_id','=',$tempid)->update(["status"=>"inactive"]);
         return redirect()->route('AdminTemplate');
     }
-    public function editFile($id) //Edit Template File, GET
+    public function editFile($upgid,$id) //Edit Template File, GET
     {
         $user = Auth::user();
         $request = \DB::table("template")->where("template_id","=",$id)->get();
@@ -31,7 +31,7 @@ class TemplateController extends Controller
 	    {
 	        $group = $ug->group_group_id;
 	    }
-	    $upgid = \Session::get('upg');
+	    //$upgid = \Session::get('upg');
 	    $client = DB::table('userpositiongroup')->where('upg_id','=',$upgid)->get();
         foreach ($client as $value) 
         {
@@ -62,10 +62,12 @@ class TemplateController extends Controller
 	                                      "groups"=>$groups,
 	                                      "wid"=>$wid,
 	                                      "gid"=>$gid,
-	                                      "tempid"=>$id]);
+	                                      "tempid"=>$id,
+                                          "tempInfos"=>$request,
+                                          "upgid"=>$upgid]);
     }
 
-    public function addEditedTemplate($tempid) //Template Creation, Post
+    public function addEditedTemplate($upgid,$tempid) //Template Creation, Post
     {
         $user = request()->all();
         $title = str_replace(" ", "_", $user['title']);
@@ -85,9 +87,9 @@ class TemplateController extends Controller
         \DB::table('template')->where('template_id','=',$tempid)->update(['templatename'=>$title,
                                                                           'group_group_id'=>$user['group'],
                                                                           'workflow_w_id'=>$user['wf']]);
-        return redirect()->route("AdminTemplate");
+        return redirect()->route("openTemplate",['upgid'=>$upgid,"id"=>$tempid]);
     }
-    public function addTemplate(Request $request) //Adds template, Post
+    public function addTemplate(Request $request,$upgid) //Adds template, Post
     {
         $name = Auth::user();
         $clients = getClientId($name->user_id);
@@ -119,7 +121,7 @@ class TemplateController extends Controller
         $dompdf->render();
         $output = $dompdf->output();
         file_put_contents("pdf/".$title.".pdf", $output);
-        return redirect()->route("AdminTemplate");
+        return redirect()->route("viewOwners",['upgid'=>$upgid]); //pls change
     }
     public function uploadfile(Request $request)
     {

@@ -1,7 +1,7 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -9,7 +9,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -17,7 +17,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -25,7 +25,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('AdminTemplate')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -131,23 +131,39 @@
 					}
 				}
 			});
-		});		
+		});	
+
+    // $('#user-role').change(function(){
+    //   var value = $(this).val();
+    //   if(value=="1")
+    //   {
+    //     console.log(value);
+    //     var text1 = "Admin";
+
+    //     $('#user-position option:contains('+text1+')').prop('selected',true);
+    //   }
+    // });	
 	});
 </script>
 
 <div class="row" style="margin-left: 60px; margin-top: 20px;" id="dep">
-	<form id="list" name="depList">
-	<input type="hidden" name="_token" value="{{csrf_token()}}">
-		<select name="dept" id="dept">
-		<option value="none">--Select a group--</option>
-			@foreach($groups as $group)
-				<option value="{{$group->group_id}}">{{$group->groupName}}</option>
-			@endforeach
-		</select>
-	</form>&nbsp;&nbsp;&nbsp;
+	
+  {{--Add assignment button--}}
   <input type="button" class="btn btn-primary" name="addAssign" value="Add Position Assignment" id="addAssign">
-	</div>
+	
+  {{--Filter by department--}}
+  <form id="list" name="depList">
+  <input type="hidden" name="_token" value="{{csrf_token()}}">
+    <select name="dept" id="dept" class="form-control ml-2">
+    <option value="none">--Select a group--</option>
+      @foreach($groups as $group)
+        <option value="{{$group->group_id}}">{{$group->groupName}}</option>
+      @endforeach
+    </select>
+  </form>
+</div>
 
+{{--Assignment Table--}}
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
 	<table class="table" id="assign-table">
 	<tr>
@@ -160,7 +176,7 @@
 	
 	</table><br><br>
 
- <!-- The Modal -->
+ <!-- The Modal for Assignment -->
 <div id="myModal" class="modal">
 
   <!-- Modal content -->
@@ -173,7 +189,7 @@
   		 </button>
   	</div>
   	<div class="modal-body">
-    <form method="post" action="{{route('newAssign')}}">
+    <form method="post" action="{{route('newAssign',['upgid'=>$upgid])}}">
     {{csrf_field()}}
     <div class="form-group row">
     	<label class="col-2 col-form-label">Department</label>
@@ -190,7 +206,7 @@
     <div class="form-group row">
     	<label class="col-2 col-form-label">Position</label>
     	<div class="col-10">
-    	 	<select class="form-control" name="position">
+    	 	<select class="form-control" name="position" id="user-position">
           <option value="none">--Select a position--</option>
     				@foreach($positions as $position)
     					<option value="{{$position->pos_id}}">{{$position->posName}}</option>
@@ -202,12 +218,6 @@
     <div class="form-group row">
     <label class="col-2 col-form-label">User</label>
     <div class="col-10">
-    			{{-- <select class="form-control" name="user" id="user">
-            <option value="none">--Select a user--</option>
-    				@foreach($users as $user)
-    					<option value="{{$user->user_id}}">{{$user->lastname}}, {{$user->firstname}}</option>
-    				@endforeach
-    			</select><br><br> --}}
           <input type="text" name="user" id="user">&nbsp;&nbsp;<input type="button" id="chooseuser" value="..." onclick="openUsers()"><input type="hidden" size="8" name="userid" id="userid">
           <br><br>
 
@@ -215,7 +225,10 @@
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  Choose a user <input type="text" id="search" name="search"><input type="button" id="find-user" value="Find">
+                  Choose a user 
+                  <div>
+                    <input type="text" id="search" name="search"><input type="button" id="find-user" value="Find">
+                  </div>
                 </div>
                 <div class="modal-body">
                   
@@ -235,7 +248,15 @@
             function openUsers()
             {
               var modal = document.getElementById('searchuser');
-              modal.style.display = "block";
+              var dep = document.getElementById('selgroup');
+              var depVal = dep.options[dep.selectedIndex].value;
+
+              console.log(depVal);
+              if(depVal=="none")
+                alert('Select a department first');
+              else if(depVal!="none")
+                 modal.style.display = "block";
+            
             }
 
             function closeUsers()
@@ -260,9 +281,9 @@
     </div>
 
     <div class="form-group row">
-   	<label class="col-2 col-form-label">Right</label>
-   	<div class="col-10">
-    			<select name="role">
+   	<label class="col-2 col-form-label">Right:</label>
+   	<div class="my-lg-auto">
+    			{{-- <select name="role" id="user-role">
     				@foreach($roles as $role)
             @if($role->rightsName=="User")
     					<option value="{{$role->rights_id}}" selected="selected">{{$role->rightsName}}</option>
@@ -270,7 +291,9 @@
               <option value="{{$role->rights_id}}">{{$role->rightsName}}</option>
             @endif
     				@endforeach
-    			</select><br><br>
+    			</select><br><br> --}}
+          <input type="text" name="role" value="2" style="display: none">
+          User
     </div>
     </div>
 

@@ -1,7 +1,7 @@
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-user fa-fw"></i>
                 <span class="nav-link-text">
                   Users</span>
@@ -9,7 +9,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewDep',['status'=>'active'])}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-building fa-fw"></i>
                 <span class="nav-link-text">
                   Departments</span>
@@ -17,7 +17,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-star fa-fw"></i>
                 <span class="nav-link-text">
                   Positions</span>
@@ -25,7 +25,7 @@
  </li>
 
  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-group fa-fw"></i>
                 <span class="nav-link-text">
                   Workflows</span>
@@ -33,7 +33,7 @@
  </li>
 
  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('AdminTemplate')}}" data-placement="right" title="Inbox">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="fa fa-file-o fa-fw"></i>
                 <span class="nav-link-text">
                   Templates</span>
@@ -52,7 +52,7 @@
 
 @section('main_content')
 <div class="row" style="margin-left: 60px; margin-top: 20px">
-  <a class="btn btn-primary" href="{{route('viewWorkflow')}}">Back</a>
+  <a class="btn btn-primary" href="{{route('viewWorkflow',['upgid'=>$upgid])}}">Back</a>
 </div>
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
     @foreach($workflow as $flow)
@@ -60,33 +60,45 @@
     {{-- <input type="text" name="wid" value="{{$flow->w_id}}"> --}}
 </div>
 <hr>
+{{--begin card div--}}
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
     Workflow Details:&nbsp;&nbsp;&nbsp;
     {{-- <input type="button" id="addstep" value="Add Step" onclick="openAdd()"> --}}
+   
     <a class="btn btn-primary" href="#" onclick="openAdd()">Add Step</a>
+  
 </div>
     <!--Sorted List-->
  <div class="row" style="margin-left: 60px; margin-top: 20px;"> 
   @if(count($steps2)>0)
   @for($a=0;$a<(count($steps2));$a++)
-  <table class="table table-sm" style="display: inline-block; width: 250px;border:0.5px solid black;">
-    <tr>
-        {{-- <th>Prev</th> --}}
-        <th>Position</th>
-        {{-- <th>Next</th> --}}
-        <th colspan="2"></th>
-    </tr>
+  <div class="media">
+  <div class="card" style="width: 10rem;border:0">
     @for($b=0;$b<(count($steps2[$a]));$b++)
-        <tr>
-            <td>
-                {{$steps2[$a][$b]['posName']}}
-            </td>
-            <td>
+    <div class="card-block p-3">
+        {{-- <th>Prev</th> --}}
+        {{-- Position --}}
+        {{-- <th>Next</th> --}}
+        {{-- <th colspan="2"></th> --}}
+    <div class="card" style="width: 10rem; border: 0.5px solid black">
+      <div class="card-block p-3">
+            <div class="row justify-content-center">    
+                <h5>{{$steps2[$a][$b]['posName']}}</h5>
+            </div>
+            <div class="btn-toolbar justify-content-between mt-3">
                 <a data-toggle="modal" href="javascript:openWsModal({{$steps2[$a][$b]['ws_id']}})" id="openWsModal">Edit</a>
-            </td>
-            <td>
+
                 <a data-toggle="modal" href="javascript:openDeleteModal({{$steps2[$a][$b]['ws_id']}})" id="openDeleteModal">Remove</a>
-            </td>
+            </div>
+          </div>
+          </div>
+        {{--   @if($steps2[$a][$b]['next']!="")
+      <script type="text/javascript">
+        var div = document.getElementById('wf-arrow');
+        div.style.display = "block";
+      </script>
+    @endif --}}
+        </div>
 
   <div id="addModal" class="modal">
   <div class="modal-dialog" role="document">
@@ -98,7 +110,7 @@
         </button>
       </div>
       <div class="modal-body">
-    <form method="post" action="{{route('postAddStep')}}">
+    <form method="post" action="{{route('postAddStep',['upgid'=>$upgid])}}">
     {{csrf_field()}}
     <input type="hidden" name="wid" value="{{$flow->w_id}}"><br>
     Position: <select id="pos" name="pos">
@@ -161,11 +173,12 @@
         <h5 class="modal-title" id="exampleModalLabel">Edit Workflow</h5>
       </div>
       <div class="modal-body">
-    <form method="post" action="{{route('UpdateWs',['wsid'=>$steps2[$a][$b]['ws_id'],'wfid'=>$steps2[$a][$b]['workflow_w_id']])}}">
+    <form method="post" action="{{route('UpdateWs',['upgid'=>$upgid,'wsid'=>$steps2[$a][$b]['ws_id'],'wfid'=>$steps2[$a][$b]['workflow_w_id']])}}">
     {{csrf_field()}}
     <input type="hidden" name="wsid" value="{{$steps2[$a][$b]['ws_id']}}"><br>
     <input type="hidden" name="wfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
-    Previous: <br>   
+    Position: {{$steps2[$a][$b]['posName']}}<br>
+              Previous:<br>   
                     <?php
                     $previous = array();
                     $previous[] = "";
@@ -212,8 +225,6 @@
                     ?>
                
                 <br>
-    Position: {{$steps2[$a][$b]['posName']}}<br>
-   
 
             <input type="submit" name="addNewStep" value="Save">&nbsp;&nbsp;
             <input type="button" id="closeWsModal" value="Cancel" onclick="closeModal({{$steps2[$a][$b]['ws_id']}})">
@@ -248,7 +259,7 @@ function closeModal(wsid) {
         <p class="modal-title">Remove Step?</p>
       </div>
       <div class="modal-body">
-        <form method="post" action="{{route('RemoveWs',['wsid'=>$steps2[$a][$b]['ws_id']])}}">
+        <form method="post" action="{{route('RemoveWs',['upgid'=>$upgid,'wsid'=>$steps2[$a][$b]['ws_id']])}}">
             {{csrf_field()}}
           
             <input type="hidden" name="wsid" value="{{$steps2[$a][$b]['ws_id']}}">
@@ -275,10 +286,14 @@ function closeModal(wsid) {
             modal3.style.display = "none";
         }
     </script>
-
-        </tr>
+      
     @endfor
-</table> <div style="margin-top: 40px;">===></div>
+</div>
+{{--end of card div--}} 
+<div class="ml-4 media-body" id="wf-arrow" style="margin-top: 40px;">
+  <i class="fa fa-arrow-right fa-fw"></i>
+</div>
+</div>
   @endfor
   @elseif(count($steps2)==0)
   <div id="addModal" class="modal">
@@ -291,7 +306,7 @@ function closeModal(wsid) {
         </button>
       </div>
       <div class="modal-body">
-    <form method="post" action="{{route('postAddStep')}}">
+    <form method="post" action="{{route('postAddStep',['upgid'=>$upgid])}}">
     {{csrf_field()}}
     <input type="hidden" name="wid" value="{{$flow->w_id}}"><br>
     Position: <select id="pos" name="pos">
@@ -301,7 +316,7 @@ function closeModal(wsid) {
                 @endforeach
                 </select><br><br>
             <div class="modal-footer">
-                <input type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
+                <input class="btn btn-primary" type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
                {{-- <a class="btn btn-primary" href="javascript:openWsModal({{}})"></a> --}}
             </div>
     </form>

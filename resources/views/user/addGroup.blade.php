@@ -19,14 +19,14 @@
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/css/sb-admin.css')}}">
 </head>
   <body class="fixed-nav sticky-footer " id="page-top">
-    <nav class="navbar navbar-expand-lg navbar-light bg-dark fixed-top" id="mainNav">
-      <a class="navbar-brand" href="#">DocTrack</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top" id="mainNav">
+      <a class="navbar-brand" href="#" style="color:black;">DocTrack</a>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
 
         <!-- SIDE MENU BAR -->
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle mr-lg-2" href="#" id="messagesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle mr-lg-2 top-nav-item" href="#" id="messagesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-fw fa-envelope"></i>
               <span class="d-lg-none">Messages
                 <span class="badge badge-pill badge-primary">12 New</span>
@@ -37,7 +37,8 @@
 
 
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle mr-lg-2 top-nav-item" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{$User->lastname}} 
               <i class="fa fa-fw fa-user"></i>
               <span class="d-lg-none">Alerts
                 <span class="badge badge-pill badge-warning">6 New</span>
@@ -45,12 +46,13 @@
             </a>
           </li>
           <li class = "nav-item">
-            {{$User->lastname}} {{-- Authentication Name --}}
+            {{-- Authentication Name --}}
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{route('Logout')}}">
+            <a class="nav-link top-nav-item" href="{{route('Logout')}}">
+              Logout
               <i class="fa fa-fw fa-sign-out"></i>
-              Logout</a>
+            </a>
           </li>
         </ul>
       </div>
@@ -115,9 +117,9 @@
             <input type="radio" name="position" value="Student">Student<br>
             <input type="radio" name="position" value="Employee">Employee<br><br>
 
-            <input type="submit" name="submit" value="Enter Group">&nbsp;&nbsp;
+            <input type="submit" class="btn btn-primary" name="submit" value="Enter Group">&nbsp;&nbsp;
             {{-- <input type="button" id="exit" value="Cancel" onclick="closeGroupModal({{$group->group_id}})"> --}}
-            <a href="javascript:closeGroupModal({{$group->group_id}})">Cancel</a>
+            <a class="btn btn-primary" href="javascript:closeGroupModal({{$group->group_id}})">Cancel</a>
     </form>
   </div>
   </div>

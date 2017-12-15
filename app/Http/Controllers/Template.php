@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Dompdf\Dompdf;
 use Storage;
 
@@ -10,7 +12,44 @@ use Storage;
 
 class Template extends Controller
 {
-    //
+
+    function viewTemplateOwners($upgid) //new
+    {
+        $name = Auth::user();
+        $clients = getClientId($name->user_id);
+        $deps = array();
+        $admingroup = getAdminGroup($upgid);
+    
+        foreach ($clients as $client) {
+            $clientId = $client->client_id;
+        }
+
+        if($clientId==$admingroup)
+           $listDep = DB::table('group')->where('client_id','=',$clientId)->where(['status'=>'active'])->get();
+         else
+           $listDep = DB::table('group')->where('group_id','=',$admingroup)->where(['status'=>'active'])->get();
+
+           foreach ($listDep as $list) {
+               $serviceCount = \DB::table('template')->where('group_group_id','=',$list->group_id)->where('status','=','active')->get();
+
+               if(count($serviceCount)>0)
+               {
+                    $deps[] = $list;
+               }
+           }
+        
+             return view('admin/templatepage1',['departments'=>$deps,'User'=>$name,'upgid'=>$upgid]);
+    }
+
+    function viewTemplates($upgid,$groupid) //new
+    {
+        $name = Auth::user();
+
+        $templates = DB::table("template")->where('status','=','active')->where('group_group_id','=',$groupid)->get();
+
+        return view("admin/grouptemplates",["templates"=>$templates,"User"=>$name,'upgid'=>$upgid]);
+    }
+
     function viewTemplate()
     {
     	

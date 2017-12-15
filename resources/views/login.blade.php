@@ -22,34 +22,29 @@
 
   </head>
 
-  <body style="background-image: url('login.jpg')">
-
+  {{-- <body style="background-image: url('login.jpg')"> --}}
+<body>
     <div class="container">
 
-      <div class="card card-login mx-auto mt-5">
-        <div class="card-header">
-          Login
-        </div>
-        <div class="card-body">
+      <h1 class="mt-5">DocTrack</h1>
+
+      <div class="card card-login mt-5 border-0">
+        <div class="card-body p-0">
           <form action = "{{Route("Credentials")}}" method = "post">
             {{csrf_field()}}
             <div class="form-group">
               <label for="exampleInputEmail1">Email</label>
-              <input type="username" class="form-control" id="username" name = "email" placeholder="example@gmail.com">
+              <input type="username" class="form-control form-blank" id="username" name = "email" placeholder="example@gmail.com">
             </div>
             <div class="form-group">
               <label for="exampleInputPassword1">Password</label>
-              <input type="password" class="form-control" id="password" name = "password" placeholder="Password">
+              <input type="password" class="form-control form-blank" id="password" name = "password" placeholder="Password">
             </div>
             <div class="form-group">
-              <div class="form-check">
-                <label class="form-check-label">
-                  <input type="checkbox" class="form-check-input">
-                  Remember Password
-                </label>
-              </div>
             </div>
-            <input type = "submit" class="btn btn-primary btn-block" value = "Login">
+            <div class="justify-content-center mt-5">
+              <input type = "submit" class="btn btn-primary btn-block" value = "Login">
+            </div>
           </form>
           <div class="text-center small"><br>
             Register as: <a href="{{route('RegisterClient')}}">Client</a> or <a href="{{route('RegisterUser')}}">User</a>
@@ -59,8 +54,6 @@
       </div>
     </div>
     <br>
-    <h1 align = "center">DocTrack</h1>
-
     <!-- Bootstrap core JavaScript -->
    <script src="homejs/homejquery/jquery.min.js"></script>
     <script src="homejs/popper/popper.min.js"></script>

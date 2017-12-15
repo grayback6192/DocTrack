@@ -2,6 +2,21 @@
 
 //Global methods to be used by other controllers
 
+function getUserUPG($upgid)
+{
+    $userupg = DB::table('userpositiongroup')->where('upg_id','=',$upgid)->get();
+    return $userupg;
+}
+
+function getAdminGroup($upgid)
+{
+    $adminupg = getUserUPG($upgid);
+    foreach ($adminupg as $admin) {
+        $admingroup = $admin->group_group_id;
+    }
+
+    return $admingroup;
+}
 
 function getClientId($userid)
 {
@@ -77,7 +92,7 @@ function getWorkflow($groupid,$templateid)
                 $sort = sortNodes($templateid,$arr,1,1,$ordered);
        return $sort;
 }
-function insertTransaction($docid,$array)
+function insertTransaction($docid,$array,$upgid)
     {
         for($i=0;$i<(count($array));$i++){
         for($j=0;$j<(count($array[$i]));$j++){
@@ -104,9 +119,9 @@ function insertTransaction($docid,$array)
             $vals1 = json_decode(json_encode($vals),TRUE);
             $val[] = $vals1;
         }
-        return insertInbox($docid,$val);
+        return insertInbox($docid,$val,$upgid);
     }
-function insertInbox($docid,$node){
+function insertInbox($docid,$node,$upgid){
         
         //get owner of template for redirection
         $tempgroup = DB::table('document')->where('doc_id','=',$docid)
@@ -128,8 +143,8 @@ function insertInbox($docid,$node){
                     ->get();
 
         foreach($send as $sends){
-            DB::table('inbox')->insert(["status"=>"unread",
-                                        "user_id"=>$sends->user_id,
+            DB::table('inbox')->insert(["istatus"=>"unread",
+                                        "upg_id"=>$sends->upg_id,
                                         "doc_id"=>$sends->document_doc_id,
                                         "time"=>$time,
                                         "date"=>$date]);
@@ -137,7 +152,7 @@ function insertInbox($docid,$node){
             $rec[] = $send;
           } 
          }
-         return redirect()->route("Template",['gid'=>$gid]);
+         return redirect()->route("Template",['upgid'=>$upgid,'gid'=>$gid]);
     }
 function sortNodes($tempid,$array,$order,$processcount,$sorted)
     {

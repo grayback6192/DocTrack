@@ -6,6 +6,7 @@ use File;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Http\Controllers\OrgChart;
 
 
 class Department extends Controller
@@ -17,28 +18,79 @@ class Department extends Controller
             return $clientgroup;
     }
   
-    function viewDep()
+    // function viewDep()           //pls don't delete this function
+    // {
+    //     $name = Auth::user();
+    //     $clients = $this->getClientId($name->user_id);
+    //     foreach ($clients as $client) {
+    //         $clientId = $client->client_id;
+    //     }
+    // 	   $listDep = DB::table('group')->where('client_id','=',$clientId)->where(['status'=>'active'])->orderBy('groupName','asc')->get();
+    //         //$listDep = DB::table('group')->where('group_group_id','=',$clientId)->where(['status'=>'active'])->get();
+        
+    //         return view('admin/depPage',['departments'=>$listDep,'User'=>$name]);
+    //     }
+
+     function viewDep($upgid)
     {
         $name = Auth::user();
+        $admingroup = getAdminGroup($upgid);
         $clients = $this->getClientId($name->user_id);
         foreach ($clients as $client) {
             $clientId = $client->client_id;
         }
-    	   $listDep = DB::table('group')->where('client_id','=',$clientId)->where(['status'=>'active'])->get();
-            //$listDep = DB::table('group')->where('group_group_id','=',$clientId)->where(['status'=>'active'])->get();
+
+        if($clientId==$admingroup){
+            $listDep = DB::table('group')->where('client_id','=',$clientId)->where(['status'=>'active'])->orderBy('groupName','asc')->get();
+            //$listDep = DB::table('group')->where('group_group_id','=',$clientId)->where(['status'=>'active'])->orderBy('groupName','asc')->get();
+        }
+        else
+        {
+            $listDep = DB::table('group')->where('group_id','=',$admingroup)->where(['status'=>'active'])->orderBy('groupName','asc')->get();
+        }
         
-            return view('admin/depPage',['departments'=>$listDep,'User'=>$name]);
+            return view('admin/depPage',['departments'=>$listDep,'User'=>$name,'upgid'=>$upgid]);
         }
 
-    function showDep($depid)
+    function showDep($upgid,$depid)
     {
         $name = Auth::user(); 
+        $admingroup = getAdminGroup($upgid);
     	$depInfo = DB::table('group')->where(['group_id'=>$depid])->get();
         $subgroups = DB::table('group')->where('group_group_id','=',$depid)->get();
-        return view('admin/depInfo',['depid'=>$depid, 'dep'=>$depInfo, 'User'=>$name, 'subgroups'=>$subgroups]);
+
+        //get org chart file only
+        $orgchart = new OrgChart;
+        $deporgchart = $orgchart->show($depid);
+
+        //get org chart info
+        $orgchartInfos = DB::table('orgchart')->where('group_id','=',$depid)->get();
+
+        //get group admins
+        $admins = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$depid)->where('upg.rights_rights_id','=',1)
+                    ->join('user as u','upg.user_user_id','u.user_id')
+                    ->get();   
+
+        //get group members
+        $members = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$depid)->where('upg.rights_rights_id','=',2)
+                    ->join('user as u','upg.user_user_id','u.user_id')
+                    ->get();   
+
+
+        return view('admin/depProfile',['depid'=>$depid, 
+                                        'depinfos'=>$depInfo, 
+                                        'User'=>$name, 
+                                        'subgroups'=>$subgroups, 
+                                        'deporgchart'=>$deporgchart, 
+                                        'orgchartInfos'=>$orgchartInfos,
+                                        'depid'=>$depid,
+                                        'admins'=>$admins,
+                                        'members'=>$members,
+                                        'upgid'=>$upgid,
+                                        'admingroup'=>$admingroup]);
     }
 
-    function showDepInfo($depid)
+    function showDepInfo($upgid,$depid)
     {
         $name = Auth::user(); 
         $dep = DB::table('group')->where('group_id',$depid)->get();
@@ -47,13 +99,14 @@ class Department extends Controller
             $clientId = $client->client_id;
         }
 
-        $motherGroups = DB::table('group')->where('status','=','active')->where('client_id','=',$clientId)->get();
-        return view('admin/depInfoEdit',['depId'=>$depid],
-                                            ['depInfos'=>$dep, 'User'=>$name, 'motherGroups'=>$motherGroups]);
+        $motherGroups = DB::table('group')->where('status','=','active')->where('client_id','=',$clientId)->orderBy('groupName','asc')->get();
+        return view('admin/depProfileEdit',['depId'=>$depid],
+                                            ['depInfos'=>$dep, 'User'=>$name, 'motherGroups'=>$motherGroups,'upgid'=>$upgid]);
     }
 
-    function editDep($depid)
+    function editDep($upgid,$depid)
     {
+        $user = Auth::user();
          $depInfo = request()->all();
 
         if($depInfo['mothergroup']==''){
@@ -73,10 +126,10 @@ class Department extends Controller
                                                             'group_group_id'=>$mg,
                                                             'businessKey'=>$depInfo['depKey']]);
 
-        return $this->showDep($depid);
+        return $this->showDep($upgid,$depid);
     }
 
-    function addDep()
+    function addDep($upgid)
     {
          $user = Auth::user(); 
          $dep = request()->all();
@@ -115,15 +168,15 @@ class Department extends Controller
                                     'businessKey'=>$dep['depKey']]);
 
 
-         return redirect()->route('viewDep');
+         return redirect()->route('viewDep',['upgid'=>$upgid]);
         //return $path;   
     }
 
-    function deleteDep($depid)
+    function deleteDep($upgid,$depid)
     {
         DB::table('group')->where('group_id',$depid)->update(['status'=>'inactive']);
 
-        return $this->viewDep();
+        return $this->viewDep($upgid);
     }
 
      function viewGroups()
@@ -138,7 +191,7 @@ class Department extends Controller
            return view('user/addGroup',['groups'=>$listDep,'User'=>$name]);
     }
 
-    function viewServiceOwners($groupid)
+    function viewServiceOwners($upgid) //for user side
     {
         $name = Auth::user();
         $clients = $this->getClientId($name->user_id);
@@ -158,9 +211,23 @@ class Department extends Controller
                }
            }
         
-            return view('user/groups',['departments'=>$deps,'User'=>$name]);
+            return view('user/groups',['departments'=>$deps,'User'=>$name,'upgid'=>$upgid]);
            // echo "<pre>";
            // var_dump($deps);
+        }
+
+        function setToActive($depid)
+        {
+            DB::table('group')->where('group_id','=',$depid)->update(['status'=>'active']);
+
+            return response()->json('successfully updated to active');
+        }
+
+        function setToInactive($depid)
+        {
+            DB::table('group')->where('group_id','=',$depid)->update(['status'=>'inactive']);
+
+            return response()->json('successfully updated to inactive');
         }
 
 }

@@ -16,7 +16,7 @@ class WorkflowController extends Controller
             return $clientgroup;
     }
 
-    public function addWF(Request $request)
+    public function addWF(Request $request,$upgid)
     {
         $user = Auth::user();
     	$rand = rand(1000,99999);
@@ -28,25 +28,26 @@ class WorkflowController extends Controller
     									'workflowName'=>$request['wfname'],
     									'status'=>'active',
                                         'client_id'=>$clientId]);
-    	return redirect()->route('viewWorkflow');
+
+    	return redirect()->route('viewWorkflow',['upgid'=>$upgid]);
     	
     }
 
     //edit
-    public function editWf(Request $req, $wfid)
+    public function editWf(Request $req,$upgid,$wfid)
     {
         DB::table('workflow')->where('w_id','=',$wfid)->update(['workflowName'=>$req['wfname']]);
-        return redirect()->route('viewWorkflow');
+        return redirect()->route('viewWorkflow',['upgid'=>$upgid]);
     }
 
     //retrieve
 
     //remove
-    public function deleteWf($wfid)
+    public function deleteWf($upgid,$wfid)
     {
         DB::table('workflow')->where('w_id','=',$wfid)->update(['status'=>'inactive']);
 
-        return redirect()->route('viewWorkflow');
+        return redirect()->route('viewWorkflow',['upgid'=>$upgid]);
     }
     //turn workflow into active
 
