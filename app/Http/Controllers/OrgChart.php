@@ -70,7 +70,7 @@ class OrgChart extends Controller
         $file= fopen($filename."orgchart.txt","w");
         $datasource=$request['id'];
         $fwrite= fwrite($file,$datasource);
-        //\DB::table('orgchart')->insert(['path'=>$filename.'orgchart.txt','group_id'=>$group]);
+       
         \DB::table('orgchart')->where('group_id','=',$group)->update(['path'=>$filename.'orgchart.txt']);
         
         return $request['id'];

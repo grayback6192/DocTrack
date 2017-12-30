@@ -142,7 +142,10 @@
                      }
                    }
                     ?>
-      </div>
+      </div><br>
+
+      Action: <input type="radio" name="action" value="sign"> Sign
+              <input type="radio" name="action" value="cc"> Carbon Copy<br>
             <div class="modal-footer">
                 <input type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
                {{-- <a class="btn btn-primary" href="javascript:openWsModal({{}})"></a> --}}
@@ -315,6 +318,9 @@ function closeModal(wsid) {
                     <option value="{{$pos->pos_id}}">{{$pos->posName}}</option>
                 @endforeach
                 </select><br><br>
+                
+      Action: <input type="radio" name="action" value="sign"> Sign
+              <input type="radio" name="action" value="cc"> Carbon Copy<br>
             <div class="modal-footer">
                 <input class="btn btn-primary" type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
                {{-- <a class="btn btn-primary" href="javascript:openWsModal({{}})"></a> --}}
