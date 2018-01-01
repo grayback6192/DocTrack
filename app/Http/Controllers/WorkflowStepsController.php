@@ -19,6 +19,7 @@ class WorkflowStepsController extends Controller
         {
             $previous = "";
             $orderprev = 1;
+
         }
         else
         {
@@ -34,6 +35,7 @@ class WorkflowStepsController extends Controller
             }
              $previous = implode(',', $prevVals);
             $orderprev++;
+
         }
         DB::table('workflowsteps')->insert(['ws_id'=>$rand,
                                             'workflow_w_id'=>$request['wid'],
@@ -42,6 +44,9 @@ class WorkflowStepsController extends Controller
                                             'action'=>$request['action'],
                                             'prev'=>$previous,
                                             'next'=>""]);
+
+
+            //update whole workflow
 
         return redirect()->route('AddWf',['id'=>$request['wid'],'upgid'=>$upgid]);
     }
@@ -73,6 +78,7 @@ class WorkflowStepsController extends Controller
 
            \DB::table('workflowsteps')->where('ws_id','=',$wsid)->update(['order'=>$prevOrder]);
             }
+
         $currNode = \DB::table('workflowsteps')->where('ws_id','=',$wsid)->get();
         foreach ($currNode as $curr) {
             $currNodeOrder = $curr->order;
@@ -89,6 +95,9 @@ class WorkflowStepsController extends Controller
 
             \DB::table('workflowsteps')->where('ws_id','=',$flow->ws_id)->update(['prev'=>$prevValue,'next'=>$nextValue]);
        }
+
+       //to edit step action
+       DB::table('workflowsteps')->where('ws_id','=',$wsid)->update(['action'=>$request['action']]);
        
          return redirect()->route('AddWf',['upgid'=>$upgid, 'id'=>$request['wfid']]);
     }
@@ -317,7 +326,7 @@ class WorkflowStepsController extends Controller
         }
         DB::table('workflowsteps')->where('ws_id','=',$wsid)->delete();
 
-        //update all
+        //update whole workflow
         $currFlow = \DB::table('workflowsteps')->where('workflow_w_id','=',$wfid)->orderBy('order')->get();
         foreach ($currFlow as $flow) {
             $prevValue = $this->setPrev($flow->ws_id,$wfid);
