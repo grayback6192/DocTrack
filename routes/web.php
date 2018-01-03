@@ -388,3 +388,6 @@ Route::get('/admin/{upgid}/addorg','OrgChart@store');
 
 //End User
 
+ //test
+ Route::get('admin/{upgid}/getMax/{wsid}','WorkflowStepsController@updateWF');
+

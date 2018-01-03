@@ -318,7 +318,15 @@ window.onclick = function(event) {
       </div>
 
       <div class="m-3">
-        <h3>Subgroups</h3>
+          <div class="row justify-content-between">
+          <div class="ml-3">
+            <h3>Subgroups</h3>
+          </div>
+          <div class="mr-5">
+           {{--  @foreach($orgchartInfos as $orgchartInfo) --}}
+<input type="button" class="btn btn-primary" id="adddep" value="Add Department" onclick="window.location='{{route('regDep',['upgid'=>$upgid])}}'"> 
+            {{-- @endforeach --}}
+          </div>
         {{--Sub groups Here--}}
         <div class="row" style="margin-left: 60px; margin-top: 10px;">
           @if(isset($subgroups))
