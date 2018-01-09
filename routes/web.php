@@ -290,10 +290,7 @@ Route::post('admin/{upgid}/workflow/edit/{wfid}','WorkflowController@editWf')->n
 Route::get('admin/viewPath','WorkflowStepsController@getWorkflow');
 
 //workflowstep mnmgt
-Route::get('admin/posusers/{posid}','WorkflowStepsController@getPosUsers');
-Route::post('admin/{upgid}/workflow/addnext','WorkflowStepsController@addNextStep')->name('addNextStep');
-Route::post('admin/{upgid}/workflow/addprev','WorkflowStepsController@addPrevStep')->name('addPrevStep');
-Route::post('admin/{upgid}/workflow/addstep','WorkflowStepsController@addFirstStep')->name('postAddStep');
+Route::post('admin/{upgid}/workflow/addstep','WorkflowStepsController@addStep')->name('postAddStep');
 Route::post('admin/{upgid}/workflow/editstep/{wsid}','WorkflowStepsController@editStep')->name('UpdateWs');
 Route::post('admin/{upgid}/workflow/deletestep/{wsid}','WorkflowStepsController@removeStep')->name('RemoveWs');
 //End Admin

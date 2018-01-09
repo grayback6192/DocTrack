@@ -9,333 +9,51 @@ use Illuminate\Http\Request;
 class WorkflowStepsController extends Controller
 {
     //
-     public function addFirstStep(Request $request, $upgid)
+    public function addStep(Request $request,$upgid)
     {
-        $wsidpk = rand(1000,99999);
-        $wsidprevpk = rand(1000,99999);
-        $wsidnextpk = rand(1000,99999);
-        
-        //next, ensure random pk is not in database
+        $prevVals = array();
 
-        DB::table('workflowsteps')->insert(['ws_id'=>$wsidpk,
+        $rand = rand(1000,99999);
+
+        if(!(isset($request['prev'])))
+        {
+            $previous = "";
+            $orderprev = 1;
+
+        }
+        else
+        {
+            $prev = $request['prev'];
+            foreach ($prev as $key) {
+                $prevorder = DB::table('workflowsteps')->where('ws_id','=',$key)->get();
+                foreach ($prevorder as $value) {
+                    $orderprev = $value->order;
+                }
+                $prevVals[] = $key;
+
+                DB::table('workflowsteps')->where('ws_id','=',$key)->update(['next'=>$rand]);
+            }
+             $previous = implode(',', $prevVals);
+            $orderprev++;
+
+        }
+        DB::table('workflowsteps')->insert(['ws_id'=>$rand,
                                             'workflow_w_id'=>$request['wid'],
                                             'position_pos_id'=>$request['pos'],
-                                            'order'=>1,
-                                            'action'=>$request['action']]); 
+                                            'order'=>$orderprev,
+                                            'action'=>$request['action'],
+                                            'prev'=>$previous,
+                                            'next'=>""]);
 
-        DB::table('previous')->insert(['prev_id'=>$wsidprevpk,
-                                        'ws_id'=>$wsidpk,
-                                        'prev_wsid'=>""]);
 
-        DB::table('next')->insert(['next_id'=>$wsidnextpk,
-                                    'ws_id'=>$wsidpk,
-                                    'next_wsid'=>""]);
-
-        if(isset($request['all'])) 
-        {
-            
-            $posusers = DB::table('userpositiongroup')->where('position_pos_id','=',$request['pos'])->get();
-            foreach ($posusers as $posuser) {
-                $wsrecidpk = rand(1000,99999);
-                DB::table('wsreceiver')->insert(['wsrec_id'=>$wsrecidpk,
-                                                    'ws_id'=>$wsidpk,
-                                                    'upg_id'=>$posuser->upg_id]);
-            }
-        }
-        else
-        {
-            foreach ($request['wfsrec'] as $value) {
-                $wsrecidpk = rand(1000,99999);
-                DB::table('wsreceiver')->insert(['wsrec_id'=>$wsrecidpk,
-                                                    'ws_id'=>$wsidpk,
-                                                    'upg_id'=>$value]);
-            }
+            //update whole workflow
+         $wfsteps = DB::table('workflowsteps')->where('workflow_w_id','=',$request['wid'])->get();
+        foreach ($wfsteps as $wfstep) {
+            $this->updateWF($wfstep->ws_id); //update whole workflow
         }
 
-         return redirect()->route('AddWf',['id'=>$request['wid'],'upgid'=>$upgid]);
+        return redirect()->route('AddWf',['id'=>$request['wid'],'upgid'=>$upgid]);
     }
-
-
-     public function addNextStep(Request $request,$upgid)
-    {
-         $wsidpk = rand(1000,99999);
-         
-         $order = $request['fornextorder'] + 1;
-         $neworder = $order;
-
-         //adjust workflow (order)
-         $wfsteps = DB::table('workflowsteps')->where('workflow_w_id','=',$request['fornextwfid'])
-                                                ->where('order','>=',$order)
-                                                ->orderBy('order')
-                                                ->get();
-        if(count($wfsteps)>0)
-        {
-            foreach ($wfsteps as $wfstep) {
-
-                //adjust order
-                ++$neworder;
-                DB::table('workflowsteps')->where('ws_id','=',$wfstep->ws_id)->update(['order'=>$neworder]);
-
-                //update previous
-                if($wfstep->order = $order+1)
-                {
-                    //$wsid2 = $wfstep->ws_id;
-                    DB::table('previous')->where('ws_id','=',$wfstep->ws_id)->update(['prev_wsid'=>""]);
-                }
-            }
-        }
-
-         //add to workflowsteps
-          DB::table('workflowsteps')->insert(['ws_id'=>$wsidpk,
-                                            'workflow_w_id'=>$request['fornextwfid'],
-                                            'position_pos_id'=>$request['fornextpos'],
-                                            'order'=>$order,
-                                            'action'=>$request['action']]);
-          //update previous of newly added step's next order
-          $nextsofnewstep = DB::table('workflowsteps')->where('workflow_w_id','=',$request['fornextwfid'])
-                                                    ->where('order','=',$order+1)
-                                                    ->get();
-            foreach ($nextsofnewstep as $nextofnewstep) {
-                DB::table('previous')->where('ws_id','=',$nextofnewstep->ws_id)->update(['prev_wsid'=>$wsidpk]);
-            }
-
-
-        
-        // add previous of newly added step
-            $prevsteps = DB::table('workflowsteps')
-                        ->where('workflow_w_id','=',$request['fornextwfid'])
-                        ->where('order','=',$request['fornextorder'])
-                        ->get();
-            foreach ($prevsteps as $prevstep) {
-                  $wsidprevpk = rand(1000,99999);
-                 DB::table('previous')->insert(['prev_id'=>$wsidprevpk,
-                                        'ws_id'=>$wsidpk,
-                                        'prev_wsid'=>$prevstep->ws_id]);
-            }
-          
-
-            //update next of previous step
-            foreach ($prevsteps as $prevstep) {
-                DB::table('next')->where('ws_id','=',$prevstep->ws_id)->update(['next_wsid'=>$wsidpk]);
-            }
-
-            //insert next of newly added step
-            $nextsteps = DB::table('workflowsteps')
-                            ->where('workflow_w_id','=',$request['fornextwfid'])
-                            ->where('order','=',$order+1)
-                            ->get();
-            if(count($nextsteps)==0)
-            {
-                $wsidnextpk = rand(1000,99999);
-                  DB::table('next')->insert(['next_id'=>$wsidnextpk,
-                                                'ws_id'=>$wsidpk,
-                                                'next_wsid'=>""]);
-            }
-            else
-            {
-                foreach ($nextsteps as $nextstep) {
-                    $wsidnextpk = rand(1000,99999);
-                    DB::table('next')->insert(['next_id'=>$wsidnextpk,
-                                                'ws_id'=>$wsidpk,
-                                                'next_wsid'=>$nextstep->ws_id]);
-                }
-            }
-
-            //insert recipients of newly-added step
-             if(isset($request['all'])) 
-        {
-            
-            $posusers = DB::table('userpositiongroup')->where('position_pos_id','=',$request['pos'])->get();
-            foreach ($posusers as $posuser) {
-                $wsrecidpk = rand(1000,99999);
-                DB::table('wsreceiver')->insert(['wsrec_id'=>$wsrecidpk,
-                                                    'ws_id'=>$wsidpk,
-                                                    'upg_id'=>$posuser->upg_id]);
-            }
-        }
-        else
-        {
-            foreach ($request['wfsrec'] as $value) {
-                $wsrecidpk = rand(1000,99999);
-                DB::table('wsreceiver')->insert(['wsrec_id'=>$wsrecidpk,
-                                                    'ws_id'=>$wsidpk,
-                                                    'upg_id'=>$value]);
-            }
-        }
-         
-         return redirect()->route('AddWf',['id'=>$request['fornextwfid'],'upgid'=>$upgid]);
-          // echo "<pre>";
-          //   var_dump($wfsteps);
-                                                
-    }
-
-    public function addPrevStep(Request $request, $upgid)
-    {
-        $wsidpk = rand(1000,99999);
-
-        //$order = $request['forprevorder'];
-        $neworder = $request['forprevorder'];
-        $incrementneworder = $neworder;
-
-        //adjust workflow (order)
-         $wfsteps = DB::table('workflowsteps')->where('workflow_w_id','=',$request['forprevwfid'])
-                                                ->where('order','>=',$request['forprevorder'])
-                                                ->orderBy('order')
-                                                ->get();
-            if(count($wfsteps)>0)
-            {
-                foreach ($wfsteps as $wfstep) {
-
-                      //adjust order
-                        ++$incrementneworder;
-                        DB::table('workflowsteps')->where('ws_id','=',$wfstep->ws_id)->update(['order'=>$incrementneworder]);  
-
-                         //update previous of current step
-                    if($wfstep->ws_id==$request['forprevwsid'])
-                    {
-                        DB::table('previous')->where('ws_id','=',$request['forprevwsid'])->update(['prev_wsid'=>""]);
-                    }  
-                }
-            }
-            // else //if no result 
-            // {
-
-            // }
-
-        //add to workflowsteps
-          DB::table('workflowsteps')->insert(['ws_id'=>$wsidpk,
-                                            'workflow_w_id'=>$request['forprevwfid'],
-                                            'position_pos_id'=>$request['forprevpos'],
-                                            'order'=>$neworder,
-                                            'action'=>$request['action']]);
-          //update previous of newly added step's next order
-          $nextsteps = DB::table('workflowsteps')->where('workflow_w_id','=',$request['forprevwfid'])
-                                                    ->where('order','=',$neworder+1)    
-                                                    ->get();
-            foreach ($nextsteps as $nextstep) {
-                DB::table('previous')->where('ws_id','=',$nextstep->ws_id)->update(['prev_wsid'=>$wsidpk]);
-            }
-
-            // add previous of newly added step
-            $prevsteps = DB::table('workflowsteps')->where('workflow_w_id','=',$request['forprevwfid'])
-                                                    ->where('order','=',$neworder-1)
-                                                    ->get();
-            if(count($prevsteps)>0){
-            foreach ($prevsteps as $prevstep) {
-                $wsidprevpk = rand(1000,99999);
-                DB::table('previous')->insert(['prev_id'=>$wsidprevpk,
-                                                'ws_id'=>$wsidpk,
-                                                'prev_wsid'=>$prevstep->ws_id]);
-            }
-        }
-        else
-        {
-              $wsidprevpk = rand(1000,99999);
-                DB::table('previous')->insert(['prev_id'=>$wsidprevpk,
-                                                'ws_id'=>$wsidpk,
-                                                'prev_wsid'=>""]);
-        }
-
-             //update next of previous step
-            foreach ($prevsteps as $prevstep) {
-                DB::table('next')->where('ws_id','=',$prevstep->ws_id)->update(['next_wsid'=>$wsidpk]);
-            }
-
-            //insert next of newly added step
-             $nextsteps = DB::table('workflowsteps')
-                            ->where('workflow_w_id','=',$request['forprevwfid'])
-                            ->where('order','=',$neworder+1)
-                            ->get();
-            if(count($nextsteps)==0)
-            {
-                $wsidnextpk = rand(1000,99999);
-                  DB::table('next')->insert(['next_id'=>$wsidnextpk,
-                                                'ws_id'=>$wsidpk,
-                                                'next_wsid'=>""]);
-            }
-            else
-            {
-                foreach ($nextsteps as $nextstep) {
-                    $wsidnextpk = rand(1000,99999);
-                    DB::table('next')->insert(['next_id'=>$wsidnextpk,
-                                                'ws_id'=>$wsidpk,
-                                                'next_wsid'=>$nextstep->ws_id]);
-                }
-            }
-
-             //insert recipients of newly-added step
-             if(isset($request['all'])) 
-        {
-            
-            $posusers = DB::table('userpositiongroup')->where('position_pos_id','=',$request['pos'])->get();
-            foreach ($posusers as $posuser) {
-                $wsrecidpk = rand(1000,99999);
-                DB::table('wsreceiver')->insert(['wsrec_id'=>$wsrecidpk,
-                                                    'ws_id'=>$wsidpk,
-                                                    'upg_id'=>$posuser->upg_id]);
-            }
-        }
-        else
-        {
-            foreach ($request['wfsrec'] as $value) {
-                $wsrecidpk = rand(1000,99999);
-                DB::table('wsreceiver')->insert(['wsrec_id'=>$wsrecidpk,
-                                                    'ws_id'=>$wsidpk,
-                                                    'upg_id'=>$value]);
-            }
-        }
-
-            return redirect()->route('AddWf',['id'=>$request['forprevwfid'],'upgid'=>$upgid]);
-            //  echo "<pre>";
-            // var_dump($wfsteps);
-    }
-
-
-    // public function addStep(Request $request,$upgid)
-    // {
-    //     $prevVals = array();
-
-    //     $rand = rand(1000,99999);
-
-    //     if(!(isset($request['prev'])))
-    //     {
-    //         $previous = "";
-    //         $orderprev = 1;
-
-    //     }
-    //     else
-    //     {
-    //         $prev = $request['prev'];
-    //         foreach ($prev as $key) {
-    //             $prevorder = DB::table('workflowsteps')->where('ws_id','=',$key)->get();
-    //             foreach ($prevorder as $value) {
-    //                 $orderprev = $value->order;
-    //             }
-    //             $prevVals[] = $key;
-
-    //             DB::table('workflowsteps')->where('ws_id','=',$key)->update(['next'=>$rand]);
-    //         }
-    //          $previous = implode(',', $prevVals);
-    //         $orderprev++;
-
-    //     }
-    //     DB::table('workflowsteps')->insert(['ws_id'=>$rand,
-    //                                         'workflow_w_id'=>$request['wid'],
-    //                                         'position_pos_id'=>$request['pos'],
-    //                                         'order'=>$orderprev,
-    //                                         'action'=>$request['action'],
-    //                                         'prev'=>$previous,
-    //                                         'next'=>""]);
-
-
-    //         //update whole workflow
-    //      $wfsteps = DB::table('workflowsteps')->where('workflow_w_id','=',$request['wid'])->get();
-    //     foreach ($wfsteps as $wfstep) {
-    //         $this->updateWF($wfstep->ws_id); //update whole workflow
-    //     }
-
-    //     return redirect()->route('AddWf',['id'=>$request['wid'],'upgid'=>$upgid]);
-    // }
 
     //edit
     public function editStep(Request $request,$upgid,$wsid)
@@ -527,32 +245,32 @@ class WorkflowStepsController extends Controller
     $steps = DB::table('workflowsteps as ws')->where('ws.workflow_w_id','=',$wid)
              ->join('position as p','ws.position_pos_id','=','p.pos_id')
              ->get();
-    //          foreach ($steps as $step) {
-    //              $prevstep = $step->prev;
-    //              //$prevarr2[] = $step->ws_id;
+             foreach ($steps as $step) {
+                 $prevstep = $step->prev;
+                 //$prevarr2[] = $step->ws_id;
 
-    //               // $prevarr = array();
-    //         if(strpos($prevstep,',')!==false)
-    //          {
-    //             $prevarr = explode(',',$prevstep);
-    //             //array_push($prevarr2, array($step->ws_id,$prevarr));
-    //          }
-    //          else
-    //          {
+                  // $prevarr = array();
+            if(strpos($prevstep,',')!==false)
+             {
+                $prevarr = explode(',',$prevstep);
+                //array_push($prevarr2, array($step->ws_id,$prevarr));
+             }
+             else
+             {
                 
-    //             $prevarr[] = $prevstep;
+                $prevarr[] = $prevstep;
               
-    //          }
-    //          array_push($prevarr2, array($step->ws_id,$prevarr));
-    //          //$prevarr2[] = $prevarr;
-    //          }
+             }
+             array_push($prevarr2, array($step->ws_id,$prevarr));
+             //$prevarr2[] = $prevarr;
+             }
             
         $steps2 = $this->sortStep($wfid);
         
-          return view("admin/addWf",['User'=>$user, 'positions'=>$positions, 'workflow'=>$workflow, 'steps'=>$steps, 'steps2'=>$steps2,'upgid'=>$upgid]);
+          return view("admin/addWf",['User'=>$user, 'positions'=>$positions, 'workflow'=>$workflow, 'steps'=>$steps, 'steps2'=>$steps2, 'prevarr'=>$prevarr,'prevarr2'=>$prevarr2,'upgid'=>$upgid]);
         
-         // echo "<pre>";
-         // var_dump($steps2);
+        // echo "<pre>";
+        // var_dump($prevarr2);
 
     }
 
@@ -605,16 +323,6 @@ class WorkflowStepsController extends Controller
     {
         $total = DB::table('workflowsteps')->where('workflow_w_id','=',$wfid)->max('order');
         return $total;
-    }
-
-    public function getPosUsers($posid)
-    {
-        $posusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$posid)
-                    ->join('user as u','upg.user_user_id','u.user_id')
-                    ->join('group as g','upg.group_group_id','g.group_id')
-                    ->get();
-
-        return response()->json($posusers);
     }
 
 //remove
@@ -752,6 +460,7 @@ class WorkflowStepsController extends Controller
 
         //return $newnextstring;
     }
+
 
     
   
