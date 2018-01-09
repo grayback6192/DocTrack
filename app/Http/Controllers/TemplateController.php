@@ -22,18 +22,16 @@ class TemplateController extends Controller
         $user = Auth::user();
         $request = \DB::table("template")->where("template_id","=",$id)->get();
         foreach ($request as $requests)
-        //Depreciated Code (Will remove after testing)
-        /*
         $phpWord = \PhpOffice\PhpWord\IOFactory::load('templates/'.$requests->templatename.'.docx');
         $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
         $htmlWriter->save('temp/'.$requests->templatename.'.html');
-        */
         $htmlLoader = file_get_contents('temp/'.$requests->templatename.'.html');
         $usergroup = DB::table('userpositiongroup')->get();
 	    foreach ($usergroup as $ug)
 	    {
 	        $group = $ug->group_group_id;
 	    }
+	    //$upgid = \Session::get('upg');
 	    $client = DB::table('userpositiongroup')->where('upg_id','=',$upgid)->get();
         foreach ($client as $value) 
         {
@@ -68,6 +66,7 @@ class TemplateController extends Controller
                                           "tempInfos"=>$request,
                                           "upgid"=>$upgid]);
     }
+
     public function addEditedTemplate($upgid,$tempid) //Template Creation, Post
     {
         $user = request()->all();
@@ -77,18 +76,18 @@ class TemplateController extends Controller
         \PhpOffice\PhpWord\Shared\Html::addHtml($section, $user['text']);
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
         $objWriter->save('templates/'.$title.'.docx');
-        $objWriterHTML = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
-        $objWriterHTML->save('temp/'.$title.'.html');
         //PDF RENDERER
         $dompdf= new Dompdf();
         $dompdf->loadHtml($user['text']);
         $dompdf->render();
         $output = $dompdf->output();
         file_put_contents("pdf/".$title.".pdf", $output);
+        //Delete Files
+        unlink('temp/'.$title.'.html');
         \DB::table('template')->where('template_id','=',$tempid)->update(['templatename'=>$title,
                                                                           'group_group_id'=>$user['group'],
                                                                           'workflow_w_id'=>$user['wf']]);
-        return redirect()->route("viewOwners",['upgid'=>$upgid]);
+        return redirect()->route("openTemplate",['upgid'=>$upgid,"id"=>$tempid]);
     }
     public function addTemplate(Request $request,$upgid) //Adds template, Post
     {
@@ -115,8 +114,6 @@ class TemplateController extends Controller
         \PhpOffice\PhpWord\Shared\Html::addHtml($section, $user['text']);
         $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
         $objWriter->save('templates/'.$title.'.docx');
-        $objWriterHTML = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
-        $objWriterHTML->save('temp/'.$title.'.html');
 
         //PDF RENDERER
         $dompdf= new Dompdf();
