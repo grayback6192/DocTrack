@@ -144,7 +144,7 @@
                     ?>
       </div><br>
 
-      Action: <input type="radio" name="action" value="sign" checked="checked"> Sign
+      Action: <input type="radio" name="action" value="sign"> Sign
               <input type="radio" name="action" value="cc"> Carbon Copy<br>
             <div class="modal-footer">
                 <input type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
@@ -228,13 +228,6 @@
                     ?>
                
                 <br>
-                Action: @if($steps2[$a][$b]['action']=="sign")
-                        <input type="radio" name="action" value="sign" checked="checked"> Sign
-                        <input type="radio" name="action" value="cc"> Carbon Copy<br>
-                        @elseif($steps2[$a][$b]['action']=="cc")
-                         <input type="radio" name="action" value="sign"> Sign
-                        <input type="radio" name="action" value="cc" checked="checked"> Carbon Copy<br>
-                        @endif
 
             <input type="submit" name="addNewStep" value="Save">&nbsp;&nbsp;
             <input type="button" id="closeWsModal" value="Cancel" onclick="closeModal({{$steps2[$a][$b]['ws_id']}})">
@@ -326,7 +319,7 @@ function closeModal(wsid) {
                 @endforeach
                 </select><br><br>
                 
-      Action: <input type="radio" name="action" value="sign" checked="checked"> Sign
+      Action: <input type="radio" name="action" value="sign"> Sign
               <input type="radio" name="action" value="cc"> Carbon Copy<br>
             <div class="modal-footer">
                 <input class="btn btn-primary" type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
