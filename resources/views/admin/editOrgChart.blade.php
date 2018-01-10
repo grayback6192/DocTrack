@@ -237,7 +237,9 @@
     $('#btn-add-nodes').on('click', function() {
       var $chartContainer = $('#chart-container');
       var nodeVals = [];
-       var x = document.getElementById("nodetext").value; //new node text box
+       var x = document.getElementById("nodetext").value;
+
+
 
       $('#new-nodelist').find('.new-node').each(function(index, item) {
         var validVal = item.value.trim();
@@ -266,7 +268,7 @@
       if (nodeType.val() === 'parent') {
         if (!$chartContainer.children('.orgchart').length) {// if the original chart has been deleted
           oc = $chartContainer.orgchart({
-            'data' : { 'name': nodeVals[0]},
+            'data' : { 'name': nodeVals[0] },
             'exportButton': true,
             'exportFilename': 'OrgChart',
             'parentNodeSymbol': 'fa-th-large',
@@ -276,7 +278,7 @@
           });
           oc.$chart.addClass('view-state');
         } else {
-          oc.addParent($chartContainer.find('.node:first'), { 'name': nodeVals[0], 'name2': nodeVals[1] ,'Id': getId() });
+          oc.addParent($chartContainer.find('.node:first'), { 'name': nodeVals[0], 'Id': getId() });
         }
       } else if (nodeType.val() === 'siblings') {
         oc.addSiblings($node,

@@ -39,7 +39,6 @@ class WorkflowStepsController extends Controller
                                             'workflow_w_id'=>$request['wid'],
                                             'position_pos_id'=>$request['pos'],
                                             'order'=>$orderprev,
-                                            'action'=>$request['action'],
                                             'prev'=>$previous,
                                             'next'=>""]);
 
@@ -67,10 +66,11 @@ class WorkflowStepsController extends Controller
             $prevNode = \DB::table('workflowsteps')->where('ws_id','=',$key)->get();
             foreach ($prevNode as $prev) { //get order of previous node
                 $prevOrder = $prev->order;
+                //$wfid = $prev->workflow_w_id;
             }
            }
            $prevOrder++;
-
+           //echo "".$prevOrder;
            \DB::table('workflowsteps')->where('ws_id','=',$wsid)->update(['order'=>$prevOrder]);
             }
         $currNode = \DB::table('workflowsteps')->where('ws_id','=',$wsid)->get();
@@ -80,7 +80,9 @@ class WorkflowStepsController extends Controller
             $currNodeNext = $curr->next;
             $wfid = $curr->workflow_w_id;
         }
- 
+
+        // $nextValue = $this->setNext($wsid,$wfid);
+        // return $nextValue;  
 
         $currFlow = \DB::table('workflowsteps')->where('workflow_w_id','=',$wfid)->orderBy('order')->get();
         foreach ($currFlow as $flow) {
@@ -91,6 +93,7 @@ class WorkflowStepsController extends Controller
        }
        
          return redirect()->route('AddWf',['upgid'=>$upgid, 'id'=>$request['wfid']]);
+        //return $p;
     }
 
     public function setPrev($wsid,$wfid) //transfer
