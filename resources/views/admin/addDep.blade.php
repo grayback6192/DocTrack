@@ -1,4 +1,4 @@
-{{-- @if(Auth::check()) --}}
+@if(Auth::check())
 @extends('mastertemplate')
 @section('menu')
 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
@@ -54,7 +54,7 @@
 @section('main_content')
 
 <div class="center-div" style="margin-top: 20px;">
-<form action="{{route('addDep',['upgid'=>$upgid])}}" method="post">
+<form action="{{route('addDep')}}" method="post">
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <div class="form-group row">
   <label class="col-sm-4 col-form-label">Department Name</label>
@@ -124,7 +124,7 @@ function showSub()
 </div>
   <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
   <div class="btn-group" role="group" aria-label="First group">
-    <a href="{{route('viewDep',['upgid'=>$upgid])}}" class="btn btn-primary">Cancel</a>
+    <a href="{{route('viewDep')}}" class="btn btn-primary">Cancel</a>
   </div>
 
   <div class="input-group">
@@ -135,4 +135,4 @@ function showSub()
 </div>
 
 @endsection
-{{-- @endif --}}
+@endif
