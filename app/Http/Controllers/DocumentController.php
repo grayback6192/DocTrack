@@ -20,13 +20,16 @@ class DocumentController extends Controller
         foreach ($request as $requests)
         $template = new \PhpOffice\PhpWord\TemplateProcessor('templates/'.$requests->templatename.'.docx');
         $variable = $template->getVariables();
-        $var = getWorkflow($group,$tempid);
+        $var = getWorkflow2($upgid,$group,$tempid);
+
         return view("user/templatefillup",["variable"=>$variable,
                                             "var"=>$var,
                                            "id"=>$request->first(),
                                            "User"=>$name,
                                             "upgid"=>$upgid,
                                             "gid"=>$gid]);
+        // echo "<pre>";
+        // var_dump($var);
     }
 	public function viewFile($id) //Views file in PDF with corresponding values inserted, POST
     {
@@ -86,7 +89,7 @@ class DocumentController extends Controller
             $newVar = str_replace(" ","_",$variables);
             $template->setValue($variables,$templateRequest[$newVar]);
         }
-        $rand = rand(10000,99999);
+         $rand = rand(10000,99999);
         $path = 'file/'.$rand.'.docx';
         DB::table("document")->insert(["doc_id"=>$rand,
                                        "docname"=>$title,
@@ -107,7 +110,7 @@ class DocumentController extends Controller
         // file_put_contents("pdf/".$doc->doc_id.".pdf", $output);
         file_put_contents("temp/".$doc->doc_id.".pdf", $output);
         }
-        $var = getWorkflow($groupid,$id); //Problem
+         $var = getWorkflow2($upgId,$groupid,$id); //Problem
         return insertTransaction($rand,$var,$upgId);
     }
 
@@ -160,7 +163,7 @@ class DocumentController extends Controller
         $request = \DB::table("document")->where("doc_id","=",$id)->get();
         foreach($request as $requests)
         $name = $requests->docname;
-        //Save file as HTML
+        // Save file as HTML
         // $phpWord = new \PhpOffice\PhpWord\PhpWord();
         // $phpWord = \PhpOffice\PhpWord\IOFactory::load('file/'.$id.'.docx'); 
         // $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');

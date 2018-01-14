@@ -145,7 +145,7 @@ function closeInstructions()
 </script>
 <br><br>
 Workflow:<br><br>
- @for($i=0;$i<(count($var));$i++)
+ {{-- @for($i=0;$i<(count($var));$i++)
  <table border="2" style="display:inline-block;">
 @if($i==(count($var)-1))
 @for($j=0;$j<(count($var[$i]));$j++)
@@ -164,7 +164,11 @@ Workflow:<br><br>
 @endfor 
 </table>-->
 @endif
-@endfor
+@endfor --}}
+<?php
+echo "<pre>";
+var_dump($var);
+?>
 <br><br>
 
 </form>

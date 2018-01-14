@@ -26,6 +26,17 @@ function getClientId($userid)
     return $clientgroup;
 }
 
+function getUserGroup($upgid)
+{
+    $user = Auth::user();
+    $usergroups = DB::table('userpositiongroup')->where('upg_id','=',$upgid)->get();
+    foreach ($usergroups as $usergroup) {
+        $ugroup = $usergroup->group_group_id;
+    }
+
+    return $ugroup;
+}
+
 function getWorkflow($groupid,$templateid)
 {
     $workflow = DB::table('template')->where('template_id','=',$templateid)
@@ -92,35 +103,160 @@ function getWorkflow($groupid,$templateid)
                 $sort = sortNodes($templateid,$arr,1,1,$ordered);
        return $sort;
 }
+
+function getWorkflow2($upgid,$groupid,$templateid)
+{
+    $workflowsteps = DB::table('template as t')->where('t.template_id','=',$templateid)
+                                                ->join('workflow as w','t.workflow_w_id','w.w_id')
+                                                ->join('workflowsteps as ws','w.w_id','ws.workflow_w_id')
+                                                ->orderBy('ws.order')
+                                                ->get();
+
+    $storestep = array();
+    $storestep2 = array();
+    $storestep3 = array();
+
+   foreach ($workflowsteps as $workflowstep) {
+       $recipients = DB::table('workflowsteps as ws')->where('ws.ws_id','=',$workflowstep->ws_id)
+                                                    ->join('wsreceiver as wsr','ws.ws_id','wsr.ws_id')
+                                                    ->join('next as nxt','ws.ws_id','nxt.ws_id')
+                                                    //->join('previous as prev','ws.ws_id','prev.ws_id')
+                                                    ->get();
+        foreach ($recipients as $recipient) {
+            //echo "".$recipient->ws_id."=".$recipient->receiver."(".$recipient->order.")"."<br>";
+            $recipientarray = json_decode(json_encode($recipient),TRUE);
+            if($recipient->receiver=="All")
+            {
+                $usergroup = getUserGroup($upgid);
+                $depposusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$recipient->position_pos_id)
+                                                                ->where('upg.group_group_id','=',$usergroup)
+                                                                ->join('user as u','upg.user_user_id','u.user_id')
+                                                                ->get();
+                if(count($depposusers)>0)
+                {
+                     foreach ($depposusers as $depposuser) {
+                        $depposuserarray = json_decode(json_encode($depposuser),TRUE);
+                        $merge = array_merge($recipientarray,$depposuserarray);
+                        $storestep[] = $merge;
+                    // storeToArray($storestep);
+                    }
+                }
+                else
+                {
+                    $allposusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$recipient->position_pos_id)
+                                                                ->join('user as u','upg.user_user_id','u.user_id')
+                                                                ->get();
+
+                     foreach ($allposusers as $allposuser) {
+                        $allposuserarray = json_decode(json_encode($allposuser),TRUE);
+                        $merge = array_merge($recipientarray,$allposuserarray);
+                        $storestep[] = $merge;
+                    // storeToArray($storestep);
+                    }
+                }
+               
+            }
+            else
+            {
+                  $posusers = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$recipient->receiver)
+                                                                ->join('user as u','upg.user_user_id','u.user_id')
+                                                                ->get();
+                foreach ($posusers as $posuser) {
+                    $posuserarray = json_decode(json_encode($posuser),TRUE);
+                    $merge = array_merge($recipientarray,$posuserarray);
+                    $storestep[] = $merge;
+                    //storeToArray($storestep);
+
+                }
+            }
+            
+        }
+       
+   }
+   return $storestep;
+}
+
+function storeToArray($array)
+{
+    $stepsstorage = array();
+    return $stepsstorage;
+}
+
 function insertTransaction($docid,$array,$upgid)
     {
-        for($i=0;$i<(count($array));$i++){
-        for($j=0;$j<(count($array[$i]));$j++){
-            $upgid = $array[$i][$j]["upg_id"];
-            $wdid = $array[$i][$j]["ws_id"];
-            $order = $array[$i][$j]["order"];
-            $next = $array[$i][$j]["next"];
+       //  for($i=0;$i<(count($array));$i++){
+       //  for($j=0;$j<(count($array[$i]));$j++){
+       //      $upgid = $array[$i][$j]["upg_id"];
+       //      $wdid = $array[$i][$j]["ws_id"];
+       //      $order = $array[$i][$j]["order"];
+       //      $next = $array[$i][$j]["next"];
 
-            DB::table('transaction')->insert(["document_doc_id"=>$docid,
-                                            "upg_id"=>$upgid,
-                                            "wd_id"=>$wdid,
-                                             "order"=>$order,
-                                             "status"=>"pending",
-                                             "next"=>$next]);
-       }
-       }
-       $val = array();
-       $firstNode = DB::table('transaction as t')->where('t.document_doc_id','=',$docid)
-                ->join('workflowsteps as ws','t.wd_id','=','ws.ws_id')
-                ->where('ws.prev','=','')
-                ->get();
-        foreach ($firstNode as $key) {
-            $vals = $key->tran_id;
-            $vals1 = json_decode(json_encode($vals),TRUE);
-            $val[] = $vals1;
-        }
-        return insertInbox($docid,$val,$upgid);
+       //      DB::table('transaction')->insert(["document_doc_id"=>$docid,
+       //                                      "upg_id"=>$upgid,
+       //                                      "wd_id"=>$wdid,
+       //                                       "order"=>$order,
+       //                                       "status"=>"pending",
+       //                                       "next"=>$next]);
+       // }
+       // }
+       // $val = array();
+       // $firstNode = DB::table('transaction as t')->where('t.document_doc_id','=',$docid)
+       //          ->join('workflowsteps as ws','t.wd_id','=','ws.ws_id')
+       //          ->where('ws.prev','=','')
+       //          ->get();
+       //  foreach ($firstNode as $key) {
+       //      $vals = $key->tran_id;
+       //      $vals1 = json_decode(json_encode($vals),TRUE);
+       //      $val[] = $vals1;
+       //  }
+       //  return insertInbox($docid,$val,$upgid);
+
+        //insert to transaction table
+         for ($i=0; $i < sizeof($array); $i++) { 
+             //echo $array[$i]['lastname']."->".$array[$i]['upg_id']."<br>";
+            $upgid = $array[$i]['upg_id'];
+            $wdid = $array[$i]['ws_id'];
+            $order = $array[$i]['order'];
+            $next = $array[$i]['next_wsid'];
+
+            DB::table('transaction')->insert(['document_doc_id'=>$docid,
+                                                'upg_id'=>$upgid,
+                                                'wd_id'=>$wdid,
+                                                'order'=>$order,
+                                                'status'=>"pending",
+                                                'next'=>$next]);
+            //echo $array[$i]['lastname']."->".$wdid."->".$next = $array[$i]['next_wsid']."<br>";
+         }
+
+         //send to first receiver
+         $firstreceivers = DB::table('transaction')->where('document_doc_id','=',$docid)->where('order','=',1)->get();
+         foreach ($firstreceivers as $firstreceiver) {
+             return insertInbox2($firstreceiver->upg_id,$docid);
+            //echo "".$firstreceiver->upg_id;
+         }
+       // echo "<pre>";
+       // var_dump(sizeof($array));
+       
+      
+
     }
+
+function insertInbox2($receiverupgid,$docid)
+{
+     $user = Auth::user();
+         date_default_timezone_set('Asia/Manila');
+        $date = date('m-d-Y');
+        $time = date('h:i:sa');
+
+        DB::table('inbox')->insert(['doc_id'=>$docid,
+                                    'upg_id'=>$receiverupgid,
+                                    'istatus'=>"unread",
+                                    'time'=>$time,
+                                    'date'=>$date]);
+
+        return "sent to first receiver success";
+}
+
 function insertInbox($docid,$node,$upgid){
         
         //get owner of template for redirection

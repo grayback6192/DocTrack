@@ -290,9 +290,14 @@ Route::post('admin/{upgid}/workflow/edit/{wfid}','WorkflowController@editWf')->n
 Route::get('admin/viewPath','WorkflowStepsController@getWorkflow');
 
 //workflowstep mnmgt
-Route::post('admin/{upgid}/workflow/addstep','WorkflowStepsController@addStep')->name('postAddStep');
-Route::post('admin/{upgid}/workflow/editstep/{wsid}','WorkflowStepsController@editStep')->name('UpdateWs');
-Route::post('admin/{upgid}/workflow/deletestep/{wsid}','WorkflowStepsController@removeStep')->name('RemoveWs');
+Route::get('admin/posusers/{posid}','WorkflowStepsController@getPosUsers');
+Route::post('admin/{upgid}/workflow/addnext','WorkflowStepsController@addNextStep')->name('addNextStep');
+Route::post('admin/{upgid}/workflow/addprev','WorkflowStepsController@addPrevStep')->name('addPrevStep');
+Route::post('admin/{upgid}/workflow/addsameorder','WorkflowStepsController@addSameOrderStep')->name('addSameOrderStep');
+Route::post('admin/{upgid}/workflow/addstep','WorkflowStepsController@addFirstStep')->name('postAddStep');
+Route::post('admin/{upgid}/workflow/editsteprec','WorkflowStepsController@editStepRecipients')->name('editStepRecs');
+Route::post('admin/{upgid}/workflow/editstepaction','WorkflowStepsController@editStepAction')->name('editStepAction');
+Route::post('admin/{upgid}/workflow/deletestep','WorkflowStepsController@removeStep')->name('RemoveWs');
 //End Admin
 
 //User
@@ -355,7 +360,7 @@ Route::get("user/{upgid}/inbox/documentView/{id}","DocumentController@viewdocs")
 
   Route::get("/user/{upgid}/inbox","user@viewInbox")->name('viewInbox');
 
-Route::post("user/{upgid}/approve/{id}","user@approvedoc")->name('approve');
+Route::post("user/{upgid}/approve/{id}","user@approvedoc2")->name('approve');
 
 Route::post("user/{upgid}/reject/{id}","user@rejectdoc")->name('reject');
 
@@ -387,4 +392,7 @@ Route::get('/admin/{upgid}/addorg','OrgChart@store');
  Route::get('/admin/{upgid}/updateOrgChart','OrgChart@update');
 
 //End User
+
+ //test
+ Route::get('admin/{upgid}/getMax/{wsid}','WorkflowStepsController@updateWF');
 

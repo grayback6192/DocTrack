@@ -39,31 +39,37 @@ class User extends Controller
           return view("user/test",['inbox'=>$inbox,'User'=>$user,'numUnread'=>$numunread,'upgid'=>$upgid]);
     }
    
-    public function approvedoc($upgid,$docid){
-        date_default_timezone_set('Asia/Manila');
+    public function approvedoc($upgid,$docid)
+    {
+         date_default_timezone_set('Asia/Manila');
         $user = Auth::user();
         $date = date('m-d-Y');
         $time = date('h:i:sa');
-        //get transactions of the document
+
+         //get transactions of the document
         $trans = \DB::table("transaction")->where('document_doc_id','=',$docid)->get();
         foreach ($trans as $tran) {
-                    $upgid = \DB::table('userpositiongroup as upg')
-                    ->where('upg.user_user_id','=',$user->user_id)
-                    ->get();
-                    foreach ($upgid as $key) {
-                        $u_id = $key->upg_id;
-                    }
+                    // $upgid = \DB::table('userpositiongroup as upg')
+                    // ->where('upg.user_user_id','=',$user->user_id)
+                    // ->get();
+                    // foreach ($upgid as $key) {
+                    //     $u_id = $key->upg_id;
+                    // }
+
                     //update transaction status to approve of the signed in approver
-            \DB::table('transaction')->where(['document_doc_id'=>$tran->document_doc_id])->where('upg_id','=',$u_id)
+            \DB::table('transaction')->where(['document_doc_id'=>$tran->document_doc_id])->where('upg_id','=',$upgid)
                 ->update(['status'=>'approved',
                             'time'=>$time,
                             'date'=>$date]);
             }
-            //get transactions of document where upg_id = upg_id of signed in approver to determine its next step
+
+             //get transactions of document where upg_id = upg_id of signed in approver to determine its next step
             $nxt = array();
-                $next = DB::table('transaction')->where(['document_doc_id'=>$tran->document_doc_id])->where('upg_id','=',$u_id)
+                $next = DB::table('transaction')->where(['document_doc_id'=>$tran->document_doc_id])->where('upg_id','=',$upgid)
                     ->get();
                 foreach ($next as $key) {
+                    $currenttran = $key->tran_id; //current transaction id
+                    $currenttranorder = $key->order; //current transaction order
                     $nexts = $key->next;
                     if(strpos($next,',')!== false) //if there are more than one nexts
                     {
@@ -74,43 +80,334 @@ class User extends Controller
                     $next1 = json_decode(json_encode($nexts),TRUE);
                     $nxt[] = $next1;
                 }
-            }   
-           $nxt2 = array();
-            //get tran_id of the next/s
+            }
+
+             $nxt2 = array();
+
+               //get tran_id of the next/s
             for($x=0;$x<count($nxt);$x++){
-                    $trans = DB::table('transaction')->where(['document_doc_id'=>$tran->document_doc_id])->where('wd_id','=',$nxt[$x])
+                    $trans = DB::table('transaction as t')->where(['t.document_doc_id'=>$tran->document_doc_id])->where('t.wd_id','=',$nxt[$x])
+                        ->join('workflowsteps as ws','t.wd_id','ws.ws_id')
                         ->get();
 
-                        foreach ($trans as $tran) {
-                    $nxt2[] = $tran->tran_id;
-                }
-                }
-                //for online signature
-                //..codes
-                 $poss= session()->get('upgid');
-$docs = DB::table("document")->where('doc_id','=',$docid)->get();
-               
+                foreach ($trans as $tran) {
+                            //if next is cc
+                            if($tran->action=="cc")
+                            {
+                                DB::table('transaction')->where('tran_id','=',$tran->tran_id)->update(['status'=>'approved',
+                                                                                                        'time'=>$time,
+                                                                                                        'date'=>$date]);
 
-           $allnxt = $this->countAllNext($docid,$nexts);
+                                //get current step
+
+                                //find how many steps has the same order as current step (which is nxt step of current transaction)
+                                $thesamestepcount = 0;
+                            $thesamesteps = DB::table('transaction')->where('document_doc_id','=',$tran->document_doc_id)
+                                                        ->where('order','=',$tran->order)
+                                                        ->get();
+                            foreach ($thesamesteps as $thesamestep) {
+                                $thesamesteporder = $thesamestep->order;
+                                $thesamestepcount++;
+                            }
+
+                            $thesamestepnxtorder = $thesamesteporder + 1; //next order of current step
+
+                            //max number of steps of workflow of document
+                            $maxstep = DB::table('transaction')->where('document_doc_id','=',$tran->document_doc_id)->max('order');
+
+                            if($thesamestepcount==1) //if only cc as nxt step of current transaction
+                            {
+                                //get current step
+                                $csteps = DB::table('transaction')->where('document_doc_id','=',$tran->document_doc_id)
+                                                                    ->where('order','=',$currenttranorder)
+                                                                    ->get();
+
+                                    $samecurrentstepcount = 0; //count how many steps in the current order
+
+                                    foreach ($csteps as $cstep) {
+                                             $samecurrentstepcount++;
+                                         }
+
+                                    if($samecurrentstepcount==1) //if only one step is in current order  
+                                    {
+
+                                        //what if the nxt order is beyond the no. of steps
+                                         $nxttrans = DB::table('transaction')->where('document_doc_id','=',$tran->document_doc_id)
+                                                        ->where('order','=',$thesamestepnxtorder)
+                                                        ->get();
+
+                                            //if thesamestepnxtorder<=maxstep, go to next next step from current order
+                                             if($thesamestepnxtorder<=$maxstep){          
+                                                foreach ($nxttrans as $nxttran) {
+                                                        $nxt2[] = $nxttran->tran_id;
+                                                }
+                                                $nxt2[] = $tran->tran_id; //include trans id with cc too
+                                            }
+                                             else //else go to next order
+                                                {
+                                                    
+                                                        $nxtcurrentorder = $currenttranorder + 1;
+                                                        $currentnexts = DB::table('transaction as t')
+                                                                            ->where('t.document_doc_id','=',$tran->document_doc_id)
+                                                                            ->join('workflowsteps as ws','t.wd_id','ws.ws_id')
+                                                                            ->where('t.order','=',$nxtcurrentorder)
+                                                                            ->get();
+
+                                                        foreach ($currentnexts as $currentnext) {
+                                                            if($currentnext->action=="cc")
+                                                            {
+                                                                $nxt2[] = $currentnext->tran_id;
+                                                            }
+                                                            
+                                                        }
+                                                    
+                                                }
+                                                
+                                    }
+                                    else if($samecurrentstepcount>1) //if 2 or more steps in current order
+                                    {
+                                        $totalcsteps = 0;
+                                        $totalapprovedcsteps = 0;
+                                        foreach ($csteps as $cstep1) { //see if the number of approve == number of current steps
+                                            $totalcsteps++;
+
+                                            if($cstep1->status=="approved")
+                                                $totalapprovedcsteps++;
+                                        }
+
+                                        if($totalcsteps==$totalapprovedcsteps)
+                                        {
+                                            // $cnxts = array();
+
+                                            // foreach ($csteps as $cstep2) {
+                                               
+                                            //     $cnexts = $cstep2->next;
+                                            //     if(strpos($csteps,',')!== false) //if there are more than one nexts
+                                            //     {
+                                            //         $cnxts = explode(',', $cnexts); //result already in array
+                                            //     }
+                                            //     else //if there's only one next, put it in array 
+                                            //     {
+                                            //         $next1 = json_decode(json_encode($cnexts),TRUE);
+                                            //         $cnxts[] = $next1;
+                                            //     }
+                                            // }
+
+                                            // $nxt2 = $cnxts;
+                                             $nxttrans = DB::table('transaction')->where('document_doc_id','=',$tran->document_doc_id)
+                                                        ->where('order','=',$thesamestepnxtorder)
+                                                        ->get();
+
+                                                if($thesamestepnxtorder<=$maxstep){ 
+                                                    foreach ($nxttrans as $nxttran) {
+                                                        $nxt2[] = $nxttran->tran_id;
+                                                    }
+                                                    $nxt2[] = $tran->tran_id;
+                                                }
+                                                else
+                                                {
+                                                    
+                                                        $nxtcurrentorder = $currenttranorder + 1;
+                                                        $currentnexts = DB::table('transaction as t')
+                                                                            ->where('t.document_doc_id','=',$tran->document_doc_id)
+                                                                            ->join('workflowsteps as ws','t.wd_id','ws.ws_id')
+                                                                            ->where('t.order','=',$nxtcurrentorder)
+                                                                            ->get();
+
+                                                        foreach ($currentnexts as $currentnext) {
+                                                            //if($currentnext->action=="cc"){
+                                                                $nxt2[] = $currentnext->tran_id;
+                                                            //}
+                                                            
+                                                        }
+                                                    
+                                                }
+
+                                        }
+                                          //return $nxt2;
+
+                                    }
+
+                             }
+                             else if($thesamestepcount>1)
+                             {
+                                //get all steps with the same order as the step with cc
+                                $sameordersteps = DB::table('transaction as t')
+                                                    ->where('t.document_doc_id','=',$tran->document_doc_id)
+                                                    ->join('workflowsteps as ws','t.wd_id','ws.ws_id')
+                                                    ->where('t.order','=',$tran->order)
+                                                    ->get();
+
+                                    foreach ($sameordersteps as $sameorderstep) {
+                                        if($sameorderstep->action=="cc"){
+                                            $nxt2[] = $sameorderstep->tran_id;
+                                        }
+                                        
+                                    }
+                             }
+                            // return $nxt2;
+                            }
+                            else{
+                                //return "next is sign";
+                                 $nxt2[] = $tran->tran_id;
+                            }
+
+                }
+
+            }
+
+            //  $poss= session()->get('upgid');
+            // $docs = DB::table("document")->where('doc_id','=',$docid)->get();
+
+             $allnxt = $this->countAllNext($docid,$nexts);
             $allapproved = $this->countAllApproved($docid,$nexts);
             $totalTrans = $this->getTotalTrans($docid);
             $currentNumApprove = $this->getTotalApprove($docid); 
 
-            if($totalTrans == $currentNumApprove){
-                return $this->archive($u_id,$docid);
-            }
+            //   if($totalTrans == $currentNumApprove){
+            //     return $this->archive($upgid,$docid);
+            // }
 
-//return $allnxt." == ".$allapproved;
-            //return $nexts;
+           // return $allnxt." == ".$allapproved;
+           //  return $nexts;
+
              if($allnxt==$allapproved)
-                   return $this->insertInboxAfterApprove($docid,$nxt2,$u_id);
-
+                    return $this->insertInboxAfterApprove($docid,$nxt2,$upgid);
               else
-                return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
-                
-             
+                  return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
+
+                // return $upgid.", ".$docid;
 
     }
+
+       
+    public function approvedoc2($upgid, $docid)
+    {
+         date_default_timezone_set('Asia/Manila');
+        $user = Auth::user();
+        $date = date('m-d-Y');
+        $time = date('h:i:sa');
+
+         //update transaction status to approve of the signed in approver
+            // \DB::table('transaction')->where(['document_doc_id'=>$tran->document_doc_id])->where('upg_id','=',$upgid)
+            //     ->update(['status'=>'approved',
+            //                 'time'=>$time,
+            //                 'date'=>$date]);
+        //get transaction info of current step
+        $currentstepinfos = DB::table('transaction')->where('document_doc_id','=',$docid)->where('upg_id','=',$upgid)->get();
+
+        foreach ($currentstepinfos as $currentstepinfo) {
+            $currentsteporder = $currentstepinfo->order;
+            $currentsteptranid = $currentstepinfo->tran_id;
+        }
+
+        //update transaction status
+         DB::table('transaction')->where('tran_id','=',$currentsteptranid)
+                                    ->update(['status'=>'approved',
+                                                'time'=>$time,
+                                                'date'=>$date]);
+
+        //get next steps of current order where status is still pending
+        $nextsteps = DB::table('transaction as t')->where('t.document_doc_id','=',$docid)
+                                                ->where('t.order','=',$currentsteporder+1)
+                                                ->where('t.status','=','pending')
+                                                ->join('workflowsteps as ws','t.wd_id','ws.ws_id')
+                                                ->get();
+         $nextarray = array(); //to store next steps
+        foreach ($nextsteps as $nextstep) {
+
+            if($nextstep->action=="cc") //if next step is cc
+            {
+                //update transaction of current order to approve
+                // DB::table('transaction')->where('document_doc_id','=',$docid)
+                //                         ->where('upg_id','=',$upgid)
+                //                         ->update(['status'=>'approved',
+                //                                     'time'=>$time,
+                //                                     'date'=>$date]);
+                //update status to approve if cc
+                DB::table('transaction')->where('tran_id','=',$nextstep->tran_id)->update(['status'=>'approved',
+                                                                                            'date'=>$date,
+                                                                                            'time'=>$time]);
+                //count how many steps has the same order as the cc nextstep where action= sign
+                $samestepsigncount = DB::table('transaction as t')->where('t.document_doc_id','=',$docid)
+                                                        ->where('t.order','=',$nextstep->order)
+                                                        ->join('workflowsteps as ws','t.wd_id','ws.ws_id')
+                                                        ->where('ws.action','=',"sign")
+                                                        ->count();
+                if($samestepsigncount==0) //if there are no sign steps then go to next's next step
+                {
+                    $nextnextarray = array();
+                    $finalnextnextarray = array();
+                    //get next's next step
+                    $nextnextsteps = DB::table('transaction')->where('document_doc_id','=',$docid)
+                                            ->where('order','=',$nextstep->order + 1)
+                                            ->get();
+                    foreach ($nextnextsteps as $nextnextstep) {
+                        //insert these to array
+                        $nextnextarray[] = $nextnextstep->upg_id;
+                    }
+                    $finalnextnextarray = array_unique($nextnextarray);
+                    $this->insertToNextInbox($docid,$upgid,$finalnextnextarray);
+                }
+                // echo "<pre>";
+                // var_dump($samestepcount);
+
+            }
+            //else{ //if next step action is sign
+            
+            //update transaction status
+            // DB::table('transaction')->where('tran_id','=',$currentsteptranid)
+            //                         ->update(['status'=>'approved',
+            //                                     'time'=>$time,
+            //                                     'date'=>$date]);
+
+           
+          
+        //}
+             //insert these next steps into the array
+            $nextarray[] = $nextstep->upg_id; 
+
+        }
+
+         $finalnextarray = array_unique($nextarray); //remove duplicate array values
+
+          //count how many transactions that has the same order as the current transaction
+            $currenttranscount = DB::table('transaction')->where('document_doc_id','=',$docid)
+                                                        ->where('order','=',$currentsteporder)
+                                                        ->count();
+
+            //count how many transactions that has the same order as the current transaction has been approved
+             $transapprovedcount = DB::table('transaction')->where('document_doc_id','=',$docid)
+                                                        ->where('order','=',$currentsteporder)
+                                                        ->where('status','=','approved')
+                                                        ->count(); 
+
+            if($currenttranscount==$transapprovedcount)
+                return $this->insertToNextInbox($docid,$upgid,$finalnextarray);
+            else
+                return redirect()->route('docView',['upgid'=>$upgid,'docid'=>$docid]);
+    }
+
+    public function insertToNextInbox($docid,$upgid,$nextarray)
+    {
+        // $user = Auth::user();
+         date_default_timezone_set('Asia/Manila');
+        $date = date('m-d-Y');
+        $time = date('h:i:sa');
+
+       for ($i=0; $i < sizeof($nextarray); $i++) { 
+
+           DB::table('inbox')->insert(['doc_id'=>$docid,
+                                        'upg_id'=>$nextarray[$i],
+                                        'istatus'=>'unread',
+                                        'time'=>$time,
+                                        'date'=>$date]);
+       }
+        // echo "<pre>";
+        // var_dump($nextarray);
+       return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
+    }
+                
 
     public function rejectdoc($upgid,$docid){
         $user = Auth::user();
@@ -143,7 +440,7 @@ $docs = DB::table("document")->where('doc_id','=',$docid)->get();
         \DB::table('archive')->insert(['idarchive'=>$rand, 'docid'=>$docid]);
 
          // return redirect()->route("viewInbox",['groupid'=>Session::get('groupid')]);
-        return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
+        //return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
     }
 
     public function getTotalTrans($docid){
@@ -192,8 +489,8 @@ $docs = DB::table("document")->where('doc_id','=',$docid)->get();
             
          }
         
-         //return redirect()->route("viewInbox",['groupid'=>Session::get('groupid')]);
          return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
+         //return "ok.";
     }
 
 
@@ -207,7 +504,7 @@ $docs = DB::table("document")->where('doc_id','=',$docid)->get();
             $nxtcount++;
         }
     // }
-        echo "".$docid.", ".$next;
+        //echo "".$docid.", ".$next;
         return $nxtcount;
     }
     //count all approved with the same nexts and docu id
