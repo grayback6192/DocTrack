@@ -18,18 +18,19 @@ class DocumentController extends Controller
         $group = \Session::get('groupid');
         $request = \DB::table("template")->where("template_id","=",$tempid)->get();
         foreach ($request as $requests)
-        $template = new \PhpOffice\PhpWord\TemplateProcessor('templates/'.$requests->templatename.'.docx');
+            $template = new \PhpOffice\PhpWord\TemplateProcessor('templates/'.$requests->templatename.'.docx');
         $variable = $template->getVariables();
         $var = getWorkflow2($upgid,$group,$tempid);
+        $position = \DB::table("position")->get();
 
         return view("user/templatefillup",["variable"=>$variable,
-                                            "var"=>$var,
+                                           "var"=>$var,
                                            "id"=>$request->first(),
                                            "User"=>$name,
-                                            "upgid"=>$upgid,
-                                            "gid"=>$gid]);
-        // echo "<pre>";
-        // var_dump($var);
+                                           "upgid"=>$upgid,
+                                           "gid"=>$gid,
+                                           "position"=>$position]);
+
     }
 	public function viewFile($id) //Views file in PDF with corresponding values inserted, POST
     {

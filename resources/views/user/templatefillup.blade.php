@@ -115,20 +115,32 @@ function closeInstructions()
 <object data="/pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350" style="float: right;"></object><br>
 </div>
 </div>
-
 <input class="row" style="margin-top: 20px;" type="text" name="subject" placeholder="Subject"><br>
-
 {{ csrf_field() }}
+{{-- Variable Form --}}
 @foreach($variable as $variables)
-<input type = "text" name = "{{ $variables }}" placeholder = "{{ $variables }}"><br>
+  @if($variables == "Body" || $variables == "body")
+    <textarea id = "textarea" rows = 5 cols = 40 name = "{{$variables}}" style = "margin-top:0px"></textarea><br>
+  @elseif($variables == "Date" || $variables == "date")
+    <input type = "date" name = "{{ $variables }}"><br>
+  @else
+    <input type = "text" name = "{{ $variables }}" placeholder = "{{ $variables }}"><br>
+  @endif
 @endforeach
+
+{{-- Unfixed --}}
+{{-- @foreach($position as $positions)
+      @if($positions == $variables)
+        <input type = "text" name = "{{ $variables }}" value = ${{{$variables}}}><br>
+      @endif
+    @endforeach --}}
+
 <br>
 
 <input class="btn btn-primary" type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
 <input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}' value = "View">
 
-{{-- '/templateView/{{ $id->template_id }}' --}}
-{{--open new window to view document--}}
+
 <script type="text/javascript" src="{{URL::asset('js/jquery-3.2.1.min.js')}}" ></script>
 <script type="text/javascript">
   $(document).ready(function(){
@@ -141,8 +153,7 @@ function closeInstructions()
         event.preventDefault();
     });
   });
-  
-</script>
+  cript>
 <br><br>
 Workflow:<br><br>
  {{-- @for($i=0;$i<(count($var));$i++)
@@ -165,10 +176,7 @@ Workflow:<br><br>
 </table>-->
 @endif
 @endfor --}}
-<?php
-echo "<pre>";
-var_dump($var);
-?>
+
 <br><br>
 
 </form>
