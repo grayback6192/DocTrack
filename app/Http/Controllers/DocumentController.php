@@ -21,15 +21,34 @@ class DocumentController extends Controller
             $template = new \PhpOffice\PhpWord\TemplateProcessor('templates/'.$requests->templatename.'.docx');
         $variable = $template->getVariables();
         $var = getWorkflow2($upgid,$group,$tempid);
-        $position = \DB::table("position")->get();
-
+        $position = \DB::table('template as t')->where('t.template_id','=',$tempid)
+                                                    ->join('workflow as w','t.workflow_w_id','w.w_id')
+                                                    ->join('workflowsteps as ws','w.w_id','ws.workflow_w_id')
+                                                    ->join('position as p','ws.position_pos_id','p.pos_id')
+                                                    ->get();
+        //Trim variable and get positions
+        foreach($position as $positions)
+        {
+            foreach($variable as $variables)
+            {
+                if($variables == $positions->posName)
+                {
+                    $signatureArray[] = $positions->posName;
+                    $temp = array_search($positions->posName,$variable);
+                    unset($variable[$temp]);
+                }
+            }
+        }   
         return view("user/templatefillup",["variable"=>$variable,
                                            "var"=>$var,
                                            "id"=>$request->first(),
                                            "User"=>$name,
                                            "upgid"=>$upgid,
                                            "gid"=>$gid,
-                                           "position"=>$position]);
+                                           "position"=>$signatureArray]);
+
+        echo "<pre>";
+        var_dump($posVariables);
 
     }
 	public function viewFile($id) //Views file in PDF with corresponding values inserted, POST
@@ -170,7 +189,10 @@ class DocumentController extends Controller
         // $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
         // $htmlWriter->save('temp/'.$id.'.html');
 
-    $api = new Api("F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw");
+    //Accounts
+    // LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag
+    //F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw
+    $api = new Api("LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag");
 
         $api->convert
         ([
