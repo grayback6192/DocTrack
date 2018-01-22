@@ -1,23 +1,25 @@
 @extends('mastertemplate')
 @section('menu')
-<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <span class="nav-link-text">
-                  Send File</span>
+<li>
+              <a href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="material-icons">send</i>
+               <p>Send File</p>
               </a>
  </li>
 
- <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <span class="nav-link-text">
-                  Inbox</span>
+ <li>
+              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                 <i class="material-icons">mail</i>
+                <p>
+                  Inbox</p>
               </a>
  </li>
 
-<li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <span class="nav-link-text">
-                  Sent</span>
+<li class="active">
+              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                 <i class="material-icons">drafts</i>
+                <p>
+                  Sent</p>
               </a>
  </li>
  
@@ -39,9 +41,10 @@
 <div class="row justify-content-center">
   @foreach($statuss as $status1)
   <div class="col-sm-6" style="margin-top: 20px;">
-    <div class="media">
-      <div class="card" style="border: 0;width: 10rem">
-        <table class="table table-sm" style="border: 0.5px solid black;">
+    <div class="btn-toolbar">
+      <div class="btn-group">
+      <div class="card" style="border: 0;">
+        <table class="table table-sm" >
     <tr>
       <th>Name</th>
       <th>Status</th>
@@ -62,9 +65,10 @@
  
   </table>
 </div>
-<div class="media-body mt-5 ml-3">
+</div>
+<div class="btn-group" style="margin-top: 70px; margin-left: 10px;">
   <div class="row justify-content-center">
-      <i class="fa fa-arrow-right fa-fw"></i>
+      <i class="material-icons">forward</i>
   </div>
 </div>
 </div>

@@ -1,5 +1,5 @@
 @extends('mastertemplate')
-<script
+{{-- <script
   src="https://code.jquery.com/jquery-1.11.2.min.js"
   integrity="sha256-Ls0pXSlb7AYs7evhd+VLnWsZ/AqEHcXBeMZUycz/CcA="
   crossorigin="anonymous"></script>
@@ -11,33 +11,36 @@
         $(document).ready(function () {
             $('#inbox-table').DataTable();
         });
-    </script>
+    </script> --}}
 @section('menu')
-<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <span class="nav-link-text">
-                  Send File</span>
+<li>
+              <a href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="material-icons">send</i>
+               <p>Send File</p>
               </a>
  </li>
 
- <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <div class="row justify-content-between ml-1 mr-2">
-                <span class="nav-link-text">
-                  Inbox</span>
-                  <span class="nav-link-text">
-                    @if($numUnread>0)
-                      {{$numUnread}}
-                    @endif {{--Number of pending inbox--}}
-                  </span>
-                  </div>
+ <li class="active">
+              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                 <i class="material-icons">mail</i>
+                <p>
+                  Inbox
+
+                  @if($numUnread>0)
+                     ({{$numUnread}})
+                    @endif 
+                </p>
+                  {{--  <div class="notification"> --}}
+                    {{--Number of pending inbox--}}
+                  {{-- </div> --}}
               </a>
  </li>
 
-<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <span class="nav-link-text">
-                  Sent</span>
+<li>
+              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                 <i class="material-icons">drafts</i>
+                <p>
+                  Sent</p>
               </a>
  </li>
  
@@ -46,9 +49,12 @@
 @section('main_content')
 
 <div class="container">
-<div class="row justify-content-end mr-2 mb-2">
+  <div class="row justify-content-end">
+    <div class="form-group col-sm-2">
 <form id="chooseinboxstatus" name="inboxstatusdrop">
-  <input type="hidden" name="_token" value="{{csrf_token()}}">
+{{--   <input type="hidden" name="_token" value="{{csrf_token()}}"> --}}
+
+  
   <select id="inboxstatus" name="inboxStatus" class="form-control">
     <option value="all">All</option>
     <option value="read">Read</option>
@@ -56,14 +62,17 @@
    {{--  <option value="approved">Approved</option>
     <option value="pending">Pending</option> --}}
   </select>
+ 
+
 </form>
 
+
 <script type="text/javascript">
-  $.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-});
+//   $.ajaxSetup({
+//     headers: {
+//         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//     }
+// });
 
   $(document).ready(function(){
   $('#inboxstatus').change(function(){
@@ -92,8 +101,9 @@
   });
   });
 </script>
+ </div>
+  </div>
 
-</div>
 
 <div class="panel-body">
 <table class="table" id="inbox-table">

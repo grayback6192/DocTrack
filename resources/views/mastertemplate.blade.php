@@ -1,104 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>ONCINUE</title>
-  <!-- Bootstrap core CSS -->
+    <meta charset="utf-8" />
+    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png" />
+    <link rel="icon" type="image/png" href="../assets/img/favicon.png" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>DocTrack</title>
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+    <meta name="viewport" content="width=device-width" />
   
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/cssnav/bootstrap.css')}}">
-     
-    <!-- Custom fonts for this template -->
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/fonts/font-awesome.min.css')}}">
-
-    <!-- Plugin CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap-grid.min.css')}}">
+  {{--   <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap-reboot.min.css')}}"> --}}
+    
+    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/material-dashboard.css')}}">
     <link rel="stylesheet" type="text/css" href="{{URL::asset('css/datatables/dataTables.bootstrap4.css')}}">
-
-    <!-- Custom styles for this template -->
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/css/sb-admin.css')}}">
-
-    <!--Org Chart-->
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/orgchart/css/font-awesome.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/orgchart/css/jquery.orgchart.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/orgchart/css/style.css')}}">
-
-    
+   
+    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/demo.css') }}">
+    <link href="{{ URL::asset('css/fresh-bootstrap-table.css')}}" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/fonts.css') }}">
+    <link rel='stylesheet' type='text/css' href="{{ URL::asset('css/googlefonts.css') }}">
 </head>
-  <body class="fixed-nav sticky-footer " id="page-top">
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-dark" id="mainNav">
-      <div class="navbar-brand bg-dark" href="#">DocTrack</div>
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
 
-            @yield('menu')
-           {{--  <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
-              <a class="nav-link" data-toggle="collapse" href="#" data-placement="right" title="Inbox">
-                <i class="fa fa-send fa-fw"></i>
-                <span class="nav-link-text">
-                  Sent File</span>
-              </a>
-            </li> --}}
-          </ul>
-        <ul class="navbar-nav ml-auto">
+<body>
+    <div class="wrapper">
+        <div class="sidebar" data-color="orange" data-image="../assets/img/sidebar-1.jpg">
+            <!--
+        Tip 1: You can change the color of the sidebar using: data-color="purple | blue | green | orange | red"
 
-        <!-- SIDE MENU BAR -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle mr-lg-2 top-nav-item" href="#" id="messagesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-fw fa-envelope"></i>
-              <span class="d-lg-none">Messages
-                <span class="badge badge-pill badge-primary">12 New</span>
-              </span>
-            </a>
-          </li>
-
-
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle mr-lg-2 top-nav-item" href="javascript:opendrop()" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              {{-- <input type="button" class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> --}}
-              {{$User->lastname}}
-              <i class="fa fa-fw fa-user"></i>
-              <span class="d-lg-none">Alerts
-                <span class="badge badge-pill badge-warning">6 New</span>
-              </span>
-            </a>
-            <div class="dropdown-menu" aria-labelledby="alertsDropdown" id="drop">
-              <a class="dropdown-item" href="{{route('chooseGroups',['userid'=>$User->user_id])}}">
-                <div class="dropdown-message small">Exit Group</div>
-              </a>
+        Tip 2: you can also add an image using data-image tag
+    -->
+            <div class="logo">
+                <div class="simple-text">
+                    Doctrack
+                </div>
             </div>
-            <script type="text/javascript">
-              function opendrop()
-              {
-                var modal = document.getElementById('drop');
-                modal.className = 'dropdown-view';
-              }
-            </script>
-          </li>
-          <li class = "nav-item">
-           {{--  <div class="nav-link">{{$User->lastname}} | {{Session::get('upgid')}}</div> --}} {{-- Authentication Name --}}
-          </li>
-          <li class="nav-item">
-            <a href="{{route('Logout')}}" class="nav-link top-nav-item">
-                Logout
-              <i class="fa fa-fw fa-sign-out"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+            <div class="sidebar-wrapper">
+                <ul class="nav">
+                   @yield('menu')
+                </ul>
+            </div>
+        </div>
+        <div class="main-panel">
+            <nav class="navbar navbar-transparent navbar-absolute">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#"> Dashboard </a>
+                    </div>
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav navbar-right">
 
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="material-icons">notifications</i>
+                                    {{-- <span class="notification">5</span> --}}
+                                    <p class="hidden-lg hidden-md">Notifications</p>
+                                </a>
+                               {{--  <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="#">Mike John responded to your email</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">You have 5 new tasks</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">You're now friend with Andrew</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Another Notification</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">Another One</a>
+                                    </li>
+                                </ul> --}}
+                            </li>
+                            <li class="dropdown">
+                                <a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">
+                                    {{Auth::user()->lastname}}
+                                    <i class="material-icons">person</i>
+                                    <p class="hidden-lg hidden-md">Profile</p>
+                                </a>
+                                 <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="{{route('chooseGroups',['userid'=>$User->user_id])}}">Exit Group</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{route('Logout')}}">Logout</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        {{-- <form class="navbar-form navbar-right" role="search">
+                            <div class="form-group  is-empty">
+                                <input type="text" class="form-control" placeholder="Search">
+                                <span class="material-input"></span>
+                            </div>
+                            <button type="submit" class="btn btn-white btn-round btn-just-icon">
+                                <i class="material-icons">search</i>
+                                <div class="ripple-container"></div>
+                            </button>
+                        </form> --}}
+                    </div>
+                </div>
+            </nav>
+<div class="content">
+@yield('main_content')
+</div>
+</div>
 
-<div class="content-wrapper">
-    @yield('main_content')
-  </div>
-      <!-- /.container-fluid -->
-     
+</body>
+@yield('datatables')
 
-    </div>
-    
-  </body>
-  
+ <script src="{{URL::asset('js/jquery-3.2.1.min.js')}}" type="text/javascript"></script>    
+<script src="{{URL::asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
+<script src="{{URL::asset('js/material.min.js')}}" type="text/javascript"></script>
+<!--  Dynamic Elements plugin -->
+<script src="{{URL::asset('js/arrive.min.js')}}"></script>
+<!--  PerfectScrollbar Library -->
+<script src="{{URL::asset('js/perfect-scrollbar.jquery.min.js')}}"></script>
+<!--  Notifications Plugin    -->
+<script src="{{URL::asset('js/bootstrap-notify.js')}}"></script>
+<!-- Material Dashboard javascript methods -->
+<script src="{{URL::asset('js/material-dashboard.js?v=1.2.0')}}"></script>
+<!-- Material Dashboard DEMO methods, don't include it in your project! -->
+<script src="{{URL::asset('js/demo.js')}}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
 
+        // Javascript method's body can be found in assets/js/demos.js
+        demo.initDashboardPageCharts();
+
+    });
+</script>
 </html>
