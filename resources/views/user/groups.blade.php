@@ -1,25 +1,23 @@
 @extends('mastertemplate')
 @section('menu')
-<li class="active">
-              <a href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">send</i>
-               <p>Send File</p>
+<li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Send File</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                 <i class="material-icons">mail</i>
-                <p>
-                  Inbox</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Inbox</span>
               </a>
  </li>
 
-<li>
-              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                 <i class="material-icons">drafts</i>
-                <p>
-                  Sent</p>
+<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Sent</span>
               </a>
  </li>
  
@@ -27,42 +25,7 @@
 
 @section('main_content')
 
- <div class="content">
-                <div class="row">
-                            <div class="card">
-                                <div class="card-header" data-background-color="orange">
-                                    <h4 class="title">Choose a Department</h4>
-                                    <p class="category">Choose a specific department in order to send a document</p>
-                                </div>
-
-                            </div>
-                       
-                    </div>
-                    <div class="container-fluid">
-                      <div class="row">
-                        @if(isset($departments))  
-                          @foreach($departments as $department)
-                             <div class="col-lg-3 col-md-6 col-sm-6">
-                            <div class="card card-stats">
-                              <a href="{{route('Template',['upgid'=>$upgid,'gid'=>$department->group_id])}}">
-                                <div class="card-header" data-background-color="orange">
-                                    <i class="material-icons">business</i>
-                                </div>
-                                <div class="card-content">
-                                    <p class="category">Department</p>
-                                    <h3 class="title">{{$department->groupName}}
-                                    </h3>
-                                </div>
-                                </a>
-                            </div>
-                          
-                            </div>
-                          @endforeach
-                        @endif
-                      </div>
-                    </div>
-{{-- <div class="row" style="margin-left: 60px; margin-top: 20px;">
- 
+<div class="row" style="margin-left: 60px; margin-top: 20px;">
     @if(isset($departments))
 @foreach($departments as $department)
  <div class="col-sm-6" style="margin-top: 15px;">
@@ -75,9 +38,6 @@
   </div>
 @endforeach
 @endif 
-</div> --}}
-
 </div>
-
 
 @endsection

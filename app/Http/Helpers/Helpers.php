@@ -231,7 +231,7 @@ function insertTransaction($docid,$array,$upgid)
          //send to first receiver
          $firstreceivers = DB::table('transaction')->where('document_doc_id','=',$docid)->where('order','=',1)->get();
          foreach ($firstreceivers as $firstreceiver) {
-             return insertInbox2($firstreceiver->upg_id,$docid,$upgid);
+             return insertInbox2($firstreceiver->upg_id,$docid);
             //echo "".$firstreceiver->upg_id;
          }
        // echo "<pre>";
@@ -241,7 +241,7 @@ function insertTransaction($docid,$array,$upgid)
 
     }
 
-function insertInbox2($receiverupgid,$docid,$upgid)
+function insertInbox2($receiverupgid,$docid)
 {
      $user = Auth::user();
          date_default_timezone_set('Asia/Manila');
@@ -254,8 +254,7 @@ function insertInbox2($receiverupgid,$docid,$upgid)
                                     'time'=>$time,
                                     'date'=>$date]);
 
-        // return "sent to first receiver success";
-        return redirect()->route('serviceowners',['upgid'=>$upgid]);
+        return "sent to first receiver success";
 }
 
 function insertInbox($docid,$node,$upgid){

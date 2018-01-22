@@ -1,34 +1,31 @@
 @extends('mastertemplate')
 @section('menu')
-<li class="active">
-              <a href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">send</i>
-               <p>Send File</p>
+<li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Send File</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                 <i class="material-icons">mail</i>
-                <p>
-                  Inbox</p>
-                   
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Inbox</span>
               </a>
  </li>
 
-<li>
-              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                 <i class="material-icons">drafts</i>
-                <p>
-                  Sent</p>
+<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Sent</span>
               </a>
  </li>
  
 @endsection
 
 @section('main_content')
-<div class="container-fluid">
-<div class="row">
+
+<div class="row" style="margin-left: 60px; margin-top: 20px;">
     
   <!-- Header -->
   {{-- <header class="w3-container" style="padding-top:22px">
@@ -37,6 +34,8 @@
   </header> --}}
 
 
+
+<br><br><br>
 @if(isset($template))
 <div class="container">
 <div class="row justify-content-start ml-2 mb-2">
@@ -57,21 +56,16 @@
 
 </table>
 </div> --}}
-<div class="row">
+<div class="row" style="margin-left: 60px; margin-top: 20px;">
       @foreach($template as $templates)
-        <div class="col-lg-3 col-md-6 col-sm-6">
-           <div class="card card-stats">
-            <a href="/user/{{$upgid}}/send/{{$gid}}/templateInput/{{ $templates->template_id }}">
-               <div class="card-header" data-background-color="orange">
-                  <i class="material-icons">description</i>
-                </div>
-          <div class="card-content">
-             <p class="category">Template</p>
-            <h3 class="title">{{$templates->templatename}}</h3>
+        <div class="col-sm-6" style="margin-top: 15px;">
+            <a href="/user/{{$upgid}}/send/{{$gid}}/templateInput/{{ $templates->template_id }}"><div class="card" style="width: 15rem; border: none;">
+            <i class="fa fa-5x fa-file-o"></i>
+          <div class="card-block">
+            <h3 class="card-title" style="margin-top: 1rem">{{$templates->templatename}}</h3>
           </div>
-          </a>
+        </div></a>
         </div>
-      </div>
       @endforeach
 </div>
 @endif
@@ -82,10 +76,10 @@
 <div class="row justify-content-start ml-2">
     <a class="btn btn-primary" href="{{route('Template',['upgid'=>$upgid,'gid'=>$gid])}}">Back</a>
 </div>
-
-<div class="row">
+<div class="media">
+<div class="row justify-content-center mr-4 ml-2">
 <form method = "post">
-{{--   <div class="media-body mr-3"> --}}
+  <div class="media-body mr-3">
 <a class="row btn btn-primary mb-3" style="margin-top: 20px;float:right;margin-left: 300px;" href="javascript:openInstructions()">Show Instructions</a>
 <div class="modal" id="instruct">
   <div class="modal-dialog" role="document">
@@ -117,9 +111,10 @@ function closeInstructions()
 }
 </script>
 
-
-{{-- </div> --}}
-<div class="col-md-4">
+<div style="float:right;margin-left: 290px;"> 
+<object data="/pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350" style="float: right;"></object><br>
+</div>
+</div>
 <input class="row" style="margin-top: 20px;" type="text" name="subject" placeholder="Subject"><br>
 {{ csrf_field() }}
 {{-- Variable Form --}}
@@ -132,23 +127,19 @@ function closeInstructions()
     <input type = "text" name = "{{ $variables }}" placeholder = "{{ $variables }}"><br>
   @endif
 @endforeach
-@foreach($position as $positions)
-  <input type = "text" id = "positions" name = "{{ $positions }}" placeholder = "{{ $positions }}" value = "<?php echo '${'.$positions.'}' ?>" hidden><br>
-@endforeach
 
 {{-- Unfixed --}}
- {{-- @foreach($position as $positions)
+{{-- @foreach($position as $positions)
       @if($positions == $variables)
         <input type = "text" name = "{{ $variables }}" value = ${{{$variables}}}><br>
-      @endif --}}
+      @endif
+    @endforeach --}}
+
+<br>
 
 <input class="btn btn-primary" type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
 <input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}' value = "View">
-</div>
 
-<div class="col-sm-3 col-md-offset-4"> 
-<object data="/pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350" style="float: right;"></object><br>
-</div>
 
 <script type="text/javascript" src="{{URL::asset('js/jquery-3.2.1.min.js')}}" ></script>
 <script type="text/javascript">
@@ -162,28 +153,36 @@ function closeInstructions()
         event.preventDefault();
     });
   });
-  </script>
+  cript>
+<br><br>
+Workflow:<br><br>
+ {{-- @for($i=0;$i<(count($var));$i++)
+ <table border="2" style="display:inline-block;">
+@if($i==(count($var)-1))
+@for($j=0;$j<(count($var[$i]));$j++)
+<tr>
+<td>
+{{$var[$i][$j]['lastname']}}, {{$var[$i][$j]['firstname']}}</td></tr>
+@endfor 
+</table>
 
+@else
+
+@for($j=0;$j<(count($var[$i]));$j++)
+<tr>
+<td>
+{{$var[$i][$j]['lastname']}}, {{$var[$i][$j]['firstname']}}</td></tr>
+@endfor 
+</table>-->
+@endif
+@endfor --}}
+
+<br><br>
+
+</form>
+@endif
 </form> 
      
 </div>
-Workflow:<br><br>
-<?php
-// echo "<pre>";
-// var_dump($var);
-for ($i=0; $i < count($var); $i++) { 
 
- if($i==(count($var)-1))
-     echo "".$var[$i]['lastname'];
-   else
-    echo "".$var[$i]['lastname']."--> ";
-
- 
-}
-?>
-<br><br>
-</div>
-@endif
-</div>
 @endsection
-

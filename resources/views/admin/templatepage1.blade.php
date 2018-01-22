@@ -3,45 +3,51 @@
 
 
 @section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">face</i>
-               <p>Users</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-user fa-fw"></i>
+                <span class="nav-link-text">
+                  Users</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">business</i>
-               <p>Departments</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-building fa-fw"></i>
+                <span class="nav-link-text">
+                  Departments</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">event_seat</i>
-                <p>Positions</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-star fa-fw"></i>
+                <span class="nav-link-text">
+                  Positions</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">group</i>
-               <p>Workflows</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-group fa-fw"></i>
+                <span class="nav-link-text">
+                  Workflows</span>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">description</i>
-                <p>Templates</p>
+ <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-file-o fa-fw"></i>
+                <span class="nav-link-text">
+                  Templates</span>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="#" data-placement="right" title="Inbox">
+                <i class="fa fa-archive fa-fw"></i>
+                <span class="nav-link-text">
+                  Archive</span>
               </a>
  </li>
 
@@ -58,16 +64,14 @@
       </form>
 
   </div>
- <div class="row">
+ <div class="row" style="margin-left: 60px; margin-top: 20px;">
     @if(isset($departments))
       @foreach($departments as $department)
-          <div class="col-sm-4" style="margin-top: 15px;">
-            <a href="{{route('getGroupTemplates',['upgid'=>$upgid,'groupid'=>$department->group_id])}}"><div class="card" style="border: none;">
-              <div style="text-align: center;">
-                <i class="material-icons" style="font-size: 60px;">description</i>
-            </div>
+          <div class="col-sm-6" style="margin-top: 15px;">
+            <a href="{{route('getGroupTemplates',['upgid'=>$upgid,'groupid'=>$department->group_id])}}"><div class="card" style="width: 15rem; border: none;">
+            <i class="fa fa-5x fa-building"></i>
           <div class="card-block">
-            <h3 class="card-title" style="margin-top: 1rem; text-align: center">{{$department->groupName}}</h3>
+            <h3 class="card-title" style="margin-top: 1rem">{{$department->groupName}}</h3>
           </div>
         </div></a>
         </div>

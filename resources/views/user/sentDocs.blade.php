@@ -13,30 +13,26 @@
         });
     </script>
 @section('menu')
-<li>
-              <a href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">send</i>
-               <p>Send File</p>
+<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('serviceowners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Send File</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                 <i class="material-icons">mail</i>
-                <p>
-                  Inbox</p>
-                 
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Inbox</span>
               </a>
  </li>
 
-<li class="active">
-              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                 <i class="material-icons">drafts</i>
-                <p>
-                  Sent</p>
+<li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <span class="nav-link-text">
+                  Sent</span>
               </a>
  </li>
- 
  
  
 @endsection

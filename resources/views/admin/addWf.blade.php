@@ -1,46 +1,53 @@
 @extends('mastertemplate')
 @section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">face</i>
-               <p>Users</p>
+<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color:black;" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-user fa-fw"></i>
+                <span class="nav-link-text">
+                  Users</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">business</i>
-               <p>Departments</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-building fa-fw"></i>
+                <span class="nav-link-text">
+                  Departments</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">event_seat</i>
-                <p>Positions</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-star fa-fw"></i>
+                <span class="nav-link-text">
+                  Positions</span>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">group</i>
-               <p>Workflows</p>
+ <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-group fa-fw"></i>
+                <span class="nav-link-text">
+                  Workflows</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">description</i>
-                <p>Templates</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-file-o fa-fw"></i>
+                <span class="nav-link-text">
+                  Templates</span>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="#" data-placement="right" title="Inbox">
+                <i class="fa fa-archive fa-fw"></i>
+                <span class="nav-link-text">
+                  Archive</span>
               </a>
  </li>
+
 @endsection
 
 @section('main_content')
@@ -64,11 +71,11 @@
   
 </div>
     <!--Sorted List-->
- <div class="row" style="margin-top: 20px;"> 
+ <div class="row" style="margin-left: 60px; margin-top: 20px;"> 
   @if(count($steps2)>0)
   @for($a=0;$a<(count($steps2));$a++)
-  <div class="col-sm-3">
-  <div class="card col-xs-10" style="border:1px solid black; margin: auto;">
+  <div class="media">
+  <div class="card" style="border:1px solid black; margin: auto;">
            {{-- <div class="btn-group btn-group-justified">
              <div class="btn-group">
                <a class="btn" href="#">Prev</a>
@@ -85,19 +92,13 @@
         @if($b==0)
           <div class="btn-group btn-group-justified">
              <div class="btn-group">
-               <a class="btn" data-toggle="modal" href="javascript:openForPrevModal({{$steps2[$a][$b]['ws_id']}})" id="openForPrevModal">
-                <i class="material-icons">arrow_back</i>
-               </a>
+               <a class="btn" data-toggle="modal" href="javascript:openForPrevModal({{$steps2[$a][$b]['ws_id']}})" id="openForPrevModal">Prev</a>
              </div>
               <div class="btn-group">
-               <a class="btn" data-toggle="modal" href="javascript:openSameOrderModal({{$steps2[$a][$b]['ws_id']}})" id="openSameOrderModal">
-                   <i class="material-icons">add</i>
-               </a>
+               <a class="btn" data-toggle="modal" href="javascript:openSameOrderModal({{$steps2[$a][$b]['ws_id']}})" id="openSameOrderModal">Add</a>
              </div>
               <div class="btn-group">
-               <a class="btn" data-toggle="modal" href="javascript:openForNextModal({{$steps2[$a][$b]['ws_id']}})" id="openForNextModal">
-                  <i class="material-icons">arrow_forward</i>
-               </a>
+               <a class="btn" data-toggle="modal" href="javascript:openForNextModal({{$steps2[$a][$b]['ws_id']}})" id="openForNextModal">Next</a>
              </div>
           </div>
         @endif
@@ -113,7 +114,7 @@
                   </h6>
                 </td>
                 <td>
-                  <a style="margin-left: 20px;" data-toggle="modal" href="javascript:openDeleteModal({{$steps2[$a][$b]['ws_id']}})" id="openDeleteModal"><i class="material-icons">delete</i></a>
+                  <a data-toggle="modal" href="javascript:openDeleteModal({{$steps2[$a][$b]['ws_id']}})" id="openDeleteModal">Remove</a>
                 </td>
               </tr>
               </tbody>
@@ -124,9 +125,8 @@
           </div>
           </div>
 
-<script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}" ></script>
+     <script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}" ></script>
 <script type="text/javascript">
-
   $(document).ready(function(){
 
     var wsid = <?php echo $steps2[$a][$b]['ws_id']; ?>;
@@ -219,8 +219,6 @@
   });
 </script>
 
-
-
 <div id="openEditModal-{{$steps2[$a][$b]['ws_id']}}" class="modal">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -230,8 +228,8 @@
       <form class="form-horizontal" method="post" action="{{route('editStepAction',['upgid'=>$upgid])}}">
         <div class="modal-body">
           {{csrf_field()}}
-          <input type="hidden" name="editwsid" value="{{$steps2[$a][$b]['ws_id']}}">
-          <input type="hidden" name="editwfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
+          <input type="text" name="editwsid" value="{{$steps2[$a][$b]['ws_id']}}">
+          <input type="text" name="editwfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
           <div class="form-group">
             <label class="col-sm-2 control-label">{{$steps2[$a][$b]['posName']}}</label>
           </div>
@@ -376,7 +374,7 @@
       <form class="form-horizontal" method="post" action="{{route('addNextStep',['upgid'=>$upgid])}}">
       <div class="modal-body">
         {{csrf_field()}}
-        <input type="hidden" name="fornextwsid" value="{{$steps2[$a][$b]['ws_id']}}"> <input type="hidden" name="fornextorder" value="{{$steps2[$a][$b]['order']}}"> <input type="hidden" name="fornextwfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
+        <input type="text" name="fornextwsid" value="{{$steps2[$a][$b]['ws_id']}}"> <input type="text" name="fornextorder" value="{{$steps2[$a][$b]['order']}}"> <input type="text" name="fornextwfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
         <div class="form-group">
           <label class="col-sm-2 control-label">Position</label>
           <div class="col-sm-10">
@@ -416,7 +414,7 @@
       <form class="form-horizontal" method="post" action="{{route('addPrevStep',['upgid'=>$upgid])}}">
       <div class="modal-body">
          {{csrf_field()}}
-        <input type="hidden" name="forprevwsid" value="{{$steps2[$a][$b]['ws_id']}}"> <input type="hidden" name="forprevorder" value="{{$steps2[$a][$b]['order']}}"> <input type="hidden" name="forprevwfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
+        <input type="text" name="forprevwsid" value="{{$steps2[$a][$b]['ws_id']}}"> <input type="text" name="forprevorder" value="{{$steps2[$a][$b]['order']}}"> <input type="text" name="forprevwfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
 
           <div class="form-group">
             <label class="col-sm-2 control-label">Position</label>
@@ -442,7 +440,7 @@
 
       </div>
         <div class="modal-footer">
-        <input class="btn btn-primary" type="submit" name="addPrev" value="Submit"> <a class="btn btn-primary" href="javascript:closeForPrev({{$steps2[$a][$b]['ws_id']}})" id="cancelForPrev">Cancel</a>
+        <input class="btn btn-primary" type="submit" name="addPrev" value="Submit"> <a class="btn btn-primary" href="javascript:closeForPrev({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
       </div>
     </form>
     </div>
@@ -458,7 +456,7 @@
        <form class="form-horizontal" method="post" action="{{route('addSameOrderStep',['upgid'=>$upgid])}}">
       <div class="modal-body">
          {{csrf_field()}}
-        <input type="hidden" name="sameorderwsid" value="{{$steps2[$a][$b]['ws_id']}}"> <input type="hidden" name="sameorderorder" value="{{$steps2[$a][$b]['order']}}"> <input type="hidden" name="sameorderwfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
+        <input type="text" name="sameorderwsid" value="{{$steps2[$a][$b]['ws_id']}}"> <input type="text" name="sameorderorder" value="{{$steps2[$a][$b]['order']}}"> <input type="text" name="sameorderwfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
 
           <div class="form-group">
             <label class="col-sm-2 control-label">Position</label>
@@ -491,7 +489,7 @@
   </div>
 </div>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
 
 function openEditModal(wsid)
@@ -577,9 +575,9 @@ function closeDeleteModal(wsid)
       </div>
        <form method="post" action="{{route('RemoveWs',['upgid'=>$upgid])}}">
       <div class="modal-body">
-            <input type="hidden" name="removewsid" value="{{$steps2[$a][$b]['ws_id']}}">
-            <input type="hidden" name="removewfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
-            <input type="hidden" name="removeorder" value="{{$steps2[$a][$b]['order']}}">
+            <input type="text" name="removewsid" value="{{$steps2[$a][$b]['ws_id']}}">
+            <input type="text" name="removewfid" value="{{$steps2[$a][$b]['workflow_w_id']}}">
+            <input type="text" name="removeorder" value="{{$steps2[$a][$b]['order']}}">
             {{csrf_field()}}
           
             <input type="hidden" name="wsid" value="{{$steps2[$a][$b]['ws_id']}}">
@@ -594,15 +592,27 @@ function closeDeleteModal(wsid)
     </div>
     </div>
 
+  {{--   <script type="text/javascript">
+        function openDeleteModal(wsid)
+        {
+            var modal3 = document.getElementById('deleteModal-'+wsid);
+            modal3.style.display = "block";
+        }
 
+        function closeDeleteModal(wsid)
+        {
+            var modal3 = document.getElementById('deleteModal-'+wsid);
+            modal3.style.display = "none";
+        }
+    </script> --}}
+      
     @endfor
 </div>
-  </div>
 {{--end of card div--}} 
-<div>
-  <i class="material-icons" style="font-size: 30px; margin: auto;">forward</i>
+<div class="ml-4 media-body" id="wf-arrow" style="margin: auto;">
+  <i class="fa fa-arrow-right fa-fw"></i>
 </div>
-
+</div>
   @endfor
 
   @endif
@@ -698,7 +708,7 @@ function closeDeleteModal(wsid)
 
 
 
-</div>
+  </div>
 
 @endforeach
 @endsection

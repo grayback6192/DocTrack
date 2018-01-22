@@ -31,7 +31,7 @@ class User extends Controller
                     ->join('user as u','upg.user_user_id','=','u.user_id')
                     ->join('group as g', 'upg.group_group_id','=','g.group_id')
                     ->orderBy('inbox.date','desc')
-                    ->orderBy('inbox.time','asc')
+                    ->orderBy('inbox.time','desc')
                     ->get();
 
         $numunread = $this->countUnread($upgid);

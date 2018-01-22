@@ -3,45 +3,51 @@
 
 
 @section('menu')
- <li class="active">
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">face</i>
-               <p>Users</p>
+ <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" data-toggle="collapse" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-user fa-fw"></i>
+                <span class="nav-link-text">
+                  Users</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">business</i>
-               <p>Departments</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-building fa-fw"></i>
+                <span class="nav-link-text">
+                  Departments</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">event_seat</i>
-                <p>Positions</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-star fa-fw"></i>
+                <span class="nav-link-text">
+                  Positions</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">group</i>
-               <p>Workflows</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-group fa-fw"></i>
+                <span class="nav-link-text">
+                  Workflows</span>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">description</i>
-                <p>Templates</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+                <i class="fa fa-file-o fa-fw"></i>
+                <span class="nav-link-text">
+                  Templates</span>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
+ <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+              <a class="nav-link" style="color: black;" data-toggle="collapse" href="#" data-placement="right" title="Inbox">
+                <i class="fa fa-archive fa-fw"></i>
+                <span class="nav-link-text">
+                  Archive</span>
               </a>
  </li>
 
@@ -56,26 +62,26 @@
   </div>
 
   <div class="row justify-content-center">
-    <div class="card border-0">
+    <div class="card border-0" style="width: 40rem">
       <div class="card-block">
         <div class="row justify-content-end mr-2">
-         {{--  <div class="fa fa-2x mt-2 mr-2">
+          <div class="fa fa-2x mt-2 mr-2">
           <label class="switch">
             <input type="checkbox" name="userstatus" checked>
             <span class="slider round"></span>
           </label>
-          </div> --}}
-          <a href="{{route('EditProfile',['upgid'=>$upgid,'id'=>$userinfo->user_id])}}"><i class="material-icons">edit_mode</i></a>
+          </div>
+          <a href="{{route('EditProfile',['upgid'=>$upgid,'id'=>$userinfo->user_id])}}"><i class="fa fa-cogs fa-2x mt-2" data-toggle="collapse" data-placement="right" title="Edit"></i></a>
         </div>
         <div class="card-title m-2">
-          <div class="row">
-            <div class="card-avatar" style="border: 1px solid black;">
+          <div class="media mt-5">
+            <div class="mr-3 ml-3 prof-pic rounded-circle" style="border: 1px solid black;">
              <img src="{{url('./users/pictures/'.$userinfo->profilepic)}}" style="display: block; width: 100%" alt="prof-pic" />{{--image here--}}
             </div>
-            {{-- <div class="media-body pt-lg-3"> --}}
+            <div class="media-body pt-lg-3">
               <h3>{{$userinfo->firstname}} {{$userinfo->lastname}}</h3>
               <p>{{$userinfo->address}}</p>
-            {{-- </div> --}}
+            </div>
           </div>
           <div class="row mt-5">
           <div class="btn-toolbar mb-2 col align-self-end">
