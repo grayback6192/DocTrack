@@ -85,17 +85,17 @@
         @if($b==0)
           <div class="btn-group btn-group-justified">
              <div class="btn-group">
-               <a class="btn" data-toggle="modal" href="javascript:openForPrevModal({{$steps2[$a][$b]['ws_id']}})" id="openForPrevModal">
+               <a class="btn" href="javascript:openForPrevModal({{$steps2[$a][$b]['ws_id']}})" id="openForPrevModal">
                 <i class="material-icons">arrow_back</i>
                </a>
              </div>
               <div class="btn-group">
-               <a class="btn" data-toggle="modal" href="javascript:openSameOrderModal({{$steps2[$a][$b]['ws_id']}})" id="openSameOrderModal">
+               <a class="btn" href="javascript:openSameOrderModal({{$steps2[$a][$b]['ws_id']}})" id="openSameOrderModal">
                    <i class="material-icons">add</i>
                </a>
              </div>
               <div class="btn-group">
-               <a class="btn" data-toggle="modal" href="javascript:openForNextModal({{$steps2[$a][$b]['ws_id']}})" id="openForNextModal">
+               <a class="btn" href="javascript:openForNextModal({{$steps2[$a][$b]['ws_id']}})" id="openForNextModal">
                   <i class="material-icons">arrow_forward</i>
                </a>
              </div>
@@ -109,11 +109,11 @@
               <tr>
                 <td>
                   <h6>
-                    <a data-toggle="modal" href="javascript:openEditModal({{$steps2[$a][$b]['ws_id']}})" id="openEditModal">{{$steps2[$a][$b]['posName']}}</a>
+                    <a href="javascript:openEditModal({{$steps2[$a][$b]['ws_id']}})" id="openEditModal">{{$steps2[$a][$b]['posName']}}</a>
                   </h6>
                 </td>
                 <td>
-                  <a style="margin-left: 20px;" data-toggle="modal" href="javascript:openDeleteModal({{$steps2[$a][$b]['ws_id']}})" id="openDeleteModal"><i class="material-icons">delete</i></a>
+                  <a style="margin-left: 20px;" href="javascript:openDeleteModal({{$steps2[$a][$b]['ws_id']}})" id="openDeleteModal"><i class="material-icons">delete</i></a>
                 </td>
               </tr>
               </tbody>

@@ -39,7 +39,7 @@
   Received File on {{$docInfo->date}} {{$docInfo->time}}
 @endforeach
   <div class="row" style="margin-left: 60px; margin-top: 20px;">
-<object data="/temp/{{ $pdf }}.pdf" type="application/pdf" width="750" height="350"></object>
+<object data="{{ $pdf }}" type="application/pdf" width="750" height="350"></object>
 <br><br>
 <form style="padding-left: 680px; margin-top: 20px;" method="post">
 {{csrf_field()}}
@@ -50,10 +50,10 @@
     Rejected on {{$date}} {{$time}}
   @endif
 @else
-  <input class="btn btn-primary" type = "submit" formaction = "{{route('approve',['upgid'=>$upgid,'id'=>$pdf])}}" value = "Approve">
+  <input class="btn btn-primary" type = "submit" formaction = "{{route('approve',['upgid'=>$upgid,'id'=>$id])}}" value = "Approve">
 {{-- <input type = "" formaction = "{{route('reject',['id'=>$pdf])}}" value = "Reject"> --}}
 {{-- <a class="btn btn-primary" href="{{route('reject',['id'=>$pdf])}}">Reject</a> --}}
-<input class="btn btn-primary" type = "submit" formaction = "{{route('reject',['upgid'=>$upgid,'id'=>$pdf])}}" value = "Reject">
+<input class="btn btn-primary" type = "submit" formaction = "{{route('reject',['upgid'=>$upgid,'id'=>$id])}}" value = "Reject">
 @endif
 
 </form>

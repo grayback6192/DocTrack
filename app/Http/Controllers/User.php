@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\SessionController;
 use Dompdf\Dompdf;
 use Session;
+use \CloudConvert\Api;
 
 
 class User extends Controller
@@ -41,6 +42,7 @@ class User extends Controller
    
     public function approvedoc($upgid,$docid)
     {
+   
          date_default_timezone_set('Asia/Manila');
         $user = Auth::user();
         $date = date('m-d-Y');
@@ -382,6 +384,52 @@ class User extends Controller
                                                         ->where('status','=','approved')
                                                         ->count(); 
 
+
+        $userid = $user->user_id;
+        $upg_user = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$upgid)
+                                                         ->where('upg.user_user_id','=',$userid)
+                                                         ->get();
+        $signature = DB::table('transaction as t')
+                     ->where('t.document_doc_id','=',$docid)
+                     ->where("t.status","=","approved")
+                     ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
+                     ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
+                     ->join("user as u","upg.user_user_id","=","u.user_id")
+                     ->get(); //Added
+        $position = DB::table("position")->get();
+        $upg= session()->get('upgid');
+
+        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$docid.'.docx');
+        $variable = $templateProcessor->getVariables();
+
+        foreach($signature as $signatures)
+        {
+            foreach($variable as $variables)
+            {
+                if($variables == $signatures->posName)
+                {
+                    $templateProcessor->setImg($variables, [
+                                                        "src"=>$signatures->signature,
+                                                        "swh"=>"150"
+                                                         ]);
+                }
+            }
+        }
+        $templateProcessor->saveAs('temp/'.$docid.'.docx');
+        //Accounts
+    //LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag
+    //F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw
+    $api = new Api("LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag");
+    $api->convert
+    ([
+        'inputformat' => 'docx',
+        'outputformat' => 'pdf',
+        'input' => 'upload',
+        'file' => fopen('temp/'.$docid.'.docx', 'r'),
+    ])
+    ->wait()
+    ->download('temp/'.$docid.'.pdf');
+
             if($currenttranscount==$transapprovedcount)
                 return $this->insertToNextInbox($docid,$upgid,$finalnextarray);
             else
@@ -592,7 +640,12 @@ class User extends Controller
    //order statuss 
     $docInfo = \DB::table("document")->where("doc_id",'=',$id)->get();
 
-    return view("user/fileStatus",["name"=>$name],["statuss"=>$statuss,'User'=>$user,"pdf"=>$id,'docinfos'=>$docInfo,'upgid'=>$upgid]);
+     if(file_exists($_SERVER['DOCUMENT_ROOT'].'/temp/'.$id.'.pdf'))      
+        $pdf = "/temp/".$id.".pdf";   
+     else
+        $pdf = "/pdf/".$id.".pdf";
+
+    return view("user/fileStatus",["name"=>$name],["statuss"=>$statuss,'User'=>$user,"pdf"=>$pdf,'docinfos'=>$docInfo,'upgid'=>$upgid]);
 }
 
     public function addFile(Request $request)

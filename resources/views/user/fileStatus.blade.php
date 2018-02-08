@@ -35,7 +35,7 @@
     File Sent on {{$docinfo->sentDate}} {{$docinfo->sentTime}}
   @endforeach
   <div class="row justify-content-center mt-4 mb-4">
-<object data="/temp/{{ $pdf }}.pdf" type="application/pdf" width="750" height="350"></object>
+<object data="{{ $pdf }}" type="application/pdf" width="750" height="350"></object>
 </div>
 
 <div class="row justify-content-center">
