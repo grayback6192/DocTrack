@@ -1,0 +1,18 @@
+Test School
+masteradmin: trina@test.com password
+Departments:
+- President - testpres
+-Vice President - testvp
+- Commerce - testcommerce
+	- Accounting - testaccounting
+		-JPIA - testjpia
+	- Marketing - testmarketing
+- IT - testit
+	- CS - testcs
+
+Employees:
+- dexter@test.com - password - school vice president (Vice President Dep.)
+- richard@test.com - password - College Dean (I.T.)
+
+Students:
+- robert@test.com - password - Student (I.T.)
