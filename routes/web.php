@@ -345,8 +345,15 @@ Route::get('/admin/{upgid}/addOrgChart/{groupid}', function ($upgid,$groupid) {
 	$user = Auth::user();
 	$clientid = Session::get('client');
 	$departments = \DB::table('group')->where('client_id','=',$clientid)->orWhere('group_id','=',$groupid)->where('status','=','active')->get();
+	 $lists=\DB::table('userpositiongroup')
+        ->where('userpositiongroup.client_id','=',$clientid)
+        ->join('position','userpositiongroup.position_pos_id','=','position.pos_id')
+        ->join('user','userpositiongroup.user_user_id','=','user.user_id')
+        ->join('group','userpositiongroup.group_group_id','=','group.group_id')
+        ->get();
+        $orgchartid = rand(1, 10000);
 	//$department = \DB::table('group')->get();
-    return view('admin/welcome',['groups'=>$departments,'User'=>$user,'groupid'=>$groupid,'upgid'=>$upgid]);
+    return view('admin/welcome',['groups'=>$departments,'User'=>$user,'groupid'=>$groupid,'upgid'=>$upgid,'lists'=>$lists,'orgchartid'=>$orgchartid]);
 })->name('AddOrgChart');
 
 Route::get('/admin/{upgid}/addorg','OrgChart@store');

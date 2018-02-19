@@ -406,44 +406,19 @@ window.onclick = function(event) {
       <div class="m-3">
         <div class="row">
           <div class="col-md-8">
-            <h3 style="margin-left: 20px">Organizational Chart</h3>
+            <h3 style="margin-left: 20px">View and Add Organizational Chart</h3>
           </div>
           <div class="col-md-offset-2">
             @foreach($orgchartInfos as $orgchartInfo)
-            <a class="btn btn-primary" href="{{route('editOrgChart',['upgid'=>$upgid,'groupid'=>$orgchartInfo->group_id])}}">Edit</a>
+            <a class="btn btn-warning" target="_blank" href="{{route('editOrgChart',['upgid'=>$upgid,'groupid'=>$orgchartInfo->group_id])}}">View and Add Organizational Chart</a>
             @endforeach
           </div>
         </div>
         {{--Org Chart Here--}}
         @if($deporgchart!=="none")
-          <div id="chart-container">
-            <script type="text/javascript" src="{{ URL::asset('js/orgchartjs/jquery.min.js') }}" ></script>
-            <script type="text/javascript" src="{{ URL::asset('js/orgchartjs/jquery.mockjax.min.js') }}" ></script>
-            <script type="text/javascript" src="{{ URL::asset('js/orgchartjs/jquery.orgchart.min.js') }}" ></script>
-            <script type="text/javascript">
-
-            $(function() {
-                $.mockjax({
-                    url: '/orgchart/initdata',
-                    responseTime: 1000,
-                    contentType: 'application/json',
-                    responseText:   
-                  <?php echo $deporgchart; ?>
          
-              });
-
-                $('#chart-container').orgchart({
-                  'data' : '/orgchart/initdata',
-                  'depth': 2,
-                  'nodeContent': 'title'
-                });
-
-             });
-          </script>
-
-          </div>
         @else
-          <a class="btn btn-primary" href="{{route('AddOrgChart',['upgid'=>$upgid,'groupid'=>$depid])}}">Add Organizational Chart</a>
+          <a class="btn btn-warning" target="_blank" href="{{route('AddOrgChart',['upgid'=>$upgid,'groupid'=>$depid])}}">Add Organizational Chart</a>
         @endif
       </div>
     </div>

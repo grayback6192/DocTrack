@@ -1,64 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->  
+  <link rel="icon" type="image/png" href="{{URL::asset('img/logos.png')}}"/>
+<!--===============================================================================================-->
 
-  <head>
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/bootstrap.min.css')}}">
+<!--===============================================================================================-->
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/font-awesome.min.css')}}">
+<!--===============================================================================================-->
 
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>Login | DocTrack</title>
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/icon-font.min.css')}}">
+<!--===============================================================================================-->
 
-    <!-- Bootstrap core CSS -->
-    <link href="homecss/cssnav/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/animate.css')}}">
+<!--===============================================================================================-->  
 
-    <!-- Custom fonts for this template -->
-   <link href="homecss/fonts/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/hamburgers.min.css')}}">
+<!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/animsition.min.css')}}">
+<!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/select2.min.css')}}">
+<!--===============================================================================================-->  
 
-    <!-- Custom styles for this template -->
-     <link href="homecss/css/sb-admin.css" rel="stylesheet">
-
-  </head>
-
-  {{-- <body style="background-image: url('login.jpg')"> --}}
-<body>
-    <div class="container">
-
-      <h1 class="mt-5">DocTrack</h1>
-
-      <div class="card card-login mt-5 border-0">
-        <div class="card-body p-0">
-          <form action = "{{Route("Credentials")}}" method = "post">
-            {{csrf_field()}}
-            <div class="form-group">
-              <label for="exampleInputEmail1">Email</label>
-              <input type="username" class="form-control form-blank" id="username" name = "email" placeholder="example@gmail.com">
-            </div>
-            <div class="form-group">
-              <label for="exampleInputPassword1">Password</label>
-              <input type="password" class="form-control form-blank" id="password" name = "password" placeholder="Password">
-            </div>
-            <div class="form-group">
-            </div>
-            <div class="justify-content-center mt-5">
-              <input type = "submit" class="btn btn-primary btn-block" value = "Login">
-            </div>
-          </form>
-          <div class="text-center small"><br>
-            Register as: <a href="{{route('RegisterClient')}}">Client</a> or <a href="{{route('RegisterUser')}}">User</a>
-            
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/daterangepicker.css')}}">
+<!--===============================================================================================-->
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/util.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/login/main.css')}}">
+<!--===============================================================================================-->
+</head>
+<body style="background-color: #666666;">
+  
+  <div class="limiter">
+    <div class="container-login100">
+      <div class="wrap-login100">
+        <form action = "{{Route("Credentials")}}" method = "post" class="login100-form validate-form">
+          {{csrf_field()}}
+           
+          <span class="login100-form-title p-b-43">
+            Login
+          </span>
+          
+          
+          <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+            <input class="input100" type="text" name="email">
+            <span class="focus-input100"></span>
+            <span class="label-input100">Email</span>
           </div>
+          
+          
+          <div class="wrap-input100 validate-input" data-validate="Password is required">
+            <input class="input100" type="password" name="password">
+            <span class="focus-input100"></span>
+            <span class="label-input100">Password</span>
+          </div>
+
+          <div class="container-login100-form-btn">
+            <input type ="submit" class="login100-form-btn" value = "Login">
+          </div>
+          
+          <div class="text-center p-t-46 p-b-20">
+            <span class="txt2">
+              Register as 
+            </span>
+            <div class="text-center small"><br>
+            <a href="{{route('RegisterClient')}}">Client</a> or <a href="{{route('RegisterUser')}}">User</a>
+        </div>
+          </div>
+
+        </form>
+
+        <div class="login100-more" style="background-image: url('{{URL::asset('img/cover.jpg')}}');">
         </div>
       </div>
     </div>
-    <br>
-    <!-- Bootstrap core JavaScript -->
-   <script src="homejs/homejquery/jquery.min.js"></script>
-    <script src="homejs/popper/popper.min.js"></script>
-     <script src="homejs/bootstrap/bootstrap.min.js"></script>
+  </div>
+  
+  
 
-  </body>
+  
+  
+<!--===============================================================================================-->
 
+  <script src="{{ URL::asset('js/login/jquery-3.2.1.min.js')}}"></script>
+<!--===============================================================================================-->
+
+  <script src="{{ URL::asset('js/login/animsition.min.js')}}"></script>
+<!--===============================================================================================-->
+
+  <script src="{{ URL::asset('js/login/popper.js')}}"></script>
+  <script src="{{ URL::asset('js/login/bootstrap.min.js')}}"></script>
+<!--===============================================================================================-->
+
+  <script src="{{ URL::asset('js/login/select2.min.js')}}"></script>
+<!--===============================================================================================-->
+
+  <script src="{{ URL::asset('js/login/moment.min.js')}}"></script>
+  <script src="{{ URL::asset('js/login/daterangepicker.js')}}"></script>
+<!--===============================================================================================-->
+
+  <script src="{{ URL::asset('js/login/countdowntime.js')}}"></script>
+<!--===============================================================================================-->
+
+  <script src="{{ URL::asset('js/login/main.js')}}"></script>
+
+</body>
 </html>

@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png" />
-    <link rel="icon" type="image/png" href="../assets/img/favicon.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="{{URL::asset('img/logos.png')}}" />
+    <link rel="icon" type="image/png" href="{{URL::asset('img/logos.png')}}" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>DocTrack</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
@@ -22,8 +22,8 @@
     <link rel='stylesheet' type='text/css' href="{{ URL::asset('css/googlefonts.css') }}">
 </head>
   <body>
-            <div class="main-panel">
-            <nav class="navbar navbar-transparent navbar-absolute">
+            <div class="main-panel1" style="margin-left: 60px; margin-right: 50px;">
+            <nav class="navbar navbar-transparent ">
                 <div class="container-fluid">
                     <div class="navbar-header">
                         <button type="button" class="navbar-toggle" data-toggle="collapse">
@@ -32,7 +32,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="#"> Dashboard </a>
+                        <a class="navbar-brand"> DOCTRACK </a>
                     </div>
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-right">
@@ -67,7 +67,7 @@
                                 </ul> --}}
                             </li>
                             <li class="dropdown">
-                                <a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">
+                                <a  class="dropdown-toggle" data-toggle="dropdown">
                                     {{Auth::user()->lastname}}
                                     <i class="material-icons">person</i>
                                     <p class="hidden-lg hidden-md">Profile</p>
@@ -95,20 +95,24 @@
                     </div>
                 </div>
             </nav>
-   
+  
 
 <!--CONTENT HERE-->
 <div class="content">
-  <div class="row" style="margin-top: 20px; margin-bottom: 20px; margin-left: 10px;">
-    <a class="btn btn-primary" href="{{route('chooseGroups',['userid'=>$User->user_id])}}">Back</a>
-  </div>
+     <div class="card">
+    <div class="card-header" data-background-color="orange">
+    <h4 class="title">Choose a Group</h4>
+    <p class="category">Choose a group that owns the Request you need to make.</p>
+   </div>
+  </div>  
+ 
 <div class="row">
  @if(isset($groups))
     @foreach($groups as $group)
-      <div class="col-sm-6">
+      <div class="col-md-3">
 
       <a href="javascript:openGroupModal({{$group->group_id}})">
-      <div class="card card-stats" style="width: 15rem; border: none;">
+      <div class="card card-stats" style=" border: none;">
         <div class="card-header" data-background-color="orange">
                                     <i class="material-icons">business</i>
                                 </div>
@@ -116,6 +120,7 @@
                                     <h3 class="title">{{$group->groupName}}</h3>
                                 </div>
     </div></a>
+
 
         <!--Enter Group Modal-->
         <div id="entergroup-{{$group->group_id}}" class="modal">
@@ -186,7 +191,13 @@
 @endforeach
 @endif
 </div>
+
+<div class="row" style="margin-top: 20px; margin-bottom: 20px; margin-right: 50px; float: right;">
+    <a class="btn btn-info" href="{{route('chooseGroups',['userid'=>$User->user_id])}}">Back</a>
+  </div>
+
  </div>
+</div>
   </body>
 
   <script src="{{URL::asset('js/orgchartjs/jquery.min.js')}}" type="text/javascript"></script>  

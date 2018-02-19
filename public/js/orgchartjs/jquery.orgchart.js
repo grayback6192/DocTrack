@@ -22,7 +22,8 @@
     this.opts = opts;
     this.defaultOptions = {
       'nodeTitle': 'name',
-      'nodeId': 'id',
+      'nodeContent': 'upgid',
+      'nodeId': 'Id',
       'toggleSiblingsResp': false,
       'depth': 999,
       'chartClass': '',
@@ -358,7 +359,7 @@
     loopChart: function ($chart) {
       var that = this;
       var $tr = $chart.find('tr:first');
-      var subObj = { 'name': $tr.find('.title')[0].id, };
+      var subObj = { 'name': $tr.find('.title')[0].id, 'upgid': $tr.find('.upgid').text()}
       $tr.siblings(':last').children().each(function() {
         if (!subObj.children) { subObj.children = []; }
         subObj.children.push(that.loopChart($(this)));
@@ -631,6 +632,7 @@
       if (!nodeData.children) { nodeData.children = []; }
       $.each(nodeData.children, function (index, child) {
         child.parentId = nodeData.id;
+        console.log(opts);
       });
       var dtd = $.Deferred();
       // construct the content of node
@@ -640,7 +642,7 @@
         $nodeDiv.append(opts.nodeTemplate(nodeData));
       } else {
         $nodeDiv.append('<div id="'+nodeData[opts.nodeTitle]+'" class="title">' + nodeData[opts.nodeTitle] + '</div>')
-          .append(typeof opts.nodeTitle !== 'undefined' ? '<div class="content">' + (nodeData[opts.nodeTitle] || '') + '</div>' : '');
+          .append(typeof opts.nodeContent !== 'undefined' ? '<div class="content"><div id="node-upgid" class="upgid">' + (nodeData[opts.nodeContent] || '') + '</div></div>' : '');
       }
       // append 4 direction arrows or expand/collapse buttons
       var flags = nodeData.relationship || '';

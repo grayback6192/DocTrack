@@ -1,52 +1,12 @@
-
-
-@extends('mastertemplate')
-@section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">face</i>
-               <p>Users</p>
-              </a>
- </li>
-
- <li class="active">
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">business</i>
-               <p>Departments</p>
-              </a>
- </li>
-
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">event_seat</i>
-                <p>Positions</p>
-              </a>
- </li>
-
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">group</i>
-               <p>Workflows</p>
-              </a>
- </li>
-
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
-                <i class="material-icons">description</i>
-                <p>Templates</p>
-              </a>
- </li>
-
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
-              </a>
- </li>
-@endsection
-
-@section('main_content')
-
+ <!DOCTYPE html>
+ <html>
+ <head>
+   <link rel='stylesheet' type='text/css' href="{{ URL::asset('css/orgchart/css/app.css') }}">
+    <link rel='stylesheet' type='text/css' href="{{ URL::asset('css/orgchart/css/jquery.orgchart.css') }}">
+    <link rel='stylesheet' type='text/css' href="{{ URL::asset('css/orgchart/css/jquery.orgchart.min.css') }}">
+    <link rel='stylesheet' type='text/css' href="{{ URL::asset('css/orgchart/css/style.css') }}">
+ </head>
+ <body>
  <div class="row justify-content-start mt-2 ml-2">
       <a class="btn btn-primary" href="{{route('showDep',['upgid'=>$upgid,'id'=>$groupid])}}">Back</a>
     </div>
@@ -65,8 +25,8 @@
       float: left;
       margin-top: 10px;
       padding: 10px;
-      color: #fff;
-      background-color: #449d44;
+      color: #00000;
+      background-color: #c77d21;
     }
     #edit-panel .btn-inputs { font-size: 24px; }
     #edit-panel.view-state>:not(#chart-state-panel) { display: none; }
@@ -130,12 +90,67 @@
       <input type="radio" name="chart-state" id="rd-view" value="view" checked="true"><label for="rd-view">View</label>
       <input type="radio" name="chart-state" id="rd-edit" value="edit"><label for="rd-edit">Edit</label>
     </span>
+
+    <label>selected node upg:</label>
+<input type="text" placeholder="selectedNodeUpg" id="selectednodeupg">
+
+    <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" onclick="openExampleModal()">
+  New node
+</button>
+
+<!-- Modal -->
+<div class="modal" id="exampleModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Choose</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table id="lists-table">
+          <thead>
+        <th>Names</th>
+        <th>Group</th>
+        <th>Position</th>
+        </thead>
+        <tbody>
+        @foreach($lists as $list)
+        <tr id={{$list->upg_id}}>
+        <td id="name-{{$list->upg_id}}"><a id="link-{{$list->upg_id}}" href="javascript:submitUserList({{$list->upg_id}},{{$list->group_id}}, {{$list->pos_id}})">{{$list->lastname}} {{$list->firstname}}</a></td>
+          <td>{{$list->posName}}</td>
+          <td>{{$list->groupName}}</td>
+      </tr>
+      
+        @endforeach
+      </tbody>
+       </table>
+      </div>
+    </div>
+  </div>
+</div>
     <label class="selected-node-group">selected node:</label>
     <input type="text" id="selected-node" class="selected-node-group">
     <label>new node:</label>
     <ul id="new-nodelist">
       <li><input type="text" id="nodetext" class="new-node"></li>
     </ul>
+    <label>Name</label>
+  <ul id="new-nodelist">
+    <input type="text" placeholder="Name" id="nodetext" class="new-node">
+    <input type="text" class="upg-ID" placeholder="upgID" id="upg">
+  </ul>
+  <input type="text" placeholder="Department" id="department">
+  <input type="text" placeholder="Position" id="position">
+  <input type="text" placeholder="posID" id="posID" >
+  <input type="text" placeholder="groupID" id="groupID">
+  <input type="text" placeholder="orgchartid" id="orgchartID" value="{{$orgchartid}}">
+
+
+
+
     <i class="fa fa-plus-circle btn-inputs" id="btn-add-input"></i>
     <i class="fa fa-minus-circle btn-inputs" id="btn-remove-input"></i>
     <span id="node-type-panel" class="radio-panel">
@@ -148,6 +163,33 @@
     <button type="button" id="btn-reset">Reset</button>
     <button type="button" id="btn-saves">Save</button>
   </div>
+   <script type="text/javascript">
+    function openExampleModal()
+    {
+      var modal = document.getElementById('exampleModal');
+      modal.style.display = "block";
+    }
+    function submitUserList($upg_id ,$group_id, $pos_id){
+      var name = document.getElementById('link-'+$upg_id);
+      var namefield = document.getElementById('nodetext');
+      namefield.value = name.innerHTML;
+
+      var modal = document.getElementById('exampleModal');
+              modal.style.display = "none";
+          
+      var upgfield =document.getElementById('upg');
+      upgfield.value = $upg_id;
+
+       var posfield =document.getElementById('posID');
+      posfield.value = $pos_id;
+
+       var groupfield =document.getElementById('groupID');
+      groupfield.value = $group_id;
+       // console.log($upg_id);
+       var modal = document.getElementById('exampleModal');
+       modal.style.display = "none";
+    }
+  </script>
   
   {{-- <script type="text/javascript" src="{{url('')}}js/jquery.min.js"></script> --}}
   <script type="text/javascript" src="{{ URL::asset('/js/orgchartjs/jquery.min.js') }}"></script>
@@ -162,18 +204,10 @@
       'name': 'President',
     };
 
-var getdex = function(){
-  $.ajax({
-       url : 'serv.php', // my php file
-       type : 'GET', // type of the HTTP request
-       success : function(result){ 
-          var obj = jQuery.parseJSON(result);
-          console.log(obj);
-       }
-    });
-};
+
+    var orgchartnodes = Array();
     var getId = function() {
-      return (new Date().getTime()) * 1000 + Math.floor(Math.random() * 1001);
+      return ( Math.floor(Math.random() * 10001)+1);
     };
 
     var oc = $('#chart-container').orgchart({
@@ -181,7 +215,6 @@ var getdex = function(){
       'exportButton': true,
       'exportFilename': 'OrgChart',
       'parentNodeSymbol': 'fa-th-large',
-      'nodeContent': 'title',
       'createNode': function($node, data) {
         $node[0].id = getId();
       }
@@ -189,9 +222,10 @@ var getdex = function(){
   
 
 
-    oc.$chartContainer.on('click', '.node', function() {
+     oc.$chartContainer.on('click', '.node', function() {
       var $this = $(this);
       $('#selected-node').val($this.find('.title').text()).data('node', $this);
+      $('#selectednodeupg').val($this.find('.upgid').text()).data('node',$this);
     });
 
     oc.$chartContainer.on('click', '.orgchart', function(event) {
@@ -240,6 +274,20 @@ var getdex = function(){
 
 
 
+       //backend
+      var pos_id= $('#posID').val();
+      var upg_id = $('#upg').val();
+      var group_id = $('#groupID').val();
+      var orgchart_id = $('#orgchartID').val();
+
+      var nodeObject = {'nodeid': getId(), 'pos_id': pos_id, 'upg_id':upg_id,'group_id':group_id, 'orgchart_id': orgchart_id};
+
+      orgchartnodes.push(nodeObject);
+      console.log(orgchartnodes);
+
+       $('#posID').val('');
+       $('#groupID').val('');     
+
       $('#new-nodelist').find('.new-node').each(function(index, item) {
         var validVal = item.value.trim();
         if (validVal.length) {
@@ -287,10 +335,11 @@ var getdex = function(){
       } else {
         var hasChild = $node.parent().attr('colspan') > 0 ? true : false;
         if (!hasChild) {
+          var upgid = $('#upg').val(); //MAO NI BAI
           var rel = nodeVals.length > 1 ? '110' : '100';
           oc.addChildren($node, {
               'children': nodeVals.map(function(item) {
-                return { 'name': item, 'relationship': rel, 'Id': getId()};
+                return { 'name': item, 'relationship': rel, 'Id': getId(), 'upgid': upgid};
               })
             }, $.extend({}, $chartContainer.find('.orgchart').data('options'), { depth: 0 }));
         } else {
@@ -303,6 +352,11 @@ var getdex = function(){
 
     $('#btn-delete-nodes').on('click', function() {
       var $node = $('#selected-node').data('node');
+      var removeUpgid= $('#selectednodeupg').val();
+      orgchartnodes = $.grep(orgchartnodes,function(e){
+        return e.upg_id != removeUpgid;
+      });
+      console.log(orgchartnodes);
       if (!$node) {
         alert('Please select one node in orgchart');
         return;
@@ -330,13 +384,17 @@ var getdex = function(){
    $('#result').html(res);
   var blob = new Blob([res], {type: "text/plain"});
   var group = $('#group-org').val();
+  var orgchart_id = $('#orgchartID').val();
   // saveAs(blob, filename+".txt");
   // var request = $.get('/uploadorgchart');
   $.ajax({
     url:'/admin/{{$upgid}}/addorg',
     method:'GET',
-    data:{id:res,
-          group_id: group},
+   data:{id:res,
+          orgchartid:orgchart_id,
+          group_id: group,
+          orgchartnodesArray: orgchartnodes
+        },
     success:function(data)
     {
       console.log(data);
@@ -345,23 +403,18 @@ var getdex = function(){
   });
 });
 
-
-
-
-// $('#btn-save').on('click', function () {
-//         $('pre').empty();
-//             var hierarchy = $('#chart-container').orgchart('getHierarchy');
-//             var tree = JSON.stringify(hierarchy, null, 2);
-//             $.ajax({
-//                 type: "POST",
-//                 url: "chart.html?tree=" + tree,
-//                 success: function (data) {
-//                 },
-//                 dataType: "json",
-//                 traditional: true
-//             });
     });
 
 
   </script>
-@endsection
+  <script src="{{URL::asset('js/orgchartjs/jquery.min.js')}}" type="text/javascript"></script>
+<script type="text/javascript" src="{{URL::asset('css/datatables/jQuery.dataTables.js')}}"></script>
+<script type="text/javascript">
+        $(document).ready(function () {
+            $('#lists-table').DataTable();
+        });
+    </script> 
+<script src="{{URL::asset('js/orgchartjs/jquery.orgchart.js')}}" type="text/javascript"></script>
+<script src="{{URL::asset('js/orgchartjs/html2canvas.min.js')}}" type="text/javascript"></script>
+</body>
+</html>

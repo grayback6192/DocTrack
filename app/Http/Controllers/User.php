@@ -699,8 +699,6 @@ class User extends Controller
                     ->join('position as p','upg.position_pos_id','=','p.pos_id')
                     ->get();
         return view('user/chooseGroup',['User'=>$name,'usergroups'=>$groups]);
-                    // echo "<pre>";
-                    // var_dump($groups);
     }
     
     public function index($upgid)
@@ -834,7 +832,6 @@ class User extends Controller
         $user = Auth::user();
         $userUpg = DB::table('userpositiongroup as upg')->where('upg.user_user_id','=',$user->user_id)->where('upg.group_group_id','=',$groupid)
                     ->where('upg.rights_rights_id','=',$rightid)
-                    ->where('upg.upg_status','=','active')
                     ->join('rights as r','upg.rights_rights_id','=','r.rights_id')
                     ->get();
 

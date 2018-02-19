@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png" />
-    <link rel="icon" type="image/png" href="../assets/img/favicon.png" />
+    <link rel="icon" type="image/png" href="{{URL::asset('img/logos.png')}}" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>DocTrack</title>
     <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
@@ -23,8 +23,8 @@
 </head>
 
   <body>
-     <div class="main-panel" style="margin: auto;">
-            <nav class="navbar navbar-transparent navbar-absolute">
+     <div class="main-panel1" style="margin-left: 60px; margin-right: 50px;">
+            <nav class="navbar navbar-transparent">
                 <div class="container-fluid">
                     <div class="navbar-header">
                         <button type="button" class="navbar-toggle" data-toggle="collapse">
@@ -73,8 +73,13 @@
 
 <!--CONTENT HERE-->
 <div class="content">
-<div class="row" style="margin-left: 10px; margin-top: 20px; margin-bottom: 20px;">
-  <a class="btn btn-primary" href="{{route('addGroup',['id'=>$User->user_id])}}">Choose Department</a>
+  <div class="card">
+    <div class="card-header" data-background-color="orange">
+    <h4 class="title">Choose a Department</h4>
+    <p class="category">Choose a department that owns the Request you need to make.</p>
+   </div>
+  </div>  
+  <a class="btn btn-warning" href="{{route('addGroup',['id'=>$User->user_id])}}">Choose Department</a>
 </div>
    <div class="row"> <!--First Row-->
   @if(isset($usergroups))

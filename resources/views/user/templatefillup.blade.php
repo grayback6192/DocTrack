@@ -39,9 +39,13 @@
 
 @if(isset($template))
 <div class="container">
-<div class="row justify-content-start ml-2 mb-2">
-  <a class="btn btn-primary" href="{{route('serviceowners',['upgid'=>$upgid])}}">  Back</a>
-  </div>
+  <div class="card">
+    <div class="card-header" data-background-color="orange">
+    <h4 class="title">Send</h4>
+    <p class="category">Send a file.</p>
+   </div>
+  </div>  
+
 {{-- <div class="row justify-content-center mr-4 ml-2">
 <table class="table">
 <tr>
@@ -57,28 +61,29 @@
 
 </table>
 </div> --}}
-<div class="dep-menu">
+<div class="row">
       @foreach($template as $templates)
-           <div class="card serviceowner">
+          <div class="col-lg-4 col-md-3 col-sm-3">
             <a href="/user/{{$upgid}}/send/{{$gid}}/templateInput/{{ $templates->template_id }}">
-               <div class="card-content text-center">
-                <div id="serviceicon">
-                  <i class="material-icons" style="font-size: 80px;">description</i>
+               <div class="card card-stats">
+         <div class="card-header" data-background-color="orange">
+                                    <i class="material-icons">description</i>
+                                </div>
+
+       <div class="card-content">
+                 <h3 class="title">{{$templates->templatename}}</h3>
                 </div>
-                 <h3 class="title" id="serviceicon">{{$templates->templatename}}</h3>
-                </div>
+              </div>
           </a>
         </div>
       @endforeach
 </div>
+
 @endif
 
 {{-- Input Type --}}
 @if(isset($variable))
 <div class="container">
-<div class="row justify-content-start ml-2">
-    <a class="btn btn-primary" href="{{route('Template',['upgid'=>$upgid,'gid'=>$gid])}}">Back</a>
-</div>
 
 <div class="row justify-content-between">
 <div class="media">
@@ -95,7 +100,7 @@
         Instructions here...
       </div>
       <div class="modal-footer">
-      <a class="btn btn-primary" href="javascript:closeInstructions()">Close</a>
+      <a class="btn btn-info" href="javascript:closeInstructions()">Close</a>
       </div>
     </div>
   </div>
@@ -119,7 +124,7 @@ function closeInstructions()
 {{-- </div> --}}
 
 <div class="media-left">
-<div class="col-md-offset-1">
+<div class="col-md-offset-1" style="padding-top: 60px;">
 
 <input class="row" style="margin-top: 20px;" type="text" name="subject" placeholder="Subject"><br>
 {{ csrf_field() }}
@@ -152,7 +157,7 @@ function closeInstructions()
   <div class="media-body">
   <div class="col-sm-7 col-md-offset-3"> 
   <div class="col-md-offset-10" style="margin-bottom: 10px;">
-    <a class="row btn btn-primary mb-3" href="javascript:openInstructions()">Show Instructions</a>
+    <a class="row btn btn-info mb-3" href="javascript:openInstructions()">Show Instructions</a>
   </div>
 <object data="/pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350"></object><br>
 </div>
@@ -223,9 +228,10 @@ function closeInstructions()
  
 //}
 ?>
-
-
 </div>
+  <div class="row justify-content-start ml-2 mb-2" style="float: right; margin-right: 50px;">
+    <a class="btn btn-info" href="{{route('serviceowners',['upgid'=>$upgid])}}">  Back</a>
+    </div>
 </div>
 @endif
 </div>
