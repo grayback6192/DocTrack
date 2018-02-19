@@ -39,7 +39,7 @@ class OrgChart extends Controller
                 $pos_id = $nodesArray['pos_id'];
                 $upg_id = $nodesArray['upg_id'];
                  
-               \DB::table('orgchartnodes')->insert(['orgchartnodes_id'=>$nodeid,
+               \DB::table('orgchartnode')->insert(['orgchartnode_id'=>$nodeid,
                                                      'orgchart_id'=>$orgchartid,
                                                     'pos_id'=>$pos_id,
                                                     'upg_id'=>$upg_id,
@@ -114,7 +114,7 @@ class OrgChart extends Controller
       {
             for ($i=0; $i < $count ; $i++) 
             {
-                \DB::table('orgchartnodes')->where('orgchart_id','=',$orgchartid)
+                \DB::table('orgchartnode')->where('orgchart_id','=',$orgchartid)
                                              ->where('upg_id','=',$removeorgchartnodesarray[$i])
                                              ->delete();
 
