@@ -10,6 +10,7 @@ use App\Http\Controllers\SessionController;
 use Dompdf\Dompdf;
 use Session;
 use \CloudConvert\Api;
+use Image;
 
 
 
@@ -402,33 +403,59 @@ class User extends Controller
         $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$docid.'.docx');
         $variable = $templateProcessor->getVariables();
 
-        foreach($signature as $signatures)
+       
+       foreach($signature as $signatures)
         {
             foreach($variable as $variables)
             {
                 if($variables == $signatures->posName)
                 {
-                    $templateProcessor->setImg($variables, [
-                                                        "src"=>$signatures->signature,
-                                                        "swh"=>"150"
-                                                         ]);
+                    if($signatures->signature == NULL)
+                    {
+                        $templateProcessor->setValue($variables,"Approved");
+                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
+                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
+                    }
+                    else
+                    {
+                        //Image Resize
+                        $img = Image::make($signatures->signature);
+                        $img->resize(100, 100);
+                        $img->save($signatures->signature);
+                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
+                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
+                        // $templateProcessor->setImg($variables, ["src"=>$signatures->signature,
+                        //                                         "swh"=>"150"]);
+                        $variablesReplace = array
+                        (
+                            "documentContent"=> array('path' => $signatures->signature, 'width' => 200, 'height' => 100)
+                        );
+                        $templateProcessor->setImageValue($variables,$variablesReplace);
+                    }
                 }
             }
         }
         $templateProcessor->saveAs('temp/'.$docid.'.docx');
-        //Accounts
+    //Accounts
     //LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag
     //F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw
-    $api = new Api("LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag");
-    $api->convert
-    ([
-        'inputformat' => 'docx',
-        'outputformat' => 'pdf',
-        'input' => 'upload',
-        'file' => fopen('temp/'.$docid.'.docx', 'r'),
-    ])
-    ->wait()
-    ->download('temp/'.$docid.'.pdf');
+    // $api = new Api("LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag");
+    // $api->convert
+    // ([
+    //     'inputformat' => 'docx',
+    //     'outputformat' => 'pdf',
+    //     'input' => 'upload',
+    //     'file' => fopen('temp/'.$docid.'.docx', 'r'),
+    // ])
+    // ->wait()
+    // ->download('temp/'.$docid.'.pdf');
+        \PhpOffice\PhpWord\Settings::setPdfRendererPath('../vendor/dompdf/dompdf');
+        \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$docid.'.docx');
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'PDF');
+        $objWriter->save('temp/'.$docid.'.pdf');
+
 
             if($currenttranscount==$transapprovedcount)
                 return $this->insertToNextInbox($docid,$upgid,$finalnextarray);
