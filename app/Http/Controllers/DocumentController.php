@@ -26,6 +26,16 @@ class DocumentController extends Controller
                                                     ->join('workflowsteps as ws','w.w_id','ws.workflow_w_id')
                                                     ->join('position as p','ws.position_pos_id','p.pos_id')
                                                     ->get();
+        $temp = sizeof($variable);
+         //Get predefined signature block
+        for ($i=0; $i <$temp; $i++) 
+        { 
+            if(strpos($variable[$i],'-')!=false)
+            {
+                unset($variable[$i]);  
+            }
+        }
+          $variable = array_values($variable);
         //Trim variable and get positions
         foreach($position as $positions)
         {
@@ -36,9 +46,11 @@ class DocumentController extends Controller
                     $signatureArray[] = $positions->posName;
                     $temp = array_search($positions->posName,$variable);
                     unset($variable[$temp]);
+                    $signatureArray[] = $positions->posName."-Name";
+                    $signatureArray[] = $positions->posName."-Position";    
                 }
             }
-        } 
+        }   
 
         return view("user/templatefillup",["variable"=>$variable,
                                            "var"=>$var,

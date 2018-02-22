@@ -10,6 +10,7 @@ use App\Http\Controllers\SessionController;
 use Dompdf\Dompdf;
 use Session;
 use \CloudConvert\Api;
+use Image;
 
 
 
@@ -408,12 +409,23 @@ class User extends Controller
             {
                 if($variables == $signatures->posName)
                 {
-                    $templateProcessor->setImg($variables, [
-                                                        "src"=>$signatures->signature,
-                                                        "swh"=>"150"
-                                                         ]);
+                     if($signatures->signature == NULL)
+                    {
+                        $templateProcessor->setValue($variables,"Approved");
+                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
+                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
+                    }
+                    else
+                    {
+                        $img = Image::make($signatures->signature);
+                        $img->resize(100, 100);
+                        $img->save($signatures->signature);
+                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
+                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
+                        $templateProcessor->setImg($variables, ["src"=>$signatures->signature]);
+                    }
                 }
-            }
+             }
         }
         $templateProcessor->saveAs('temp/'.$docid.'.docx');
         //Accounts
@@ -434,7 +446,8 @@ class User extends Controller
                 return $this->insertToNextInbox($docid,$upgid,$finalnextarray);
             else
                 return redirect()->route('docView',['upgid'=>$upgid,'docid'=>$docid]);
-    }
+    
+}
 
     public function insertToNextInbox($docid,$upgid,$nextarray)
     {

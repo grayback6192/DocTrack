@@ -80,6 +80,9 @@
 <script>
   tinymce.init({
   selector: "#textarea",
+  plugins: "table",
+  toolbar:"table bold italic underline alignleft aligncenter alignright",
+  menubar: 'file edit insert view format table tools help',
   branding:false,
   height:350,
   width:750
