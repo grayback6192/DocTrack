@@ -69,6 +69,19 @@ class RegisterUserController extends Controller
     protected function create(array $data)
     {
 
+        //validate if email already taken
+        $sameemails = \DB::table('user')->where('email','=',$data['email'])->get();
+
+        if(count($sameemails)>0)
+        {
+            return redirect()->route('RegisterUser')->with('emailtaken','This email is already taken.');
+        }
+
+        //validate if group exists
+        $groupkeys = \DB::table('group')->where('businessKey','=',$data['business'])->get();
+        if(count($groupkeys)==0)
+            return redirect()->route('RegisterUser')->with('nokey','No school with such key exists.');
+
          $rand = rand(100000,999999);
 
         if(isset($data['sign']))
@@ -81,11 +94,11 @@ class RegisterUserController extends Controller
 
         if(isset($data['userprofpic']))
         {
-             $path = $request->profpic->store('users/pictures');
-            $image = $request->profpic->hashName();
+             $path = $data['userprofpic']->store('users/pictures');
+            $image = $data['userprofpic']->hashName();
         }
         else
-            $image="";
+            $image="default.png";
 
 
         $user = User::create([
@@ -99,7 +112,7 @@ class RegisterUserController extends Controller
             'gender'=> $data['gender'],
             'profilepic'=>$image,
             'signature'=>$signpath,
-            'status'=> 'Active',
+            'status'=> 'active',
         ]);
             
         $businessKey = \DB::table("group")->where("businessKey","=",$data['business'])->get();
@@ -114,7 +127,7 @@ class RegisterUserController extends Controller
             'rights_rights_id'=>'2',
             'group_group_id'=>NULL,
             'client_id'=> $group,
-            'upg_status'=>'active',
+            'upg_status'=>'inactive',
         ]);
         return $user;
     }

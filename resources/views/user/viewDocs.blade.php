@@ -26,9 +26,6 @@
 
 @section('main_content')
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
-    <div class="alert alert-success alert-dismissable">
-  <strong>Download</strong> the file to view the signature.
-</div>
 </div>
 
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
@@ -58,6 +55,36 @@
 
 </form>
 </div>  
+<div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Document Workflow</h3>
+  </div>
+  <div class="panel-body">
+  <div class="row">
+    @foreach($docworkflows as $docworkflow)
+      <div class="media">
+      <div class="media-left">
+      <div class="card">
+        <div class="card-content">
+          {{$docworkflow->lastname}}, {{$docworkflow->firstname}}
+        </div>
+      </div>
+      </div>
+
+      @if($docworkflow->order != (count($docworkflows)))
+      <div class="media-right">
+        <div style="margin-top: 40px;">
+          <i class="material-icons">forward</i>
+        </div>
+      </div>
+      @endif
+      </div>
+    @endforeach
+  </div>
+  </div>
+</div>
+</div>
 @endsection
 
 @section('js')

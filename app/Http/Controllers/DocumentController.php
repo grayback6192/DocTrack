@@ -26,16 +26,18 @@ class DocumentController extends Controller
                                                     ->join('workflowsteps as ws','w.w_id','ws.workflow_w_id')
                                                     ->join('position as p','ws.position_pos_id','p.pos_id')
                                                     ->get();
+
         $temp = sizeof($variable);
-         //Get predefined signature block
+        //Get predefined signature block
         for ($i=0; $i <$temp; $i++) 
         { 
             if(strpos($variable[$i],'-')!=false)
             {
-                unset($variable[$i]);  
+                unset($variable[$i]); 
             }
         }
-          $variable = array_values($variable);
+        
+        $variable = array_values($variable);
         //Trim variable and get positions
         foreach($position as $positions)
         {
@@ -47,18 +49,26 @@ class DocumentController extends Controller
                     $temp = array_search($positions->posName,$variable);
                     unset($variable[$temp]);
                     $signatureArray[] = $positions->posName."-Name";
-                    $signatureArray[] = $positions->posName."-Position";    
+                    $signatureArray[] = $positions->posName."-Position";
+                    //$variable = array_values($variable);
                 }
             }
         }   
-
-        return view("user/templatefillup",["variable"=>$variable,
+        if(isset($signatureArray))
+            return view("user/templatefillup",["variable"=>$variable,
                                            "var"=>$var,
                                            "id"=>$request->first(),
                                            "User"=>$name,
                                            "upgid"=>$upgid,
                                            "gid"=>$gid,
                                            "position"=>$signatureArray]);
+        else
+             return view("user/templatefillup",["variable"=>$variable,
+                                           "var"=>$var,
+                                           "id"=>$request->first(),
+                                           "User"=>$name,
+                                           "upgid"=>$upgid,
+                                           "gid"=>$gid]);
 
     }
 
@@ -152,6 +162,43 @@ class DocumentController extends Controller
         return insertTransaction($rand,$var,$upgId);
     }
 
+    public function sendScratchDoc(Request $request,$upgid) //send doc from scratch
+    {
+        $name = Auth::user();
+        $rand = rand(1,1000);
+        $user = request()->all();
+        $title = str_replace(" ", "_", $user['title']);
+        $path = "file/".$rand.".docx";
+        $workflow = $request['wf'];
+
+        DB::table("document")->insert(["doc_id"=>$rand,
+                                       "docname"=>$title,
+                                       "doc_path"=>$path,
+                                       "template_template_id"=>NULL,
+                                       "userpositiongroup_upg_id"=>$upgid,
+                                        "sentDate" => NULL,
+                                        "sentTime" => NULL]);
+
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $section = $phpWord->addSection();
+        \PhpOffice\PhpWord\Shared\Html::addHtml($section, $user['text']);
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save('file/'.$rand.'.docx');
+        $objWriterHTML = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
+        $objWriterHTML->save('temp/'.$rand.'.html');
+
+        //PDF RENDERER
+        $dompdf= new Dompdf();
+        $dompdf->loadHtml($user['text']);
+        $dompdf->render();
+        $output = $dompdf->output();
+        file_put_contents("pdf/".$rand.".pdf", $output);
+
+        $docworkflow = getWorkflowForCustom($upgid,$workflow);
+        return insertTransaction($rand,$docworkflow,$upgid);
+
+    }
+
      public function viewdocs(Request $request,$upgid,$id){    
 
         $user = Auth::user();
@@ -243,6 +290,16 @@ class DocumentController extends Controller
             $time = $key->time;
         }
 
+        //for viewing workflow of document
+         $docworkflows=\DB::table("transaction")
+            ->where('transaction.document_doc_id','=',$id)
+            ->join('document','transaction.document_doc_id','=','document.doc_id')
+            ->join('userpositiongroup','transaction.upg_id','=','userpositiongroup.upg_id')
+            ->join('user','userpositiongroup.user_user_id','=','user.user_id')
+            ->select('transaction.status','user.lastname','user.firstname','transaction.time','transaction.date','document.template_template_id','transaction.order','userpositiongroup.upg_id')
+            ->orderBy('transaction.order')
+            ->get();
+
         \DB::table('inbox')->where('doc_id','=',$id)->where('upg_id','=',$recid)->update(['istatus'=>'read']);
         $docInfo = \DB::table('inbox')->where('doc_id','=',$id)->where('upg_id','=',$recid)->get();
 
@@ -251,7 +308,7 @@ class DocumentController extends Controller
      else
         $pdf = "/pdf/".$id.".pdf";
 
-       return view("user/viewDocs",["pdf"=>$pdf, 'User'=>$user, 'status'=>$status, 'time'=>$time, 'date'=>$date, 'docInfos'=>$docInfo,'upgid'=>$upgid,'id'=>$id]);
+       return view("user/viewDocs",["pdf"=>$pdf, 'User'=>$user, 'status'=>$status, 'time'=>$time, 'date'=>$date, 'docInfos'=>$docInfo,'upgid'=>$upgid,'id'=>$id,'docworkflows'=>$docworkflows]);
         //return $id;
         
     }

@@ -106,6 +106,20 @@
    </div>
   </div>  
  
+  @if(session('wrongkey'))
+<div class="alert alert-danger alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {{session('wrongkey')}}
+</div>
+@endif
+
+ @if(session('correctkey'))
+<div class="alert alert-success alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {{session('correctkey')}}
+</div>
+@endif
+
 <div class="row">
  @if(isset($groups))
     @foreach($groups as $group)

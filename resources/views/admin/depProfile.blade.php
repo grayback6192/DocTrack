@@ -116,7 +116,15 @@
          {{--  <a href="{{route('deleteDep',['upgid'=>$upgid,'id'=>$depinfo->group_id])}}"><i class="material-icons">delete</i></a> --}}
          
         </div>
-      <div class="jumbotron">
+      <div class="jumbotron"> 
+
+        @if(session('edited'))
+    <div class="alert alert-success alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {{session('edited')}}
+</div>
+  @endif
+  
         <div class="text-right" style="margin-right: 10px;">
            <a class="btn btn-primary" href="{{route('editDep',['upgid'=>$upgid,'id'=>$depinfo->group_id])}}"><i class="material-icons">mode_edit</i></a>
         </div>
@@ -276,7 +284,7 @@
 
     <div class="modal-footer">
 
-          <input type="submit" class="btn btn-primary" name="addNewAssign" value="Submit">
+          <input type="submit" class="btn btn-primary" name="addNewAssign" value="Add New Admin">
     </div>
     </form>
   </div>

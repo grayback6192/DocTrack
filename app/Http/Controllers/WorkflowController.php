@@ -29,7 +29,7 @@ class WorkflowController extends Controller
     									'status'=>'active',
                                         'client_id'=>$clientId]);
 
-    	return redirect()->route('viewWorkflow',['upgid'=>$upgid]);
+    	return redirect()->route('AddWf',['upgid'=>$upgid, 'wfid'=>$rand]);
     	
     }
 

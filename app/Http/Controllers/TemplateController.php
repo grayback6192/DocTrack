@@ -78,8 +78,8 @@ class TemplateController extends Controller
 	                                      "tempid"=>$id,
                                           "tempInfos"=>$request,
                                           "upgid"=>$upgid,
-                                            "admingroup"=>$admingroup,
-                                            "workflowpositions"=>$workflowpositions]);
+                                          "admingroup"=>$admingroup,
+                                          "workflowpositions"=>$workflowpositions]);
     }
     public function addEditedTemplate($upgid,$tempid) //Template Creation, Post
     {

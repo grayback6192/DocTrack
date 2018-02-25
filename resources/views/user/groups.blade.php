@@ -55,6 +55,18 @@
                             </div>
                           @endforeach
                         @endif
+                          <div class="col-lg-4 col-md-6 col-sm-6">                            
+                              <a href="{{route('test',['upgid'=>$upgid])}}">
+                               <div class="card card-stats" style="border: none">
+                                  <div class="card-header" data-background-color="blue">
+                                   <i class="material-icons">folder_open</i>
+                               </div>
+                                  <div class="card-content">
+                                    <h3 class="title">Create Document</h3>
+                                </div>
+                              </div>
+                                </a>
+                            </div>
                       </div>
                     </div>
 

@@ -55,23 +55,28 @@
       </form>
   </div>
 
-<div class="container-fluid">
- <div class="dep-menu">
+<div class="content">
+<div class="row">
+
     @if(isset($departments))
       @foreach($departments as $department)
-          <div class="card serviceowner">
+       <div class="col-lg-3 col-md-6 col-sm-6">
+          <div class="card card-stats">
             <a href="{{route('getGroupTemplates',['upgid'=>$upgid,'groupid'=>$department->group_id])}}">
-              <div class="card-content text center">
-              <div id="serviceicon">
-                <i class="material-icons" style="font-size: 80px;">folder_open</i>
+              
+              <div class="card-header" data-background-color="orange">
+                <i class="material-icons">folder_open</i>
             </div>
-            <h3 class="title" id="serviceicon">{{$department->groupName}}</h3>
+        <div class="card-content">
+            <h3 class="title">{{$department->groupName}}</h3>
         </div>
       </a>
         </div>
+      </div>
       @endforeach
     @endif 
-  </div>
+
+</div>
 </div>
 
   {{-- Input Type --}}

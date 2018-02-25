@@ -72,25 +72,25 @@ class RegisterController extends Controller
         $userRand = rand(101010,999999);
         $posrand = rand(1000,99999);
 
-        //for profpic
-         if(isset($data['clientprofpic']))
-         {
-             $path = $request->profpic->store('users/pictures');
-            $image = $request->profpic->hashName();
-         }
-         else
-            $image="";
+        // //for profpic
+        //  if(isset($data['clientprofpic']))
+        //  {
+        //     $path = $request->profpic->store('users/pictures');
+        //     $image =$request->profpic->hashName();
+        //  }
+        //  else
+        //     $image="";
 
         $user = User::create([
             'user_id' => $userRand,
             'email' => $data['email'],
             'contactnum' => $data['contact'],
             'password' => bcrypt($data['password']),
-            'lastname'=> $data['fname'],
-            'firstname'=> $data['lname'],
+            'lastname'=> $data['lname'],
+            'firstname'=> $data['fname'],
             'address'=> $data['address'],
             'gender'=> $data['gender'],
-            'profilepic' => $image,
+            // 'profilepic' => $image,
             'status'=> 'active',
         ]);
         

@@ -23,7 +23,10 @@ class Role extends Controller
          foreach ($clients as $client) {
             $clientId = $client->client_id;
         }
-    	$roles = DB::table('position')->where('status','=','active')->where('client_id','=',$clientId)->paginate(5);
+    	$roles = DB::table('position')->where('status','=','active')
+                                        ->where('client_id','=',$clientId)
+                                        ->orderBy('posName')
+                                        ->paginate(5);
         $deps = DB::table('group')->get();
         $admingroup = getAdminGroup($upgid);
 
@@ -72,15 +75,30 @@ class Role extends Controller
 
     function editRole($upgid,$roleid,Request $request)
     {
+         $info = request()->all();
+        //validate if edited role already exists aside from its name
+        $samePosNameCount = 0;
 
-        // $this->validate($request,[
-        //                     'role'=>'required|unique:position,posName',
-        //                             ]);
+        $posnames = DB::table('position')->where('posName','=',$info['role'])->get();
+        foreach ($posnames as $posname) {
+            $posID = $posname->pos_id;
+            $posName = $posname->posName;
+        }
 
-        $info = request()->all();
-        DB::table('position')->where('pos_id','=',$roleid)->update(['posName'=>$info['role'],
+        if(($posID!=$roleid) && ($posName==$info['role']))
+            $samePosNameCount++;
+
+       if($samePosNameCount==0)
+       {
+            DB::table('position')->where('pos_id','=',$roleid)->update(['posName'=>$info['role'],
                                                                 'posDescription'=>$info['roledesc']]);
+        }
 
-        return redirect()->route('viewRolePage',['upgid'=>$upgid]);
+        if($samePosNameCount>0)
+        {
+            return redirect()->route('viewRolePage',['upgid'=>$upgid])->with('takenposname','Position Name already exists.');
+        }
+        else
+             return redirect()->route('viewRolePage',['upgid'=>$upgid]);
     }
 }

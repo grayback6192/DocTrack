@@ -42,12 +42,32 @@ class Department extends Controller
         //if department id has no client_id (mothergroup), masteradmin is automatically part of admin
         //get master admin of depid
         $adminid = DB::table('position')->where('posName','=','Admin')
-                                        ->orWhere('posName','=','masteradmin')
                                         ->where('client_id','=',$clientid)
                                         ->get();
-        foreach ($adminid as $key) {
+        if(count($adminid)>0)
+        {
+            foreach ($adminid as $key) {
             $adminposid = $key->pos_id;
+            }
         }
+        else
+        {
+            $adminid = rand(10,10000);
+            DB::table('position')->insert(['pos_id'=>$adminid,
+                                            'posName'=>'Admin',
+                                            'posDescription'=>'',
+                                            'status'=>'active',
+                                            'client_id'=>$clientid]);
+            //retrieve new position
+            $newadminid = DB::table('position')->where('posName','=','Admin')
+                                                ->where('client_id','=',$clientid)
+                                                ->get();
+            foreach ($newadminid as $key) {
+                $adminposid = $key->pos_id;
+            }
+
+        }
+        
         
 
         //get group admins
@@ -137,6 +157,8 @@ class Department extends Controller
             $mg = $client->client_id;
         }
         }
+        else if($depInfo['mothergroup']=="NULL")
+            $mg = NULL;
         else
         {
             $mg = $depInfo['mothergroup'];
@@ -148,23 +170,14 @@ class Department extends Controller
                                                             'group_group_id'=>$mg,
                                                             'businessKey'=>$depInfo['depKey']]);
 
-        return $this->showDep($upgid,$depid);
+        return $this->showDep($upgid,$depid)->with('edited','Department information has been edited.');
     }
 
     function addDep($upgid)
     {
          $user = Auth::user(); 
          $dep = request()->all();
-          $path = public_path().'/storage/docs/'.$dep['depname'];
-        File::makeDirectory($path,$mode=0777,true,true);
-        $path2 = $path.'/pdf';
-        $path3 = $path.'/temp';
-        $path4 = $path.'/template';
-
-        File::makeDirectory($path2,$mode=0777,true,true);
-        File::makeDirectory($path3,$mode=0777,true,true);
-        File::makeDirectory($path4,$mode=0777,true,true);
-
+    
         if($dep['mothergroup']==''){
             $mothergroup = $this->getClientId($user->user_id);
         foreach ($mothergroup as $client) {
@@ -190,9 +203,9 @@ class Department extends Controller
                                     'businessKey'=>$dep['depKey']]);
 
         $admingroup = getAdminGroup($upgid);
-         //return redirect()->route('viewDep',['upgid'=>$upgid]);
-        return redirect()->route('showDep',['upgid'=>$upgid,'depid'=>$admingroup]);
-        //return $path;   
+
+        return redirect()->route('showDep',['upgid'=>$upgid,'depid'=>$rand]);
+ 
     }
 
     function deleteDep($upgid,$depid)

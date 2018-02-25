@@ -119,7 +119,7 @@
 						html+="<td>"+data[i].lastname+", "+data[i].firstname+"</td>";
             html+="<td>"+data[i].posName+"</td>";
 						html+="<td>"+data[i].rightsName+"</td>";
-						html+="<td><a href=http://localhost:8000/admin/assignment/delete/"+data[i].upg_id+">Remove</a></td>";
+						html+="<td><button type='button' class='btn btn-danger' data-toggle='modal' data-target='#removeupg-"+data[i].upg_id+"'><i class='material-icons'>delete</i></button></td>";
 						html+="</form></tr></tbody>";
 						console.log(html);
 						$('#assign-table').append(html);
@@ -327,7 +327,7 @@
 
     <div class="modal-footer">
 
-    			<input type="submit" class="btn btn-primary" name="addNewAssign" value="Submit">
+    			<input type="submit" class="btn btn-primary" name="addNewAssign" value="Add New Assignment">
    	</div>
     </form>
   </div>

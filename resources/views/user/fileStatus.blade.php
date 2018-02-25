@@ -49,18 +49,44 @@
       <div class="media-left">
       <div class="card" style="border: 0;">
         <table class="table table-sm" >
-    <tr>
+   {{--  <tr>
       <th>Name</th>
       <th>Status</th>
       <th></th>
-    </tr>
+    </tr> --}}
 
 <tr>
 <td>{{$status1->lastname}}, {{$status1->firstname}}</td>
+</tr>
+
+{{-- @if()
+<tr>
+<td>
+  fdgfh
+</td>    
+</tr>
+@endif --}}
+<?php
+foreach ($inboxstatus as $key) {
+  if($key->upg_id==$status1->upg_id)
+  {
+    if($key->readtime!=NULL && $key->readdate!=NULL)
+    {
+      ?>
+        <tr>
+          <td>seen <?php echo "".$key->readdate." ".$key->readtime; ?></td>
+        </tr>
+      <?php
+    }
+  }
+}
+?>
+
+<tr>
 <td>{{$status1->status}}
   <div class="card-block">
     @if(isset($status1->time) && isset($status1->date))
-      on {{$status1->date}}  {{$status1->time}}
+      on {{$status1->date}} {{$status1->time}}
     @endif
   </div>
 </td>

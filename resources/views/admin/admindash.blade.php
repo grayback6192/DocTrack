@@ -32,17 +32,17 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="#"> Dashboard </a>
+                        <a class="navbar-brand" href="#"> Admin </a>
                     </div>
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-right">
 
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                               {{--  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <i class="material-icons">notifications</i>
-                                    {{-- <span class="notification">5</span> --}}
+                                    <span class="notification">5</span>
                                     <p class="hidden-lg hidden-md">Notifications</p>
-                                </a>
+                                </a> --}}
                                {{--  <ul class="dropdown-menu">
                                     <li>
                                         <a href="#">Mike John responded to your email</a>
@@ -63,6 +63,7 @@
                             </li>
                             <li class="dropdown">
                                 <a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">
+                                  {{Auth::user()->lastname}}
                                     <i class="material-icons">person</i>
                                     <p class="hidden-lg hidden-md">Profile</p>
                                 </a>
@@ -76,7 +77,7 @@
                                 </ul>
                             </li>
                         </ul>
-                        <form class="navbar-form navbar-right" role="search">
+                        {{-- <form class="navbar-form navbar-right" role="search">
                             <div class="form-group  is-empty">
                                 <input type="text" class="form-control" placeholder="Search">
                                 <span class="material-input"></span>
@@ -85,7 +86,7 @@
                                 <i class="material-icons">search</i>
                                 <div class="ripple-container"></div>
                             </button>
-                        </form>
+                        </form> --}}
                     </div>
                 </div>
             </nav>
@@ -93,7 +94,7 @@
 <!--CONTENT HERE-->
 <div class="content">
 
-   <div class="row mt-5"> <!--First Row-->
+   <div class="row" style="margin-top: 40px;"> <!--First Row-->
   <div class="col-sm-3">
     <a href="{{route('UserManage',['upgid'=>$upgid])}}">
     <div class="card text-center border-0" style="background-color: transparent;">
@@ -145,14 +146,14 @@
     </div></a>
   </div>
 
-  <div class="col-sm-3">
+ {{--  <div class="col-sm-3">
     <a href="#"><div class="card text-center border-0 hvr-underline-from-center" style="background-color: transparent;">
        <i class="material-icons" style="font-size: 100px;">archive</i>
       <div class="card-block">
         <h3 class="card-title" style="margin-top: 1rem">Archive</h3>
       </div>
     </div></a>
-  </div>
+  </div> --}}
 </div>
 
 </div>

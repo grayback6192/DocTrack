@@ -10,8 +10,8 @@
  * file that was distributed with this source code. For the full list of
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
- * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2016 PHPWord contributors
+ * @see         https://github.com/PHPOffice/PHPWord
+ * @copyright   2010-2017 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
@@ -37,46 +37,56 @@ class TemplateProcessor
     protected $zipClass;
 
     /**
-     * @var string Temporary document filename (with path).
+     * @var string Temporary document filename (with path)
      */
     protected $tempDocumentFilename;
 
     /**
-     * Content of main document part (in XML format) of the temporary document.
+     * Content of main document part (in XML format) of the temporary document
      *
      * @var string
      */
     protected $tempDocumentMainPart;
 
     /**
-     * Content of headers (in XML format) of the temporary document.
+     * Content of headers (in XML format) of the temporary document
      *
      * @var string[]
      */
     protected $tempDocumentHeaders = array();
 
     /**
-     * Content of footers (in XML format) of the temporary document.
+     * Content of footers (in XML format) of the temporary document
      *
      * @var string[]
      */
     protected $tempDocumentFooters = array();
 
     /**
-    *
-    * Rels and Types - used in inserting images
-    * 
-    */
-    protected $_main_rels;
-    protected $_header_rels = [];
-    protected $_footer_rels = [];
-    protected $_types;
-    protected $blank_rels_page = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+     * Document relations (in XML format) of the temporary document.
+     *
+     * @var string[]
+     */
+    protected $tempDocumentRelations = array();
 
     /**
-     * @since 0.12.0 Throws CreateTemporaryFileException and CopyFileException instead of Exception.
+     * Document content types (in XML format) of the temporary document.
      *
-     * @param string $documentTemplate The fully qualified template filename.
+     * @var string
+     */
+    protected $tempDocumentContentTypes = '';
+
+    /**
+     * new inserted images list
+     *
+     * @var string[]
+     */
+    protected $tempDocumentNewImages = array();
+
+    /**
+     * @since 0.12.0 Throws CreateTemporaryFileException and CopyFileException instead of Exception
+     *
+     * @param string $documentTemplate The fully qualified template filename
      *
      * @throws \PhpOffice\PhpWord\Exception\CreateTemporaryFileException
      * @throws \PhpOffice\PhpWord\Exception\CopyFileException
@@ -99,29 +109,42 @@ class TemplateProcessor
         $this->zipClass->open($this->tempDocumentFilename);
         $index = 1;
         while (false !== $this->zipClass->locateName($this->getHeaderName($index))) {
-            $this->tempDocumentHeaders[$index] = $this->fixBrokenMacros(
-                $this->zipClass->getFromName($this->getHeaderName($index))
-            );
+            $this->tempDocumentHeaders[$index] = $this->readPartWithRels($this->getHeaderName($index));
             $index++;
         }
         $index = 1;
         while (false !== $this->zipClass->locateName($this->getFooterName($index))) {
-            $this->tempDocumentFooters[$index] = $this->fixBrokenMacros(
-                $this->zipClass->getFromName($this->getFooterName($index))
-            );
+            $this->tempDocumentFooters[$index] = $this->readPartWithRels($this->getFooterName($index));
             $index++;
         }
-        $this->tempDocumentMainPart = $this->fixBrokenMacros($this->zipClass->getFromName($this->getMainPartName()));
-        $this->_countRels=100;
+
+        $this->tempDocumentMainPart = $this->readPartWithRels($this->getMainPartName());
+        $this->tempDocumentContentTypes = $this->zipClass->getFromName($this->getDocumentContentTypesName());
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return string
+     */
+    protected function readPartWithRels($fileName)
+    {
+        $relsFileName = $this->getRelationsName($fileName);
+        $partRelations = $this->zipClass->getFromName($relsFileName);
+        if ($partRelations !== false) {
+            $this->tempDocumentRelations[$fileName] = $partRelations;
+        }
+
+        return $this->fixBrokenMacros($this->zipClass->getFromName($fileName));
     }
 
     /**
      * @param string $xml
      * @param \XSLTProcessor $xsltProcessor
      *
-     * @return string
-     *
      * @throws \PhpOffice\PhpWord\Exception\Exception
+     *
+     * @return string
      */
     protected function transformSingleXml($xml, $xsltProcessor)
     {
@@ -166,8 +189,6 @@ class TemplateProcessor
      * @param \DOMDocument $xslDomDocument
      * @param array $xslOptions
      * @param string $xslOptionsUri
-     *
-     * @return void
      *
      * @throws \PhpOffice\PhpWord\Exception\Exception
      */
@@ -216,9 +237,7 @@ class TemplateProcessor
     /**
      * @param mixed $search
      * @param mixed $replace
-     * @param integer $limit
-     *
-     * @return void
+     * @param int $limit
      */
     public function setValue($search, $replace, $limit = self::MAXIMUM_REPLACEMENTS_DEFAULT)
     {
@@ -249,184 +268,141 @@ class TemplateProcessor
     }
 
     /**
-     * Set a new image
-     *
-     * @param string $search
-     * @param string $replace
+     * @param mixed $search
+     * @param mixed $replace Path to image, or array("path" => xx, "width" => yy, "height" => zz)
+     * @param int $limit
      */
-    public function setImageValue($search, $replace)
+    public function setImageValue($search, $replace, $limit = self::MAXIMUM_REPLACEMENTS_DEFAULT)
     {
-        // Sanity check
-        if (!file_exists($replace)) {
-            return;
+        // prepare $search_replace
+        if (!is_array($search)) {
+            $search = array($search);
         }
-        // Delete current image
-        $this->zipClass->deleteName('word/media/' . $search);
-        // Add a new one
-        $this->zipClass->addFile($replace, 'word/media/' . $search);
-    }
-    
-    public function setImages($search, $images){
-        $this->setImagesInner($search, $images);
-    }
-    
-    public function setImg($search, $img){
-        $this->setImagesInner($search, array($img));
-    }
-    
-    
-    private function setImagesInner($search, $images){
-    
-        $images_to_add = "";
-        $types_to_add = "";
-        $rels_to_add = "";
-    
-        foreach($images as $img){
-    
-            list($width, $height) = getimagesize($img['src']);
 
-            if(isset($img['swh'])){
-                //if the image is more vertical
-                if($width<=$height){
-                    //set the vertical size to the one specified
-                    $desired_height=(int)$img['swh'];
-                    //figure out the ratio between the height and width
-                    $ratio=$width/$height;
-                    //increase the other by the ratio
-                    $desired_width=(int)$img['swh']*$ratio;
-                    //make a whole number
-                    $desired_width=round($desired_width);
-                }
-                
-                //if the image is more horizontal
-                if($width>=$height){
-                    $desired_width=(int)$img['swh'];
-                    $ratio=$height/$width;
-                    $desired_height=(int)$img['swh']*$ratio;
-                    $desired_height=round($desired_height);
-                }
-                
-                //set the new width and height
-                $width=$desired_width;
-                $height=$desired_height;
-            }                        
-            
-            //get current picture counter
-            $countrels=$this->_countRels++;
-            //create a relationship id
-            $rel_id = 'rId' . $countrels;
-            
-            //get the image extension from file source
-            $exploded = explode(".", $img['src']);
-            $img_extension = end($exploded);    
-            //eg img100.jpg
-            $img_name = 'img' . $countrels . '.' . $img_extension;
-
-            //remove file if exists and add new one
-            $this->zipClass->deleteName('word/media/' . $img_name);
-            $this->zipClass->addFile($img['src'], 'word/media/' . $img_name);
-
-            
-            //create img content
-            $img_template = '
-                <w:pict>
-                    <v:shape type="#_x0000_t75" style="width:WIDpx;height:HEIpx">
-                        <v:imagedata r:id="RID" o:title=""/>
-                    </v:shape>
-                </w:pict>
-            ';
-            
-            $img_search = array('RID', 'WID', 'HEI');
-            $img_replace = array($rel_id, $width, $height);
-            $img_to_add = str_replace($img_search, $img_replace, $img_template);    
-            $images_to_add .= $img_to_add;
-
-            //create type content       
-            $type_template = '<Override PartName="/word/media/IMG" ContentType="image/EXT"/>';
-            
-            $type_search = array('IMG', 'EXT'); 
-            $type_replace = array($img_name, $img_extension);
-            $type_to_add = str_replace($type_search, $type_replace, $type_template) ;
-            $types_to_add .= $type_to_add;
-            
-            //create relationship content
-            $rel_template = '<Relationship Id="RID" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/IMG"/>';
-                
-            $rel_search = array('RID', 'IMG');
-            $rel_replace = array($rel_id, $img_name);
-            $rel_to_add = str_replace($rel_search, $rel_replace, $rel_template);
-            $rels_to_add .= $rel_to_add;                    
-                
+        $replacesList = array();
+        if (!is_array($replace) || isset($replace['path'])) {
+            $replacesList[] = $replace;
+        } else {
+            $replacesList = array_values($replace);
         }
-            
-        //add stuff to search string
-        $str_key = '${'.$search.'}';
-        
-        
-        //try to insert the part to replace, if count comes back positive, add to rels      
-        
-        //start with main part
-        $count = 0;
-        $this->tempDocumentMainPart =  str_replace($str_key, $images_to_add, $this->tempDocumentMainPart, $count);
-        
-        if ($count > 0){
-            if ($this->_main_rels==""){
-                $this->_main_rels=$this->zipClass->getFromName('word/_rels/document.xml.rels');
+
+        $searchReplace = array();
+        foreach ($search as $searchIdx => $searchString) {
+            $searchReplace[$searchString] = isset($replacesList[$searchIdx]) ? $replacesList[$searchIdx] : $replacesList[0];
+        }
+
+        // define templates
+        // result can be verified via "Open XML SDK 2.5 Productivity Tool" (http://www.microsoft.com/en-us/download/details.aspx?id=30425)
+        $imgTpl = '<w:pict><v:shape type="#_x0000_t75" style="width:{WIDTH}px;height:{HEIGHT}px"><v:imagedata r:id="{RID}" o:title=""/></v:shape></w:pict>';
+        $typeTpl = '<Override PartName="/word/media/{IMG}" ContentType="image/{EXT}"/>';
+        $relationTpl = '<Relationship Id="{RID}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/{IMG}"/>';
+        $newRelationsTpl = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\n" . '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+        $newRelationsTypeTpl = '<Override PartName="/{RELS}" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>';
+        $extTransform = array(
+            'image/jpeg' => 'jpeg',
+            'image/png'  => 'png',
+            'image/bmp'  => 'bmp',
+            'image/gif'  => 'gif',
+        );
+
+        $searchParts = array(
+                            $this->getMainPartName() => &$this->tempDocumentMainPart,
+                            );
+        foreach (array_keys($this->tempDocumentHeaders) as $headerIndex) {
+            $searchParts[$this->getHeaderName($headerIndex)] = &$this->tempDocumentHeaders[$headerIndex];
+        }
+        foreach (array_keys($this->tempDocumentFooters) as $headerIndex) {
+            $searchParts[$this->getFooterName($headerIndex)] = &$this->tempDocumentFooters[$headerIndex];
+        }
+
+        foreach ($searchParts as $partFileName => &$partContent) {
+            $partVariables = $this->getVariablesForPart($partContent);
+
+            $partSearchReplaces = array();
+            foreach ($searchReplace as $search => $replace) {
+                if (!in_array($search, $partVariables)) {
+                    continue;
+                }
+
+                // get image path and size
+                if (is_array($replace) && isset($replace['path'])) {
+                    $imgPath = $replace['path'];
+                    if (isset($replace['width'])) {
+                        $width = $replace['width'];
+                    }
+                    if (isset($replace['height'])) {
+                        $height = $replace['height'];
+                    }
+                } else {
+                    $imgPath = $replace;
+                }
+
+                $imageData = @getimagesize($imgPath);
+                if (!is_array($imageData)) {
+                    throw new Exception(sprintf('Invalid image: %s', $imgPath));
+                }
+                list($actualWidth, $actualHeight, $imageType) = $imageData;
+                $imageMimeType = image_type_to_mime_type($imageType);
+
+                if (!isset($width)) {
+                    $width = $actualWidth;
+                }
+                if (!isset($height)) {
+                    $height = $actualHeight;
+                }
+
+                // get image index
+                $imgIndex = $this->getNextRelationsIndex($partFileName);
+                $rid = 'rId' . $imgIndex;
+
+                // get image embed name
+                if (isset($this->tempDocumentNewImages[$imgPath])) {
+                    $imgName = $this->tempDocumentNewImages[$imgPath];
+                } else {
+                    // transform extension
+                    if (isset($extTransform[$imageMimeType])) {
+                        $imgExt = $extTransform[$imageMimeType];
+                    } else {
+                        throw new Exception("Unsupported image type $imageMimeType");
+                    }
+
+                    // add image to document
+                    $imgName = 'image' . $imgIndex . '_' . pathinfo($partFileName, PATHINFO_FILENAME) . '.' . $imgExt;
+                    $this->zipClass->pclzipAddFile($imgPath, 'word/media/' . $imgName);
+                    $this->tempDocumentNewImages[$imgPath] = $imgName;
+
+                    // setup type for image
+                    $xmlImageType = str_replace(array('{IMG}', '{EXT}'), array($imgName, $imgExt), $typeTpl);
+                    $this->tempDocumentContentTypes = str_replace('</Types>', $xmlImageType, $this->tempDocumentContentTypes) . '</Types>';
+                }
+
+                $xmlImage = str_replace(array('{RID}', '{WIDTH}', '{HEIGHT}'), array($rid, $width, $height), $imgTpl);
+                $xmlImageRelation = str_replace(array('{RID}', '{IMG}'), array($rid, $imgName), $relationTpl);
+
+                if (!isset($this->tempDocumentRelations[$partFileName])) {
+                    // create new relations file
+                    $this->tempDocumentRelations[$partFileName] = $newRelationsTpl;
+                    // and add it to content types
+                    $xmlRelationsType = str_replace('{RELS}', $this->getRelationsName($partFileName), $newRelationsTypeTpl);
+                    $this->tempDocumentContentTypes = str_replace('</Types>', $xmlRelationsType, $this->tempDocumentContentTypes) . '</Types>';
+                }
+
+                // add image to relations
+                $this->tempDocumentRelations[$partFileName] = str_replace('</Relationships>', $xmlImageRelation, $this->tempDocumentRelations[$partFileName]) . '</Relationships>';
+
+                // collect prepared replaces
+                $search = self::ensureMacroCompleted($search);
+                $matches = array();
+                if (preg_match('/<[^<]+' . preg_quote($search) . '[^>]+>/u', $partContent, $matches)) {
+                    $partSearchReplaces[$matches[0]] = $xmlImage;
+                }
             }
-            $this->_main_rels = str_replace('</Relationships>', $rels_to_add, $this->_main_rels) . '</Relationships>';
-        }
-                
-        //headers
-        
-        foreach($this->tempDocumentHeaders as $index=>$header){
-            $count = 0;
-            $this->tempDocumentHeaders[$index] = str_replace($str_key, $images_to_add, $this->tempDocumentHeaders[$index], $count);
-            if ($count > 0){
-                //check if not set
-                if (!isset($this->_header_rels[$index])){
-                    $this->_header_rels = $this->zipClass->getFromName('word/_rels/header'.$index.'.xml.rels');
-                }
-                //check if empty
-                if ($this->_header_rels[$index] == ""){
-                    $this->_header_rels[$index]=$this->blank_rels_page;
-                }
-                //add
-                $this->_header_rels[$index] = str_replace('</Relationships>', $rels_to_add, $this->_header_rels[$index]) . '</Relationships>';
+
+            if ($partSearchReplaces) {
+                $partContent = $this->setValueForPart(array_keys($partSearchReplaces), $partSearchReplaces, $partContent, $limit);
             }
         }
-        
-        //footers
-        
-        foreach($this->tempDocumentFooters as $index=>$footer){
-            $count = 0;
-            $this->tempDocumentFooters[$index] = str_replace($str_key, $images_to_add, $this->tempDocumentFooters[$index], $count);
-            if ($count > 0){
-                //check if not set
-                if (!isset($this->_footer_rels[$index])){
-                    $this->_footer_rels = $this->zipClass->getFromName('word/_rels/footer'.$index.'.xml.rels');
-                }
-                //check if empty
-                if ($this->_footer_rels[$index] == ""){
-                    $this->_footer_rels[$index]=$this->blank_rels_page;
-                }
-                //add
-                $this->_footer_rels[$index] = str_replace('</Relationships>', $rels_to_add, $this->_footer_rels[$index]) . '</Relationships>';
-            }
-        }
-        
-        
-        //check if types are set
-        if($this->_types==""){          
-            $this->_types=$this->zipClass->getFromName('[Content_Types].xml');
-        }
-        
-        //add types onto the the end of types
-        $this->_types = str_replace('</Types>', $types_to_add, $this->_types) . '</Types>';
-        
-    
     }
-
-   
 
     /**
      * Returns array of all variables in template.
@@ -452,9 +428,7 @@ class TemplateProcessor
      * Clone a table row in a template document.
      *
      * @param string $search
-     * @param integer $numberOfClones
-     *
-     * @return void
+     * @param int $numberOfClones
      *
      * @throws \PhpOffice\PhpWord\Exception\Exception
      */
@@ -466,7 +440,7 @@ class TemplateProcessor
 
         $tagPos = strpos($this->tempDocumentMainPart, $search);
         if (!$tagPos) {
-            throw new Exception("Can not clone row, template variable not found or variable contains markup.");
+            throw new Exception('Can not clone row, template variable not found or variable contains markup.');
         }
 
         $rowStart = $this->findRowStart($tagPos);
@@ -511,8 +485,8 @@ class TemplateProcessor
      * Clone a block.
      *
      * @param string $blockname
-     * @param integer $clones
-     * @param boolean $replace
+     * @param int $clones
+     * @param bool $replace
      *
      * @return string|null
      */
@@ -549,8 +523,6 @@ class TemplateProcessor
      *
      * @param string $blockname
      * @param string $replacement
-     *
-     * @return void
      */
     public function replaceBlock($blockname, $replacement)
     {
@@ -573,8 +545,6 @@ class TemplateProcessor
      * Delete a block of text.
      *
      * @param string $blockname
-     *
-     * @return void
      */
     public function deleteBlock($blockname)
     {
@@ -584,45 +554,24 @@ class TemplateProcessor
     /**
      * Saves the result document.
      *
-     * @return string
-     *
      * @throws \PhpOffice\PhpWord\Exception\Exception
+     *
+     * @return string
      */
     public function save()
     {
         foreach ($this->tempDocumentHeaders as $index => $xml) {
-            $this->zipClass->addFromString($this->getHeaderName($index), $xml);
+            $this->savePartWithRels($this->getHeaderName($index), $xml);
         }
 
-        $this->zipClass->addFromString($this->getMainPartName(), $this->tempDocumentMainPart);
-        
+        $this->savePartWithRels($this->getMainPartName(), $this->tempDocumentMainPart);
+
         foreach ($this->tempDocumentFooters as $index => $xml) {
-            $this->zipClass->addFromString($this->getFooterName($index), $xml);
-        }        
-        
+            $this->savePartWithRels($this->getFooterName($index), $xml);
+        }
 
-        //main rels
-        if($this->_main_rels!="")
-        {
-            $this->zipClass->addFromString('word/_rels/document.xml.rels', $this->_main_rels);          
-        }
-        
-        //header rels
-        foreach($this->_header_rels as $index=>$rel){
-            $this->zipClass->addFromString('word/_rels/header'.$index.'.xml.rels', $rel);
-        }
-        
-        //footer rels
-        foreach($this->_footer_rels as $index=>$rel){
-            $this->zipClass->addFromString('word/_rels/footer'.$index.'.xml.rels', $rel);
-        }
-        
-        //types
-        if($this->_types!="")
-        {
-            $this->zipClass->addFromString('[Content_Types].xml', $this->_types);
-        }
-        
+        $this->zipClass->addFromString($this->getDocumentContentTypesName(), $this->tempDocumentContentTypes);
+
         // Close zip file
         if (false === $this->zipClass->close()) {
             throw new Exception('Could not close zip file.');
@@ -632,13 +581,24 @@ class TemplateProcessor
     }
 
     /**
+     * @param string $fileName
+     * @param string $xml
+     */
+    protected function savePartWithRels($fileName, $xml)
+    {
+        $this->zipClass->addFromString($fileName, $xml);
+        if (isset($this->tempDocumentRelations[$fileName])) {
+            $relsFileName = $this->getRelationsName($fileName);
+            $this->zipClass->addFromString($relsFileName, $this->tempDocumentRelations[$fileName]);
+        }
+    }
+
+    /**
      * Saves the result document to the user defined file.
      *
      * @since 0.8.0
      *
      * @param string $fileName
-     *
-     * @return void
      */
     public function saveAs($fileName)
     {
@@ -662,7 +622,7 @@ class TemplateProcessor
      * Finds parts of broken macros and sticks them together.
      * Macros, while being edited, could be implicitly broken by some of the word processors.
      *
-     * @param string $documentPart The document part in XML representation.
+     * @param string $documentPart The document part in XML representation
      *
      * @return string
      */
@@ -687,7 +647,7 @@ class TemplateProcessor
      * @param mixed $search
      * @param mixed $replace
      * @param string $documentPartXML
-     * @param integer $limit
+     * @param int $limit
      *
      * @return string
      */
@@ -696,10 +656,10 @@ class TemplateProcessor
         // Note: we can't use the same function for both cases here, because of performance considerations.
         if (self::MAXIMUM_REPLACEMENTS_DEFAULT === $limit) {
             return str_replace($search, $replace, $documentPartXML);
-        } else {
-            $regExpEscaper = new RegExp();
-            return preg_replace($regExpEscaper->escape($search), $replace, $documentPartXML, $limit);
         }
+        $regExpEscaper = new RegExp();
+
+        return preg_replace($regExpEscaper->escape($search), $replace, $documentPartXML, $limit);
     }
 
     /**
@@ -719,7 +679,7 @@ class TemplateProcessor
     /**
      * Get the name of the header file for $index.
      *
-     * @param integer $index
+     * @param int $index
      *
      * @return string
      */
@@ -739,7 +699,7 @@ class TemplateProcessor
     /**
      * Get the name of the footer file for $index.
      *
-     * @param integer $index
+     * @param int $index
      *
      * @return string
      */
@@ -749,13 +709,42 @@ class TemplateProcessor
     }
 
     /**
+     * Get the name of the relations file for document part.
+     *
+     * @param string $documentPartName
+     *
+     * @return string
+     */
+    protected function getRelationsName($documentPartName)
+    {
+        return 'word/_rels/' . pathinfo($documentPartName, PATHINFO_BASENAME) . '.rels';
+    }
+
+    protected function getNextRelationsIndex($documentPartName)
+    {
+        if (isset($this->tempDocumentRelations[$documentPartName])) {
+            return substr_count($this->tempDocumentRelations[$documentPartName], '<Relationship');
+        }
+
+        return 1;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDocumentContentTypesName()
+    {
+        return '[Content_Types].xml';
+    }
+
+    /**
      * Find the start position of the nearest table row before $offset.
      *
-     * @param integer $offset
-     *
-     * @return integer
+     * @param int $offset
      *
      * @throws \PhpOffice\PhpWord\Exception\Exception
+     *
+     * @return int
      */
     protected function findRowStart($offset)
     {
@@ -774,9 +763,9 @@ class TemplateProcessor
     /**
      * Find the end position of the nearest table row after $offset.
      *
-     * @param integer $offset
+     * @param int $offset
      *
-     * @return integer
+     * @return int
      */
     protected function findRowEnd($offset)
     {
@@ -786,8 +775,8 @@ class TemplateProcessor
     /**
      * Get a slice of a string.
      *
-     * @param integer $startPosition
-     * @param integer $endPosition
+     * @param int $startPosition
+     * @param int $endPosition
      *
      * @return string
      */

@@ -60,7 +60,7 @@
 
 @endsection
 
-@section('js')
+{{-- @section('js')
 <script
   src="https://code.jquery.com/jquery-1.11.2.min.js"
   integrity="sha256-Ls0pXSlb7AYs7evhd+VLnWsZ/AqEHcXBeMZUycz/CcA="
@@ -73,8 +73,15 @@
             $('#sent-table').DataTable();
         });
     </script>
-@endsection
+@endsection --}}
 
 @section('js')
- <script src="{{URL::asset('js/jquery-3.2.1.min.js')}}" type="text/javascript"></script>  
+ <script src="{{URL::asset('js/jquery-3.2.1.min.js')}}" type="text/javascript"></script> 
+ <script type="text/javascript">
+        $(document).ready(function () {
+            $('#sent-table').DataTable({
+             "ordering": false
+            });
+        });
+    </script> 
 @endsection

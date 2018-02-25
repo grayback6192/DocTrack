@@ -59,9 +59,11 @@
           <div class="media">
             <div class="media-left">
             <div class="img-circle profilepic" id="pic" data-toggle="tooltip" data-placement="bottom" title="Change Profile Picture">
-             <div class="media-object">
+             {{-- <div class="media-object"> --}}
               <input type="file" name="profpic" id="profilepic" style="display: none;" />
-              <img id="user-prof-pic" src="{{url('./users/pictures/'.$userinfo->profilepic)}}" alt="prof-pic"/> {{--image here--}}
+              <div id="profprev">
+                <img id="user-prof-pic" src="{{url('./users/pictures/'.$userinfo->profilepic)}}" alt="prof-pic"/> {{--image here--}}
+              </div>
 
               <script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}"></script>
               <script type="text/javascript">
@@ -83,7 +85,8 @@
                       var reader = new FileReader();
 
                       reader.onload = function(e){
-                         $('#user-prof-pic').attr('src', e.target.result);
+                         var img = $('#user-prof-pic').attr('src', e.target.result);
+                         //$('profilepic').html(img);
                         //$('#prof-frame').css('background', 'transparent url('+e.target.result+') left top no-repeat');
                       }
 
@@ -98,7 +101,7 @@
                 });  
               </script>
 
-            </div>
+            {{-- </div> --}}
           </div>
           </div>
           <div class="media-body" style="padding: 0 20px;">
@@ -143,7 +146,12 @@
                 <input type="file" class="form-control-file" name="sign" id="file-sign">
             </label>
             <div class="signaturediv">
-              <img src="{{url('./users/signatures/'.$userinfo->signature)}}" alt="sign" id="sign-view">
+              {{-- <img src="{{url('./users/signatures/'.$userinfo->signature)}}" alt="sign" id="sign-view"> --}}
+              @if($userinfo->signature!="")
+              <img src="{{URL::to('/'.$userinfo->signature)}}" alt="sign" id="sign-view">
+              @else
+              <p class="text-center">No signature uploaded.</p>
+              @endif
 
               <script type="text/javascript" src="{{ URL::asset('js/jquery-3.2.1.min.js') }}"></script>
               <script type="text/javascript">

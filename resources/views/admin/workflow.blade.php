@@ -72,7 +72,7 @@
 </div>
 </div>
         <div class="modal-footer">
-          <input type="submit" class="btn btn-primary" name="addNewAssign" value="Submit">
+          <input type="submit" class="btn btn-primary" name="addNewAssign" value="Add New Workflow">
         </div>
     </form>
   </div>

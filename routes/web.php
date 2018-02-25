@@ -11,10 +11,25 @@
 |
 */
 
+//for sending of doc from scratch
+Route::get('/user/{upgid}/send/newdoc', function($upgid){
+	$user = Auth::user();
+	$clientid = \Session::get('client');
+	$usergroup = DB::table('userpositiongroup')->where('user_user_id','=',$user->user_id)->get();
+	foreach ($usergroup as $ug) {
+		$group = $ug->client_id;
+	}
+	$workflow = DB::table('workflow')->where('client_id','=',$clientid)->where('status','=','active')->get();
+	$groups = DB::table('group')->where('client_id','=',$clientid)->where('status','=','active')->get();
+	return view('user/createDocs',['User'=>$user, 'workflow'=>$workflow, 'groups'=>$groups,'upgid'=>$upgid]);
+})->name('test');
+
+Route::post("/test/{upgid}/create","DocumentController@sendScratchDoc");
+
+
 Route::get('master',function(){
 	return view('mastertemplate');
 });
-
 //End Login
 Route::get("/","Auth\LoginController@showLoginForm")->name("Login");
 Route::post("/login","Auth\LoginController@login")->name("Credentials");
@@ -24,21 +39,17 @@ Route::get('/logout',"Auth\LoginController@logout")->name('Logout');
 Route::get("/registeruser","Auth\RegisterUserController@showRegistrationForm")->name("RegisterUser");
 Route::post("/registeruser","Auth\RegisterUserController@register")->name("UserRegister");
 Route::get("/key","Auth\LoginController@getBusinessKey");
-
 //User routes
 Route::get('/home', function(){
 	return view('user/userhome');
 });
-
 //Admin Routes
 Route::get('/admin/{upgid}', function($upgid){
 	$name = Auth::user();
     return view('admin/admindash',["User"=>$name,"upgid"=>$upgid]);
 })->name('AdminDash');
 //User Management
-
 Route::get('admin/{upgid}/usermanagement','User@index')->name('UserManage');
-
 Route::get('admin/user/{status}', function($status){
 
  $clientid = \Session::get('client');
@@ -47,6 +58,7 @@ Route::get('admin/user/{status}', function($status){
             $users = \DB::table('user')->where('user.status','=',$status)
                     ->join('userpositiongroup as upg','user.user_id','=','upg.user_user_id')
                     ->where('client_id','=',$clientid)
+                     ->select([DB::raw('DISTINCT(user.user_id)'),'user.lastname','user.firstname'])
                     ->orderBy('lastname','asc')
                     //->paginate(7); //change
                      ->get();
@@ -56,6 +68,7 @@ Route::get('admin/user/{status}', function($status){
              $users = \DB::table('user')
                     ->join('userpositiongroup as upg','user.user_id','=','upg.user_user_id')
                     ->where('client_id','=',$clientid)
+                     ->select([DB::raw('DISTINCT(user.user_id)'),'user.lastname','user.firstname'])
                     ->orderBy('lastname','asc')
                      //change
                      ->get();
@@ -64,13 +77,9 @@ Route::get('admin/user/{status}', function($status){
         return response()->json($users);
 
 })->name('filterStatus');
-
 Route::get('admin/{upgid}/usermanagement/userprofile/{id}','User@show')->name('UserProfile');
-
 Route::post('admin/{upgid}/usermanagement/userprofile/{id}','User@update')->name('Update');
-
 Route::get('admin/{upgid}/usermanagement/userprofile/{id}/edit', 'User@showForEdit')->name('EditProfile');
-
 Route::get('admin/usermanagement/adduser', function(){
 	return view('admin/addUser');
 })->name('Reg');
@@ -123,17 +132,14 @@ Route::get('admin/{upgid}/department/add',function($upgid){
 })->name('regDep');
 Route::post('admin/{upgid}/department/add', 'Department@addDep')->name('addDep');
 Route::get('admin/{upgid}/department/{id}','Department@deleteDep')->name('deleteDep');
-
 Route::get('admin/depactive/{depid}','Department@setToActive');
 Route::get('admin/depinactive/{depid}','Department@setToInactive');
 //End Department Management
-
 //roles
 Route::get('admin/{upgid}/roles', 'Role@viewRoles')->name('viewRolePage');
 Route::post('admin/{upgid}/roles', 'Role@addRole')->name('AddRole');
 Route::get('admin/{upgid}/roles/{id}', 'Role@deleteRole')->name('DelRole');
 Route::post('admin/{upgid}/roles/edit={id}', 'Role@editRole')->name('UpdateRole');
-
 Route::get('admin/{upgid}/assignment', function($upgid){
 	$user = Auth::user();
 	$admingroup = getAdminGroup($upgid);
@@ -169,9 +175,7 @@ Route::get('admin/{upgid}/assignment', function($upgid){
 
 	return view('admin/assignment',['User'=>$user, 'groups'=>$groups, 'positions'=>$positions,'allupgs'=>$allupgs,'roles'=>$roles,'upgid'=>$upgid,'admingroup'=>$admingroup]);
 })->name('viewAssignments');
-
 Route::get('admin/group/user/find/{groupid}/{string}/','User@findUser')->name('findUser');
-
 Route::get('admin/group/{groupid}', function($groupid){ //for assignment 
 	$users = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$groupid)
 			->join('user','upg.user_user_id','=','user.user_id')
@@ -182,7 +186,6 @@ Route::get('admin/group/{groupid}', function($groupid){ //for assignment
 });
 Route::post('admin/{upgid}/assignment/add', 'UserPositionGroup@addNewAssignment')->name('newAssign'); //add new admin
 Route::post('admin/{upgid}/assignment/delete', 'UserPositionGroup@removeAdmin')->name('removeAdmin'); //remove admin
-
 Route::get('admin/assignment/{upgid}/{depid}', function($upgid,$depid){
 
 	$results = DB::table('group as g')->where('g.group_id','=',$depid)
@@ -193,18 +196,11 @@ Route::get('admin/assignment/{upgid}/{depid}', function($upgid,$depid){
 				->get();
 	return Response::json($results);
 });
-
 Route::post('admin/assignment/delete/','UserPositionGroup@removeAssignment')->name('removeUPG');
 //end role
-
-
-
 Route::post('admin/template', 'Template@addTemplate')->name('SubmitTemplate');
-
 Route::get('admin/{upgid}/template1', 'Template@viewTemplateOwners')->name('viewOwners'); //testUI
-
 Route::get('admin/{upgid}/template/{groupid}', 'Template@viewTemplates')->name('getGroupTemplates'); //new
-
 Route::get('admin/template',function()
 {
 	$user= Auth::user();
@@ -216,7 +212,6 @@ Route::get('admin/template',function()
 				->get();
 	return view("admin/templatepage",["template"=>$template, 'User'=>$user]);
 })->name("AdminTemplate");
-
 Route::get('admin/{upgid}/addtemplate', function($upgid){
 	$user = Auth::user();
 	$clientid = \Session::get('client');
@@ -225,11 +220,9 @@ Route::get('admin/{upgid}/addtemplate', function($upgid){
 		$group = $ug->client_id;
 	}
 	$workflow = DB::table('workflow')->where('client_id','=',$clientid)->where('status','=','active')->get();
-	// $groups = DB::table('group')->where('group_group_id','=',$group)->where('client_id','=',$clientid)->where('status','=','active')->get();
 	$groups = DB::table('group')->where('client_id','=',$clientid)->where('status','=','active')->get();
 	return view('admin/addTemplate',['User'=>$user, 'workflow'=>$workflow, 'groups'=>$groups,'upgid'=>$upgid]);
 })->name('AddTemplate');
-
 Route::get('admin/template/workflow/{wid}',function($wid)
 {
 	$results = \DB::table('workflowsteps as ws')
@@ -237,19 +230,12 @@ Route::get('admin/template/workflow/{wid}',function($wid)
 				->join('position as p','ws.position_pos_id','=','p.pos_id')
 				->orderBy('ws.order')
 				->get();
-
 	return response()->json($results);
 });
-
 Route::post("admin/{upgid}/template/create","TemplateController@addTemplate")->name('CreateTemplate');
-
-
 Route::get("admin/{upgid}/template/edit/{id}","TemplateController@editFile")->name('openTemplate');
-
 Route::post("admin/{upgid}/template/delete/{id}","TemplateController@deleteTemplate")->name('removeTemplate');
-
 Route::post("admin/templateInsert/{id}","DocumentController@insertFileVariables")->name("postDoc");
-
 Route::post("admin/{upgid}/templateEdit/create/{tempid}","TemplateController@addEditedTemplate");
 //end template management
 

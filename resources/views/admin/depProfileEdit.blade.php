@@ -89,6 +89,8 @@
           </div> 
           </div>
         <hr>
+        @else
+        <input type="hidden" name="mothergroup" value="NULL">
         @endif
 
         <div class="form-group">

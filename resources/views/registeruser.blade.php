@@ -44,6 +44,9 @@
 		                    	<div class="wizard-header text-center">
 		                        	<h3 class="wizard-title">User Register</h3>
 									<p class="category">This is the part of User Register.</p>
+									@if(session('nokey'))
+										<p class="category" style="color: red;">{{session('nokey')}}</p>
+									@endif
 		                    	</div>
 
 								<div class="wizard-navigation">
@@ -150,6 +153,9 @@
 		                                    	<div class="form-group">
 		                                            <label>Email</label>
 		                                            <input name="email" type="email" class="form-control" placeholder="example@gmail.com">
+		                                            @if(session('emailtaken'))
+		                                            	<label id="email-taken" class="error" for="email">{{session('emailtaken')}}</label>
+		                                            @endif
 		                                        </div>
 		                                    </div>
 		                                    <div class="col-sm-7 col-sm-offset-1">

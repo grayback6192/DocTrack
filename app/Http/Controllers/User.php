@@ -16,6 +16,43 @@ use Image;
 
 class User extends Controller
 {
+    public function sendScratchDoc(Request $request,$upgid) //send for doc from scratch
+    {
+        $name = Auth::user();
+        $rand = rand(1,1000);
+        $user = request()->all();
+        $title = str_replace(" ", "_", $user['title']);
+        $path = "file/".$rand.".docx";
+        $workflow = $request['wf'];
+
+        DB::table("document")->insert(["doc_id"=>$rand,
+                                       "docname"=>$title,
+                                       "doc_path"=>$path,
+                                       "template_template_id"=>NULL,
+                                       "userpositiongroup_upg_id"=>$upgid,
+                                        "sentDate" => NULL,
+                                        "sentTime" => NULL]);
+
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $section = $phpWord->addSection();
+        \PhpOffice\PhpWord\Shared\Html::addHtml($section, $user['text']);
+        $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save('file/'.$rand.'.docx');
+        $objWriterHTML = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'HTML');
+        $objWriterHTML->save('temp/'.$rand.'.html');
+
+        //PDF RENDERER
+        $dompdf= new Dompdf();
+        $dompdf->loadHtml($user['text']);
+        $dompdf->render();
+        $output = $dompdf->output();
+        file_put_contents("pdf/".$rand.".pdf", $output);
+        //return view("user/createDocs",["upgid"=>$upgid]);
+
+        $docworkflow = getWorkflowForCustom($upgid,$workflow);
+        insertTransaction($rand,$docworkflow,$upgid);
+
+    }
     public function countUnread($upgid) //new-- count unread docs in inbox
     {
         $numUnread = DB::table('inbox')->where('inbox.upg_id','=',$upgid)
@@ -403,13 +440,14 @@ class User extends Controller
         $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$docid.'.docx');
         $variable = $templateProcessor->getVariables();
 
-        foreach($signature as $signatures)
+       
+       foreach($signature as $signatures)
         {
             foreach($variable as $variables)
             {
                 if($variables == $signatures->posName)
                 {
-                     if($signatures->signature == NULL)
+                    if($signatures->signature == NULL)
                     {
                         $templateProcessor->setValue($variables,"Approved");
                         $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
@@ -417,21 +455,29 @@ class User extends Controller
                     }
                     else
                     {
+                        //Image Resize
                         $img = Image::make($signatures->signature);
                         $img->resize(100, 100);
                         $img->save($signatures->signature);
+                        $templateProcessor->setImg($variables, ["src"=>$signatures->signature]);
                         $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
                         $templateProcessor->setValue($variables."-Position",$signatures->posName);
-                        $templateProcessor->setImg($variables, ["src"=>$signatures->signature]);
+                        // $templateProcessor->setImg($variables, ["src"=>$signatures->signature,
+                        //                                         "swh"=>"150"]);
+                        // $variablesReplace = array
+                        // (
+                        //     "documentContent"=> array('path' => $signatures->signature, 'width' => 200, 'height' => 100)
+                        // );
+                        // $templateProcessor->setImageValue($variables,$variablesReplace);
                     }
                 }
-             }
+            }
         }
         $templateProcessor->saveAs('temp/'.$docid.'.docx');
-        //Accounts
+    //Accounts
     //LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag
     //F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw
-    $api = new Api("LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag");
+    $api = new Api("F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw");
     $api->convert
     ([
         'inputformat' => 'docx',
@@ -442,12 +488,19 @@ class User extends Controller
     ->wait()
     ->download('temp/'.$docid.'.pdf');
 
+        // \PhpOffice\PhpWord\Settings::setPdfRendererPath('../vendor/dompdf/dompdf');
+        // \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
+        // $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        // $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$docid.'.docx');
+        // $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'PDF');
+        // $objWriter->save('temp/'.$docid.'.pdf');
+
+
             if($currenttranscount==$transapprovedcount)
                 return $this->insertToNextInbox($docid,$upgid,$finalnextarray);
             else
                 return redirect()->route('docView',['upgid'=>$upgid,'docid'=>$docid]);
-    
-}
+    }
 
     public function insertToNextInbox($docid,$upgid,$nextarray)
     {
@@ -647,9 +700,11 @@ class User extends Controller
     ->join('document','transaction.document_doc_id','=','document.doc_id')
     ->join('userpositiongroup','transaction.upg_id','=','userpositiongroup.upg_id')
     ->join('user','userpositiongroup.user_user_id','=','user.user_id')
-    ->select('transaction.status','user.lastname','user.firstname','transaction.time','transaction.date','document.template_template_id','transaction.order')
+    ->select('transaction.status','user.lastname','user.firstname','transaction.time','transaction.date','document.template_template_id','transaction.order','userpositiongroup.upg_id')
     ->orderBy('transaction.order')
     ->get();
+
+    $inboxstatus = DB::table('inbox')->where('doc_id','=',$id)->get();
 
    //order status 
     $docInfo = \DB::table("document")->where("doc_id",'=',$id)->get();
@@ -662,7 +717,7 @@ class User extends Controller
     //get maximum order of  document in a transaction
     $last_order = DB::table('transaction')->where('document_doc_id','=',$id)->max('order');
 
-    return view("user/fileStatus",["name"=>$name],["statuss"=>$statuss,'User'=>$user,"pdf"=>$id,'docinfos'=>$docInfo,'upgid'=>$upgid,'lastOrder'=>$last_order]);
+    return view("user/fileStatus",["name"=>$name],["statuss"=>$statuss,'User'=>$user,"pdf"=>$pdf,'docinfos'=>$docInfo,'upgid'=>$upgid,'lastOrder'=>$last_order,'inboxstatus'=>$inboxstatus]);
 }
 
     public function addFile(Request $request)
@@ -785,23 +840,19 @@ class User extends Controller
             DB::table('user')->where('user_id',$id)->update(['profilepic'=>$image]);
         }
 
-        // if($request->sign){
-        //     // $path = $request->sign->store('users/signatures');
-        //     // $signature = $request->sign->hashName();
-        //     $rand = rand(100000,999999);
-        //     // Storage::putFileAs("signature",$request['sign'],$rand.".png");
-        //     // $signpath = $rand.".png";
-        //     $path = $request->sign->store('users/signatures');
-        //     $signature = $request->sign->hashName();
-        //     DB::table('user')->where('user_id',$id)->update(['signature'=>$signature]);
-        // }
+        //get info of user
+        $userinfos = DB::table('user')->where('user_id','=',$id)->get();
+        foreach ($userinfos as $userinfo) {
+            $usersign = $userinfo->signature;
+        }
+        
          if(isset($request['sign']))
         {
              Storage::putFileAs("signature",$request['sign'],$id.".png");
              $signpath = "signature/".$id.".png";
         }
         else
-            $signpath="";
+            $signpath=$usersign;
         
         DB::table('user')->where('user_id',$id)->update(['firstname'=>$request['fname'],
                                                         'lastname'=>$request['lname'],

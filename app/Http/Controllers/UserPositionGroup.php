@@ -63,6 +63,18 @@ class UserPositionGroup extends Controller
         $rand = rand(100,9999);
         $found = $this->findNull($user->user_id);
 
+        //check if entered key is correct
+        $depinfos = DB::table('group')->where('group_id','=',$request['groupid'])->get();
+
+        foreach ($depinfos as $depinfo) {
+            $depKey = $depinfo->businessKey;
+        }
+
+        if($request['groupkey']!=$depKey)
+        {
+            return redirect()->route('addGroup',['userid'=>$user->user_id])->with('wrongkey','Incorrect Department Key');
+        }
+
         $studpos = DB::table('position')->where('posName','=','Student')->where('client_id','=',$request['clientid'])->get();
 
         if(count($studpos)==0)
@@ -96,6 +108,7 @@ class UserPositionGroup extends Controller
                                                     'client_id'=>$request['clientid'],
                                                     'upg_status'=>'inactive']);
         }
+         return redirect()->route('addGroup',['userid'=>$user->user_id])->with('correctkey','Successfully entered group. Go to admin for position assignment.');
         }
         else if($request['position']=="Student")
         {

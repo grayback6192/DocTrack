@@ -21,8 +21,8 @@ $(document).ready(function(){
                     var html = "<tr>";
                     html+= "<td>"+data[i].lastname+"</td>";
                     html+="<td>"+data[i].firstname+"</td>";
-                    html+="<td><a href=http://localhost:8000/admin/"+upgid+"/usermanagement/userprofile/"+data[i].user_id+">View</a></td>";
-                    html+="<td><a href=http://localhost:8000/admin/"+upgid+"/usermanagement/"+data[i].user_id+">Delete</a></td>";
+                    html+="<td><a class='btn btn-info' href=http://localhost:8000/admin/"+upgid+"/usermanagement/userprofile/"+data[i].user_id+"><i class='material-icons'>face</i></a></td>";
+                    html+="<td><a class='btn btn-danger' href=http://localhost:8000/admin/"+upgid+"/usermanagement/"+data[i].user_id+"><i class='material-icons'>delete</i></a></td>";
                     html+="</tr>";
                     console.log(html);
                     $('#users-table').append(html);

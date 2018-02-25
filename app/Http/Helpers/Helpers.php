@@ -48,73 +48,6 @@ function getUserGroup($upgid)
     return $ugroup;
 }
 
-// function getWorkflow($groupid,$templateid)
-// {
-//     $workflow = DB::table('template')->where('template_id','=',$templateid)
-//                 ->join('workflow','template.workflow_w_id','=','workflow.w_id')
-//                 ->join('workflowsteps','workflow.w_id','=','workflowsteps.workflow_w_id')
-//                 ->get();
-//     $flowlist = array();
-//     $arr = array();
-//     foreach ($workflow as $flow)
-//     {
-//         $res = DB::table('userpositiongroup as upg')
-//                         ->where('upg.position_pos_id','=',$flow->position_pos_id)
-//                         ->join('user as u','upg.user_user_id','=','u.user_id')
-//                         ->get();
-//         if((count($res))>1)
-//         {
-//             $res2 = DB::table('userpositiongroup as upg')
-//                              ->where('upg.group_group_id','=',$groupid)
-//                              ->where('upg.position_pos_id','=',$flow->position_pos_id)
-//                              ->join('user as u','upg.user_user_id','=','u.user_id')
-//                              ->get();
-//                             if(count($res2)>0)
-//                             {
-//                                 $flowlist[] = $res2;
-//                             }
-//                             else
-//                             {
-//                                 $res5 = DB::table('userpositiongroup as upg')
-//                                                   ->where('upg.position_pos_id','=',$flow->position_pos_id)
-//                                                   ->join('user as u','upg.user_user_id','=','u.user_id')
-//                                                   ->get();
-//                                 $flowlist[] = $res5;
-//                                 }
-//                       }
-//                       else
-//                       {
-//                         $flowlist[] = $res;
-//                       }
-//                 }
-//                 for($x=0;$x<(count($flowlist));$x++)
-//                 {
-//                     for($y=0;$y<(count($flowlist[$x]));$y++)
-//                     {
-//                         $query6 = DB::table('template')
-//                                     ->where('template.template_id','=',$templateid)
-//                                     ->join('workflow','template.workflow_w_id','=','workflow.w_id')
-//                                     ->join('workflowsteps','workflow.w_id','=','workflowsteps.workflow_w_id')
-//                                     ->join('position','workflowsteps.position_pos_id','=','position.pos_id')
-//                                     ->where('position.pos_id','=',$flowlist[$x][$y]->position_pos_id)
-//                                     ->join('userpositiongroup as upg','position.pos_id','=','upg.position_pos_id')
-//                                     ->where('upg.upg_id','=',$flowlist[$x][$y]->upg_id)
-//                                     ->join('user','upg.user_user_id','=','user.user_id')
-//                                     ->get();
-//                             if($query6->count())
-//                             {
-//                                 $arr1 = json_decode(json_encode($query6),TRUE);
-//                                 $arr[] = $arr1;
-//                             }
-//                     }
-//                 }
-//                 $order = 1;
-//                 $processcount = 1;
-//                 $ordered = array();
-//                 $sort = sortNodes($templateid,$arr,1,1,$ordered);
-//        return $sort;
-// }
-
 function getWorkflow2($upgid,$groupid,$templateid)
 {
     $workflowsteps = DB::table('template as t')->where('t.template_id','=',$templateid)
@@ -144,15 +77,36 @@ function getWorkflow2($upgid,$groupid,$templateid)
                                                                 ->where('upg.group_group_id','=',$usergroup)
                                                                 ->join('user as u','upg.user_user_id','u.user_id')
                                                                 ->get();
-                if(count($depposusers)>0)
-                {
+                 //get from org chart                                                
+                $deporgchart = DB::table('orgchartnode as on')->where('on.pos_id','=',$recipient->position_pos_id)
+                                                            ->where('on.group_id','=',$usergroup)
+                                                            ->get();
+                if(count($deporgchart)>0)
+                 {
+                    foreach ($deporgchart as $orgchartupg) {
+                        $orgchartupgs = DB::table('userpositiongroup as upg')
+                                        ->where('upg.upg_id','=',$orgchartupg->upg_id)
+                                        ->join('user as u','upg.user_user_id','u.user_id')
+                                        ->get();
+
+                    }
+                     foreach ($orgchartupgs as $orgchartupg) {
+                        $deporgchartarray = json_decode(json_encode($orgchartupg), TRUE);
+                        $merge = array_merge($recipientarray,$deporgchartarray);
+                        $storestep[] = $merge;
+                     }
+                }   
+                else if(count($deporgchart)==0) 
+                {                                           
+                    if(count($depposusers)>0)
+                    {
                      foreach ($depposusers as $depposuser) {
                         $depposuserarray = json_decode(json_encode($depposuser),TRUE);
                         $merge = array_merge($recipientarray,$depposuserarray);
                         $storestep[] = $merge;
                     // storeToArray($storestep);
+                        }
                     }
-                }
                 else
                 {
                     $allposusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$recipient->position_pos_id)
@@ -167,6 +121,7 @@ function getWorkflow2($upgid,$groupid,$templateid)
                     // storeToArray($storestep);
                     }
                 }
+            }
                
             }
             else
@@ -187,6 +142,102 @@ function getWorkflow2($upgid,$groupid,$templateid)
        
    }
    return $storestep;
+}
+
+function getWorkflowForCustom($upgid,$wfid)
+{
+    //get workflow where wfid = $wfid
+      $storestep = array();
+    $selectedworkflow = DB::table('workflow as w')->where('w_id','=',$wfid)
+                        ->join('workflowsteps as ws','w.w_id','ws.workflow_w_id')
+                        ->orderBy('ws.order')
+                        ->get();
+
+    foreach ($selectedworkflow as $selectedstep) {
+        $recipients = DB::table('workflowsteps as ws')->where('ws.ws_id','=',$selectedstep->ws_id)
+                                                    ->join('wsreceiver as wsr','ws.ws_id','wsr.ws_id')
+                                                    ->join('next as nxt','ws.ws_id','nxt.ws_id')
+                                                    ->get();    
+
+            foreach ($recipients as $recipient) {
+                $recipientarray = json_decode(json_encode($recipient),TRUE);
+                
+                 if($recipient->receiver=="All")
+             {
+                $usergroup = getUserGroup($upgid);
+                $depposusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$recipient->position_pos_id)
+                                                                ->where('upg.upg_status','=','active')
+                                                                ->where('upg.group_group_id','=',$usergroup)
+                                                                ->join('user as u','upg.user_user_id','u.user_id')
+                                                                ->get();
+
+                 //get from org chart                                                
+                $deporgchart = DB::table('orgchartnode as on')->where('on.pos_id','=',$recipient->position_pos_id)
+                                                            ->where('on.group_id','=',$usergroup)
+                                                            ->get();
+
+                                  
+                if(count($deporgchart)>0)
+                 {
+                    foreach ($deporgchart as $orgchartupg) {
+                        $orgchartupgs = DB::table('userpositiongroup as upg')
+                                        ->where('upg.upg_id','=',$orgchartupg->upg_id)
+                                        ->join('user as u','upg.user_user_id','u.user_id')
+                                        ->get();
+
+                    }
+                     foreach ($orgchartupgs as $orgchartupg) {
+                        $deporgchartarray = json_decode(json_encode($orgchartupg), TRUE);
+                        $merge = array_merge($recipientarray,$deporgchartarray);
+                        $storestep[] = $merge;
+                     }
+                }   
+                else if(count($deporgchart)==0) 
+                {                                           
+                    if(count($depposusers)>0)
+                    {
+                     foreach ($depposusers as $depposuser) {
+                        $depposuserarray = json_decode(json_encode($depposuser),TRUE);
+                        $merge = array_merge($recipientarray,$depposuserarray);
+                        $storestep[] = $merge;
+                    // storeToArray($storestep);
+                        }
+                    }
+                else
+                {
+                    $allposusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$recipient->position_pos_id)
+                                                                ->where('upg.upg_status','=','active')
+                                                                ->join('user as u','upg.user_user_id','u.user_id')
+                                                                ->get();
+
+                     foreach ($allposusers as $allposuser) {
+                        $allposuserarray = json_decode(json_encode($allposuser),TRUE);
+                        $merge = array_merge($recipientarray,$allposuserarray);
+                        $storestep[] = $merge;
+                    // storeToArray($storestep);
+                    }
+                }
+            }
+               
+             }
+            else
+            {
+                  $posusers = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$recipient->receiver)
+                                                                ->join('user as u','upg.user_user_id','u.user_id')
+                                                                ->get();
+                foreach ($posusers as $posuser) {
+                    $posuserarray = json_decode(json_encode($posuser),TRUE);
+                    $merge = array_merge($recipientarray,$posuserarray);
+                    $storestep[] = $merge;
+                    //storeToArray($storestep);
+
+                }
+            }
+        } 
+    }
+
+    return $storestep;
+       
 }
 
 function storeToArray($array)

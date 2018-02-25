@@ -138,9 +138,11 @@ function closeInstructions()
     <input type = "text" name = "{{ $variables }}" placeholder = "{{ $variables }}"><br>
   @endif
 @endforeach
+@if(isset($position))
 @foreach($position as $positions)
   <input type = "text" id = "positions" name = "{{ $positions }}" placeholder = "{{ $positions }}" value = "<?php echo '${'.$positions.'}' ?>" hidden><br>
 @endforeach
+@endif
 
 {{-- Unfixed --}}
  {{-- @foreach($position as $positions)

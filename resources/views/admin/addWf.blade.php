@@ -691,10 +691,11 @@ function closeDeleteModal(wsid)
     </div>
     </div>
 
-
+    <?php $currstep = $steps2[$a][$b]['order']; ?>
+    
     @endfor
 </div>
-  @if($steps2[$a] != (count($steps2)-1))
+  @if($currstep!=count($steps2))
 <div>
   <i class="material-icons" style="font-size: 30px; margin: auto;">forward</i>
 </div>

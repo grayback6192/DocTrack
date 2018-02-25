@@ -38,12 +38,12 @@
               </a>
  </li>
 
- <li>
+ {{-- <li>
               <a href="#" data-placement="right" title="Inbox">
                 <i class="material-icons">archive</i>
                 <p>Archive</p>
               </a>
- </li>
+ </li> --}}
 @endsection
 
 @section('main_content')
@@ -51,20 +51,24 @@
     <div class="row justify-content-start">
       <a class="btn btn-primary" href="{{route('viewOwners',['upgid'=>$upgid])}}">Back</a>
     </div>
-  <div class="dep-menu" style="margin-left: 60px; margin-top: 20px;">
+  <div class="row">
     @if(isset($templates))
       @foreach($templates as $template)
-        <div class="card serviceowner" style="margin-top: 15px;">
+        <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="card card-stats">
             <a href="{{route('openTemplate',['upgid'=>$upgid,'id'=>$template->template_id])}}">
-          <div class="card-content text-center">
-            <div id="serviceicon">
-              <i class="material-icons" style="font-size: 60px;">insert_drive_file</i>
-            
+          
+            <div class="card-header" data-background-color="orange">
+              <i class="material-icons">insert_drive_file</i>
+          </div>
+
+           <div class="card-content"> 
             <h3 class="card-title">{{$template->templatename}}</h3>
             </div>
-        </div>
+
       </a>
         </div>
+      </div>
       @endforeach
     @endif
 
