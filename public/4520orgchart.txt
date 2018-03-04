@@ -1,0 +1,28 @@
+{
+  "name": "President",
+  "upgid": "",
+  "children": [
+    {
+      "name": "Baroc Marlon",
+      "upgid": "50523",
+      "children": [
+        {
+          "name": "Catipay Julieta",
+          "upgid": "6831",
+          "children": [
+            {
+              "name": "Christopher Maspara",
+              "upgid": "98192",
+              "children": [
+                {
+                  "name": "Velez Jesus",
+                  "upgid": "34966"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
