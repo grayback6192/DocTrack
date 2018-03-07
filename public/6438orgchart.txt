@@ -1,8 +1,0 @@
-{
-  "name": "President",
-  "children": [
-    {
-      "name": "Catingub Jereco"
-    }
-  ]
-}
