@@ -1,0 +1,13 @@
+{
+  "name": "President",
+  "children": [
+    {
+      "name": "Bumangabang James",
+      "children": [
+        {
+          "name": "Catipay Julieta"
+        }
+      ]
+    }
+  ]
+}
