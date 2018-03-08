@@ -147,7 +147,7 @@ class DocumentController extends Controller
             $newVar = str_replace(" ","_",$variables);
             $template->setValue($variables,$templateRequest[$newVar]);
         }
-        $rand = rand(10000,99999);
+        $rand = rand(1,10000000);
         $path = 'file/'.$rand.'.docx';
         DB::table("document")->insert(["doc_id"=>$rand,
                                        "docname"=>$title,
@@ -183,7 +183,7 @@ class DocumentController extends Controller
         $name = Auth::user();
         $rand = rand(1,1000);
         $user = request()->all();
-        $title = str_replace(" ", "_", $user['title']);
+        $title = $user['title'];
         $path = "file/".$rand.".docx";
         $workflow = $request['wf'];
 

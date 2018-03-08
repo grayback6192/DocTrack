@@ -28,13 +28,7 @@ class TemplateController extends Controller
         $user = Auth::user();
         $request = \DB::table("template")->where("template_id","=",$id)->get();
         foreach ($request as $requests)
-        //Depreciated Code (Will remove after testing)
-        /*
-        $phpWord = \PhpOffice\PhpWord\IOFactory::load('templates/'.$requests->templatename.'.docx');
-        $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
-        $htmlWriter->save('temp/'.$requests->templatename.'.html');
-        */
-        $htmlLoader = file_get_contents('temp/'.$requests->templatename.'.html');
+            $htmlLoader = file_get_contents('temp/'.$requests->templatename.'.html');
         $usergroup = DB::table('userpositiongroup')->get();
 	    foreach ($usergroup as $ug)
 	    {
@@ -93,7 +87,7 @@ class TemplateController extends Controller
     public function addEditedTemplate($upgid,$tempid) //Template Creation, Post
     {
         $user = request()->all();
-        $title = str_replace(" ", "_", $user['title']);
+        $title =$user['title'];
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
         $section = $phpWord->addSection();
         \PhpOffice\PhpWord\Shared\Html::addHtml($section, $user['text']);
@@ -120,12 +114,10 @@ class TemplateController extends Controller
         {
             $clientId = $client->client_id;
         }
-        $rand = rand(1,1000);
         $user = request()->all();
         $title = $user['title'];
         $path = "templates/".$title.".docx";
-        DB::table("template")->insert(["template_id"=>$rand,
-                                       "templatename"=>$title,
+        DB::table("template")->insert(["templatename"=>$title,
                                        "template_path"=>$path,
                                        "group_group_id"=>$request['group'],
                                        "workflow_w_id"=>$request['wf'],
@@ -146,6 +138,6 @@ class TemplateController extends Controller
         $dompdf->render();
         $output = $dompdf->output();
         file_put_contents("pdf/".$title.".pdf", $output);
-        return redirect()->route("viewOwners",['upgid'=>$upgid]); //pls change
+        return redirect()->route("viewOwners",['upgid'=>$upgid]);
     }
 }
