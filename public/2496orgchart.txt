@@ -1,4 +1,0 @@
-{
-  "name": "President",
-  "upgid": "node-upgid"
-}
