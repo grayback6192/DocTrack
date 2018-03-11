@@ -1,0 +1,16 @@
+{
+  "name": "President",
+  "upgid": "",
+  "children": [
+    {
+      "name": "Hannah Mary",
+      "upgid": "17556",
+      "children": [
+        {
+          "name": "Gonzalez Phillip",
+          "upgid": "66712"
+        }
+      ]
+    }
+  ]
+}

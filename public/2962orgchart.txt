@@ -1,0 +1,34 @@
+{
+  "name": "President",
+  "upgid": "",
+  "children": [
+    {
+      "name": "Catipay Julieta",
+      "upgid": "",
+      "children": [
+        {
+          "name": "Bumangabang James",
+          "upgid": "",
+          "children": [
+            {
+              "name": "Christopher Maspara",
+              "upgid": "",
+              "children": [
+                {
+                  "name": "Abarquez Trisha",
+                  "upgid": "",
+                  "children": [
+                    {
+                      "name": "Aba Mae",
+                      "upgid": "91611"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

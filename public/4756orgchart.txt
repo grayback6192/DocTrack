@@ -1,0 +1,29 @@
+{
+  "name": "Abarquez Trina Mae",
+  "upgid": "2526",
+  "positions": "President",
+  "children": [
+    {
+      "name": "Solar Dexter",
+      "upgid": "86456",
+      "positions": "Vice President",
+      "children": [
+        {
+          "name": "Dean2 Dean2",
+          "upgid": "30887",
+          "positions": "I.T."
+        },
+        {
+          "name": "Hannah Mary",
+          "upgid": "17556",
+          "positions": "Engineering"
+        },
+        {
+          "name": "Moreno Richard",
+          "upgid": "74433",
+          "positions": "I.T."
+        }
+      ]
+    }
+  ]
+}

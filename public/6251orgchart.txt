@@ -1,0 +1,22 @@
+{
+  "name": "President",
+  "upgid": "",
+  "children": [
+    {
+      "name": "Trina Mae Abarquez",
+      "upgid": "2526",
+      "children": [
+        {
+          "name": "Solar Dexter",
+          "upgid": "86456",
+          "children": [
+            {
+              "name": "Moreno Richard",
+              "upgid": "74433"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
