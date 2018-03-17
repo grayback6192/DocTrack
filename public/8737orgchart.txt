@@ -1,0 +1,16 @@
+{
+  "name": "President",
+  "upgid": "President",
+  "children": [
+    {
+      "name": "Catipay Julieta",
+      "upgid": "Catipay Julieta",
+      "children": [
+        {
+          "name": "Bumangabang James",
+          "upgid": "Bumangabang James"
+        }
+      ]
+    }
+  ]
+}
