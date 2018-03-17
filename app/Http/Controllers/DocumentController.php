@@ -21,7 +21,6 @@ class DocumentController extends Controller
         foreach ($request as $requests)
             //get template name
             $tempname = $requests->templatename;
-
             $template = new \PhpOffice\PhpWord\TemplateProcessor('templates/'.$requests->templatename.'.docx');
         $variable = $template->getVariables();
         $var = getWorkflow2($upgid,$group,$tempid);
@@ -32,7 +31,6 @@ class DocumentController extends Controller
                                                     ->join('position as p','ws.position_pos_id','p.pos_id')
                                                     ->get();
         $numinprogress = getNumberofInProgress($upgid);
-
         $temp = sizeof($variable);
         //Get predefined signature block
         for ($i=0; $i <$temp; $i++) 
@@ -90,8 +88,10 @@ class DocumentController extends Controller
         // var_dump($var); 
     }
 
-	public function viewFile($id) //Views file in PDF with corresponding values inserted, POST
+	public function viewFile($id, $upgid) //Views file in PDF with corresponding values inserted, POST
     {
+        $groupid = \Session::get('groupid');
+        $workflow = getWorkflow2($upgid,$groupid,$id);
         $templateRequest = request()->all();
         $request = \DB::table("template")->where("template_id","=",$id)->get();
         foreach ($request as $requests)
@@ -99,8 +99,14 @@ class DocumentController extends Controller
         $variable = $template->getVariables();
         foreach($variable as $variables)
         {
-            $newVar = str_replace(" ","_",$variables);
-            $template->setValue($variables,$templateRequest[$newVar]);
+            foreach($workflow as $workflows)
+            {
+                $template->setValue($workflows['posName']."-Name",$workflows['lastname'].', '.$workflows['firstname']);
+                $template->setValue($workflows['posName']."-Position",$workflows['groupName'].', '.$workflows['posName']);
+            }
+            // $newVar = str_replace(" ","_",$variables);
+            if(!strpos($variables,'-'))
+            $template->setValue($variables,$templateRequest[$variables]);
         }
         $template->saveAs('temp/'.$requests->templatename.'.docx');
 
@@ -146,8 +152,9 @@ class DocumentController extends Controller
         $variable = $template->getVariables();
         foreach($variable as $variables)
         {
-            $newVar = str_replace(" ","_",$variables);
-            $template->setValue($variables,$templateRequest[$newVar]);
+            // $newVar = str_replace(" ","_",$variables);
+            if(!strpos($variables,"-"))
+            $template->setValue($variables,$templateRequest[$variables]);
         }
         $rand = rand(1,99999);
         $path = 'file/'.$rand.'.docx';
@@ -217,8 +224,8 @@ class DocumentController extends Controller
 
     }
 
-     public function viewdocs(Request $request,$upgid,$id){    
-
+     public function viewdocs(Request $request,$upgid,$id)
+     {    
         $user = Auth::user();
         $authSignature = $user->signature;
         $userid = $user->user_id;
@@ -287,6 +294,75 @@ class DocumentController extends Controller
             ->orderBy('transaction.order')
             ->get();
 
+            \PhpOffice\PhpWord\Settings::setPdfRendererPath('../vendor/dompdf/dompdf');
+            \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
+
+          $signature = DB::table('transaction as t')
+                     ->where('t.document_doc_id','=',$id)
+                     // ->where("t.status","=","approved")
+                     // ->join("log","t.tran_id","log.tran_id")
+                     // ->where("log.status","approved")
+                     ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
+                     ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
+                     ->join("user as u","upg.user_user_id","=","u.user_id")
+                     ->join("group as gr", "upg.group_group_id","gr.group_id")
+                     ->get(); //Added
+                //get tran_id approve
+            $approve = DB::table("transaction as t")
+                                ->where("t.document_doc_id",$id)
+                                ->join("log","t.tran_id","log.tran_id")
+                                ->where("log.status","approved")
+                                ->get();
+
+
+        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$id.'.docx');
+        $variable = $templateProcessor->getVariables();
+
+       
+       foreach($signature as $signatures)
+        {
+            foreach($variable as $variables)
+            {
+                if($variables == $signatures->posName."-Name")
+                {
+                    if($signatures->signature == NULL)
+                    {
+                        foreach($approve as $approves)
+                        {
+                            if($approves->tran_id == $signatures->tran_id)
+                            {
+                                $string = explode("-",$variables);
+                                $templateProcessor->setValue($string[0]."-Name","SGV, ".$signatures->lastname.", ".$signatures->firstname);
+                                $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);
+                            }
+                              
+                        }
+                    }
+                    else
+                    {
+                        //Image Resize
+                        $img = Image::make($signatures->signature);
+                        $img->resize(100, 100);
+                        $img->save($signatures->signature);
+                        $templateProcessor->setImg($variables, ["src"=>$signatures->signature]);
+                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
+                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
+                    }
+                    $string = explode("-",$variables);
+                    $templateProcessor->setValue($string[0]."-Name",$signatures->lastname.", ".$signatures->firstname);
+                    $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);  
+                }
+            }
+        }
+
+         $templateProcessor->saveAs('temp/'.$id.'.docx');
+
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$id.'.docx'); 
+        $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'PDF');
+        $htmlWriter->save('temp/'.$id.'.pdf');
+
+
         $docInfo = \DB::table('inbox')->where('doc_id','=',$id)->where('upg_id','=',$recid)->get();
         $docStatus = DB::table('transaction')->where('document_doc_id','=',$id)->where('upg_id','=',$recid)->get();
 
@@ -310,9 +386,9 @@ class DocumentController extends Controller
         }
 
         if(file_exists($_SERVER['DOCUMENT_ROOT'].'/temp/'.$id.'.pdf'))      
-        $pdf = "/temp/".$id.".pdf";   
-     else
-        $pdf = "/pdf/".$id.".pdf";
+            $pdf = "/temp/".$id.".pdf";   
+        else
+            $pdf = "/pdf/".$id.".pdf";
 
     $comments = \DB::table('comment as c')->where('c.comment_doc_id','=',$id)
                                      ->join('userpositiongroup as upg','c.comment_upg_id','=','upg.upg_id')
@@ -458,7 +534,6 @@ class DocumentController extends Controller
     usort($readApproveArray,function($item1, $item2){
       return $item2['log_id'] - $item1['log_id'];
     });
-
        return view("user/viewDocs",["pdf"=>$pdf, 'User'=>$user, 'status'=>$status, 'datetime'=>$datetime, 'docInfos'=>$docInfo,'receivedatetime'=>$receivedatetime,'docStatus'=>$docStatus,'upgid'=>$upgid,'id'=>$id,'docworkflows'=>$docworkflows, 'comments'=>$comments,'numUnread'=>$numunread,'docwf'=>$docwf,'logsArray'=>$readApproveArray]);
         
     }

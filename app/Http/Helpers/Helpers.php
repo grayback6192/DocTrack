@@ -137,6 +137,8 @@ function getWorkflow2($upgid,$groupid,$templateid)
                         $orgchartupgs = DB::table('userpositiongroup as upg')
                                         ->where('upg.upg_id','=',$orgchartupg->upg_id)
                                         ->join('user as u','upg.user_user_id','u.user_id')
+                                        ->join("position as pos","pos.pos_id","upg.position_pos_id")
+                                        ->join("group as gr", "gr.group_id","upg.group_group_id")
                                         ->get();
 
                     }

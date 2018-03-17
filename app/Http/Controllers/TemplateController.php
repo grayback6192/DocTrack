@@ -9,7 +9,6 @@ use Dompdf\Dompdf;
 use Session;
 
 
-
 class TemplateController extends Controller
 {
 	public function deleteTemplate($upgid,$id,Request $request) //Deletes existing template, Get

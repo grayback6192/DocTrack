@@ -62,6 +62,10 @@ class User extends Controller
        
     public function approvedoc2($upgid, $docid)
     {
+      //Initialize PDF
+      \PhpOffice\PhpWord\Settings::setPdfRendererPath('../vendor/dompdf/dompdf');
+      \PhpOffice\PhpWord\Settings::setPdfRendererName('DomPDF');
+
          date_default_timezone_set('Asia/Manila');
         $user = Auth::user();
         $datetime = date('M d, Y H:i:s a');
@@ -79,86 +83,15 @@ class User extends Controller
                                 'status'=>'approved',
                                 'datetime'=>$datetime]);
 
-              $signature = DB::table('transaction as t')
-                     ->where('t.document_doc_id','=',$docid)
-                     // ->where("t.status","=","approved")
-                     ->join("log","t.tran_id","log.tran_id")
-                     ->where("log.status","approved")
-                     ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
-                     ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
-                     ->join("user as u","upg.user_user_id","=","u.user_id")
-                     ->get(); //Added
-
                 //get tran_id approve
                 $approvetran = DB::table('log')->where('tran_id','=',$currentsteptranid)
                                                       ->orderBy('datetime')
                                                       ->first();
-                 // $signature = DB::table('transaction as t')
-                 //     ->where('t.document_doc_id','=',$docid)
-                 //     ->join('log as l','t.tran_id','l.tran_id')
-                 //     ->where('l.log_id','=',$approvetran->log_id)
-                 //     ->where("l.status","=","approved")
-                 //     ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
-                 //     ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
-                 //     ->join("user as u","upg.user_user_id","=","u.user_id")
-                 //     ->get(); //Added
+    
 
         $position = DB::table("position")->get();
         $upg= session()->get('upgid');
 
-        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$docid.'.docx');
-        $variable = $templateProcessor->getVariables();
-
-       
-       foreach($signature as $signatures)
-        {
-            foreach($variable as $variables)
-            {
-                if($variables == $signatures->posName)
-                {
-                    if($signatures->signature == NULL)
-                    {
-                        $templateProcessor->setValue($variables,"Approved");
-                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
-                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
-                    }
-                    else
-                    {
-                        //Image Resize
-                        $img = Image::make($signatures->signature);
-                        $img->resize(100, 100);
-                        $img->save($signatures->signature);
-                        $templateProcessor->setImg($variables, ["src"=>$signatures->signature]);
-                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
-                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
-                    }
-                }
-            }
-        }
-        $templateProcessor->saveAs('temp/'.$docid.'.docx');
-
-    //     done
-    //     F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw
-    // Accounts
-    // LT0JZLv5hHtw7DLL6Ojo4h4cAfP6W8CBsHdjYAuw1Ki_09T0dApTNS--6vtPMH9BnzSwB5JfiGfiJDAuFZV4ag
-
-    $api = new Api("F1i2XV0-j4T28Ca9Ws8SEoC3vemDk3EHtHbMjhuldxLb76e5Mm6xopi-i4nxtNRG02xOCZ7s-Y5D1ybJSjSRdw");
-    $api->convert
-    ([
-        'inputformat' => 'docx',
-        'outputformat' => 'pdf',
-        'input' => 'upload',
-        'file' => fopen('temp/'.$docid.'.docx', 'r'),
-    ])
-    ->wait()
-    ->download('temp/'.$docid.'.pdf');
-
-        //get next steps of current order where status is still pending
-        // $nextsteps = DB::table('transaction as t')->where('t.document_doc_id','=',$docid)
-        //                                         ->where('t.order','=',$currentsteporder+1)
-        //                                         //->where('t.status','=','pending')
-        //                                         ->join('workflowsteps as ws','t.wd_id','ws.ws_id')
-        //                                         ->get();
 
         $nextsteps = DB::table('transaction as t')->where('t.document_doc_id','=',$docid)
                                                 ->where('t.order','=',$currentsteporder+1)
@@ -197,8 +130,6 @@ class User extends Controller
                
             }
 
-                  
-               
           $nextarray = array(); //to store next steps
 
          if($samesteptranscount==$samesteptranscountapproved){

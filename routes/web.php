@@ -354,7 +354,7 @@ Route::post("templateEdit/create","TemplateController@addEditedTemplate");
 
 Route::post("/templateInsert/{id}","DocumentController@insertFileVariables")->name("postDoc");
 
-Route::post("/templateView/{id}","DocumentController@viewFile")->name('viewfile');
+Route::post("/templateView/{id}/{upgid}","DocumentController@viewFile")->name('viewfile');
 
 Route::get("/templateEdit/{id}","TemplateController@editFile");
 

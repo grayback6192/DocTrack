@@ -214,7 +214,7 @@
     </div>
   </div>
 <input class="btn btn-primary" style = "background-color:green"type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
-<input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}' value = "Preview Document">
+<input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}/{{$upgid}}' value = "Preview Document">
 </div>
 </div>
 
@@ -279,7 +279,7 @@
   </div>
 </div>
   <div class="row justify-content-start ml-2 mb-2" style="float: right; margin-right: 50px;">
-    <a class="btn btn-info" href="{{route('Template',['upgid'=>$upgid])}}">  Back</a>
+    <a class="btn btn-info" href="{{route('Template',['upgid'=>$upgid])}}">Back</a>
     </div>
 </div>
 @endif
