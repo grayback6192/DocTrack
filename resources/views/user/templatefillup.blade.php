@@ -43,7 +43,9 @@
 @endsection
 
 @section('main_content')
-
+ <script type="text/javascript" src="{{URL::asset('js/jquery-3.2.1.min.js')}}" ></script>
+   <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <div class="container-fluid">
 <div class="row">
     
@@ -136,55 +138,40 @@
 <div class="row justify-content-between">
 <div class="media">
 <form method = "post">
-
-
-<div class="media-left">
+<div>
 <div class="col-md-offset-1" style="padding-top: 60px;">
   <div class = "form-group">
     <label for="subject"><h4><b>Subject</b></h4></label>
     <input class="form-control" id = "subject" type="text" name="subject" value="{{$templatename}}" placeholder="Subject"><br>
   </div>
-<table width = 1000>
   
   {{ csrf_field() }}
 {{-- Variable Form --}}
+
   @foreach($variable as $variables)
     @if(str_contains($variables,'Body') || str_contains($variables,'body'))
-     @if($loop->index%5 == 0)
-      </tr>
-      <tr>
-    @endif
-      <td>
       <div class = "form-group" style = "padding-right: 15px;width: 185px;">
         <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-          <textarea id = "textarea" class="form-control" rows = 5 cols = 40 name = "{{$variables}}" style = "margin-top:0px"></textarea><br>
+          <textarea id = "textarea" class="form-control" rows = 5 cols = 40 name = "{{ str_replace(" ","_",$variables) }}" style = "margin-top:0px"></textarea><br>
       </div>
-    </td>
   @elseif(str_contains($variables,'Date') || str_contains($variables,"date"))
-    @if($loop->index%5 == 0)
-      </tr>
-      <tr>
-    @endif
-    <td>
       <div class = "form-group" style = "padding-right: 15px;width: 185px;">
         <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-          <input type = "text" class="form-control date"  placeholder = "{{$variables}}" name = "{{ $variables }}"><br>
+          <input type = "text" class="form-control date"  placeholder = "{{$variables}}" name = "{{ str_replace(" ","_",$variables) }}"><br>
       </div>
-    </td>
+  @elseif(str_contains($variables,'Sender') || str_contains($variables,'sender'))
+    @foreach($sender as $senders)
+    <div hidden>
+      <input type = "text" name = "{{ $variables }}" class="form-control" placeholder = "{{ $variables }}" value = '{{$senders->lastname}}, {{$senders->firstname}}' hidden >
+    </div>
+    @endforeach
   @else
-    @if($loop->index%5 == 0)
-  </tr>
-      <tr>
-    @endif
-      <td>
-        <div class = "form-group" style = "padding-right: 15px;width: 185px;">
-        <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-        <input type = "text" name = "{{ $variables }}" class="form-control" placeholder = "{{ $variables }}"><br>
-        </div>
-      </td>
+    <div class = "form-group" style = "padding-right: 15px;width: 185px;">
+      <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
+      <input type = "text" name = "{{ str_replace(" ","_",$variables) }}" class="form-control" placeholder = "{{ $variables }}"><br>
+    </div>
     @endif
   @endforeach
-</table>
 <small class="form-text text-muted"><i>Values written in ${} will be replaced in the form. Please refer by opening the template button above.</i></small>
 @if(isset($position))
 @foreach($position as $positions)
@@ -217,7 +204,6 @@
 <input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}/{{$upgid}}' value = "Preview Document">
 </div>
 </div>
-
 
   <div class="media-body">
   <div class="col-sm-7 col-md-offset-3"> 

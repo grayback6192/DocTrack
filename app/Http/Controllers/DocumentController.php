@@ -14,6 +14,11 @@ class DocumentController extends Controller
 {
    public function readFile($upgid,$tempid)
     {
+        //Testing
+        $sender = DB::table("userpositiongroup as upg")
+                            ->where("upg_id",$upgid)
+                            ->join("user","user.user_id","upg.user_user_id")
+                            ->get();
         $name = Auth::user();
         $group = \Session::get('groupid');
         $numunread = getNumberOfUnread($upgid);
@@ -57,7 +62,7 @@ class DocumentController extends Controller
                     //$variable = array_values($variable);
                 }
             }
-        }   
+        }
         if(isset($signatureArray))
         {
             return view("user/templatefillup",["variable"=>$variable,
@@ -69,7 +74,8 @@ class DocumentController extends Controller
                                            "position"=>$signatureArray,
                                             "numUnread"=>$numunread,
                                             'numinprogress'=>$numinprogress,
-                                            "templatename"=>$tempname]);
+                                            "templatename"=>$tempname,
+                                            "sender"=>$sender]);
         }
         else
         {
@@ -81,7 +87,8 @@ class DocumentController extends Controller
                                            "upgid"=>$upgid,
                                             "numUnread"=>$numunread,
                                             'numinprogress'=>$numinprogress,
-                                            "templatename"=>$tempname]);
+                                            "templatename"=>$tempname,
+                                            "sender"=>$sender]);
         }
 
         // echo "<pre>";
@@ -90,6 +97,7 @@ class DocumentController extends Controller
 
 	public function viewFile($id, $upgid) //Views file in PDF with corresponding values inserted, POST
     {
+
         $groupid = \Session::get('groupid');
         $workflow = getWorkflow2($upgid,$groupid,$id);
         $templateRequest = request()->all();
@@ -97,6 +105,7 @@ class DocumentController extends Controller
         foreach ($request as $requests)
         $template = new \PhpOffice\PhpWord\TemplateProcessor('templates/'.$requests->templatename.'.docx');
         $variable = $template->getVariables();
+
         foreach($variable as $variables)
         {
             foreach($workflow as $workflows)
@@ -104,9 +113,12 @@ class DocumentController extends Controller
                 $template->setValue($workflows['posName']."-Name",$workflows['lastname'].', '.$workflows['firstname']);
                 $template->setValue($workflows['posName']."-Position",$workflows['groupName'].', '.$workflows['posName']);
             }
-            // $newVar = str_replace(" ","_",$variables);
+            
             if(!strpos($variables,'-'))
-            $template->setValue($variables,$templateRequest[$variables]);
+            {
+            	$newVar = str_replace(" ","_",$variables);
+	            $template->setValue($variables,$templateRequest[$newVar]);
+	        }
         }
         $template->saveAs('temp/'.$requests->templatename.'.docx');
 
@@ -154,7 +166,10 @@ class DocumentController extends Controller
         {
             // $newVar = str_replace(" ","_",$variables);
             if(!strpos($variables,"-"))
-            $template->setValue($variables,$templateRequest[$variables]);
+            {
+            	$newVar = str_replace(" ","_",$variables);
+	            $template->setValue($variables,$templateRequest[$newVar]);
+	        }
         }
         $rand = rand(1,99999);
         $path = 'file/'.$rand.'.docx';
@@ -174,7 +189,6 @@ class DocumentController extends Controller
         $htmlWriter->save('temp/'.$id.'.html');
         foreach ($docs as $doc) 
         {
-
             $html = file_get_contents('temp/'.$id.'.html');
             $dompdf= new Dompdf();
             $dompdf->loadHtml($html);
