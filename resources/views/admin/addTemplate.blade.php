@@ -189,7 +189,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Instructions</h5>
+        <h3 class="modal-title">Instructions</h3>
       </div>
       <div class="modal-body" style="height: 400px; overflow-y: scroll;">
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">

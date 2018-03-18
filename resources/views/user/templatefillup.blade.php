@@ -135,74 +135,60 @@
 <div class="container">
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" style = " background-color:orange; margin-left:62px; position:absolute" >Open Template</button>
 
-<div class="row justify-content-between">
-<div class="media">
-<form method = "post">
-<div>
-<div class="col-md-offset-1" style="padding-top: 60px;">
-  <div class = "form-group">
-    <label for="subject"><h4><b>Subject</b></h4></label>
-    <input class="form-control" id = "subject" type="text" name="subject" value="{{$templatename}}" placeholder="Subject"><br>
+<div class="row">
+  <div class="media">
+    <form method = "post">
+      <div class = "flex-container">
+        <div class="col-md-offset-1" style="padding-top: 60px;">
+          <div class = "form-group">
+            <label for="subject"><h4><b>Subject</b></h4></label>
+              <div class = "form-group">
+                <input class="form-control" id = "subject" type="text" name="subject" value="{{$templatename}}" placeholder="Subject"><br>
+              </div>
+
+       
+            {{-- Variable Form --}}
+            {{ csrf_field() }}
+            <div class = "row">
+              @foreach($variable as $variables)
+                @if(str_contains($variables,'Body') || str_contains($variables,'body'))
+                  <div class = "form-group" style = "padding-right: 15px;width: 200px;">
+                    <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
+                    <textarea id = "textarea" class="form-control" rows = 5 cols = 40 name = "{{ str_replace(" ","_",$variables) }}" style = "margin-top:0px"></textarea><br>
+                  </div>
+                @elseif(str_contains($variables,'Date') || str_contains($variables,"date"))
+                  <div class = "form-group" style = "padding-right: 15px;width: 200px;">
+                    <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
+                      <input type = "text" class="form-control date"  placeholder = "{{$variables}}" name = "{{ str_replace(" ","_",$variables) }}"><br>
+                  </div>
+                @elseif(str_contains($variables,'Sender') || str_contains($variables,'sender'))
+                  @foreach($sender as $senders)
+                    <div hidden>
+                      <input type = "text" name = "{{ $variables }}" class="form-control" placeholder = "{{ $variables }}" value = '{{$senders->lastname}}, {{$senders->firstname}}' hidden >
+                    </div>
+                  @endforeach
+                @else
+                  <div class = "form-group" style = "padding-right: 15px;width: 200px;">
+                    <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
+                    <input type = "text" name = "{{ str_replace(" ","_",$variables) }}" class="form-control" placeholder = "{{ $variables }}"><br>
+                  </div>
+                @endif
+              @endforeach
+              <small class="form-text text-muted"><i>Values written in ${} will be replaced in the form. Please refer by opening the template button above.</i></small>
+              @if(isset($position))
+                @foreach($position as $positions)
+                  <input type = "text" id = "positions" name = "{{ $positions }}" placeholder = "{{ $positions }}" value = "<?php echo '${'.$positions.'}' ?>" hidden><br>
+                @endforeach
+              @endif
+                <br><input class="btn btn-primary" style = "background-color:green"type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
+                <input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}/{{$upgid}}' value = "Preview Document">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
-  
-  {{ csrf_field() }}
-{{-- Variable Form --}}
-
-  @foreach($variable as $variables)
-    @if(str_contains($variables,'Body') || str_contains($variables,'body'))
-      <div class = "form-group" style = "padding-right: 15px;width: 185px;">
-        <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-          <textarea id = "textarea" class="form-control" rows = 5 cols = 40 name = "{{ str_replace(" ","_",$variables) }}" style = "margin-top:0px"></textarea><br>
-      </div>
-  @elseif(str_contains($variables,'Date') || str_contains($variables,"date"))
-      <div class = "form-group" style = "padding-right: 15px;width: 185px;">
-        <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-          <input type = "text" class="form-control date"  placeholder = "{{$variables}}" name = "{{ str_replace(" ","_",$variables) }}"><br>
-      </div>
-  @elseif(str_contains($variables,'Sender') || str_contains($variables,'sender'))
-    @foreach($sender as $senders)
-    <div hidden>
-      <input type = "text" name = "{{ $variables }}" class="form-control" placeholder = "{{ $variables }}" value = '{{$senders->lastname}}, {{$senders->firstname}}' hidden >
-    </div>
-    @endforeach
-  @else
-    <div class = "form-group" style = "padding-right: 15px;width: 185px;">
-      <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-      <input type = "text" name = "{{ str_replace(" ","_",$variables) }}" class="form-control" placeholder = "{{ $variables }}"><br>
-    </div>
-    @endif
-  @endforeach
-<small class="form-text text-muted"><i>Values written in ${} will be replaced in the form. Please refer by opening the template button above.</i></small>
-@if(isset($position))
-@foreach($position as $positions)
-<input type = "text" id = "positions" name = "{{ $positions }}" placeholder = "{{ $positions }}" value = "<?php echo '${'.$positions.'}' ?>" hidden><br>
-@endforeach
-@endif
-
-
-{{-- Modal Content --}}
- <!-- Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body" style = "padding-right: 74px;padding-left: 56px;">
-          <object data="/pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350"></object><br>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-<input class="btn btn-primary" style = "background-color:green"type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
-<input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}/{{$upgid}}' value = "Preview Document">
-</div>
 </div>
 
   <div class="media-body">
@@ -229,6 +215,25 @@
 </div>
 
 <br><br><br>
+
+ <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog" role = "document">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body" style = "padding-right: 74px;padding-left: 56px;">
+          <object data="/pdf/{{ $id->templatename }}.pdf" type="application/pdf" width="500" height="350"></object><br>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
 
 <div class="panel panel-default">
   <div class="panel-heading"><h3 class="panel-title">Document Workflow</h3></div>
@@ -271,6 +276,13 @@
 @endif
 </div>
 
+<style type="text/css">
+  .flex-container
+  {
+
+  }
+
+</style>
 
 @endsection
 

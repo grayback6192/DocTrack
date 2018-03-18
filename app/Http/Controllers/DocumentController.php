@@ -127,6 +127,10 @@ class DocumentController extends Controller
         $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$requests->templatename.'.docx'); 
         $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
         $htmlWriter->save('temp/'.$requests->templatename.'.html');
+        $getContent = file_get_contents('temp/'.$requests->templatename.'.html');
+        //Change name
+        $replaceTitle = str_replace("PHPWord","DocTrack | Preview",$getContent);
+        file_put_contents('temp/'.$requests->templatename.'.html', $replaceTitle);
         unlink('temp/'.$requests->templatename.'.docx');
 
         //View using DOMPDF
@@ -346,7 +350,7 @@ class DocumentController extends Controller
                             if($approves->tran_id == $signatures->tran_id)
                             {
                                 $string = explode("-",$variables);
-                                $templateProcessor->setValue($string[0]."-Name","SGV, ".$signatures->lastname.", ".$signatures->firstname);
+                                $templateProcessor->setValue($string[0]."-Name","SGD, ".$signatures->lastname.", ".$signatures->firstname);
                                 $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);
                             }
                               
@@ -371,15 +375,35 @@ class DocumentController extends Controller
 
          $templateProcessor->saveAs('temp/'.$id.'.docx');
 
+
+
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
         $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$id.'.docx'); 
+        $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
+        $htmlWriter->save('temp/'.$id.'.html');
+        $getContent = file_get_contents('temp/'.$id.'.html');
+        //Change name
+        $replaceTitle = str_replace("PHPWord","DocTrack | Preview",$getContent);
+        file_put_contents('temp/'.$id.'.html', $replaceTitle);
+
+        //View using DOMPDF
+        $dompdf= new Dompdf();
+        $dompdf->set_option("chroot","temp/");
+        $dompdf->load_html_file('temp/'.$id.'.html');
+        $dompdf->render();
+        $output = $dompdf->output();
+        file_put_contents("temp/".$id.".pdf", $output);
+
+        //Working HTML TO PDF
+        /*
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$id.'.docx');
         $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'PDF');
         $htmlWriter->save('temp/'.$id.'.pdf');
-
+        */
 
         $docInfo = \DB::table('inbox')->where('doc_id','=',$id)->where('upg_id','=',$recid)->get();
         $docStatus = DB::table('transaction')->where('document_doc_id','=',$id)->where('upg_id','=',$recid)->get();
-
         //get receivedatetime
         foreach ($docStatus as $status) {
             $docInfoLog = DB::table('log')->where('tran_id','=',$status->tran_id)
