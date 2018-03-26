@@ -840,6 +840,89 @@ class User extends Controller
    //order status 
     $docInfo = \DB::table("document")->where("doc_id",'=',$id)->get();
 
+
+    //Read upon opening the file.
+    $signature = DB::table('transaction as t')
+                     ->where('t.document_doc_id','=',$id)
+                     // ->where("t.status","=","approved")
+                     // ->join("log","t.tran_id","log.tran_id")
+                     // ->where("log.status","approved")
+                     ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
+                     ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
+                     ->join("user as u","upg.user_user_id","=","u.user_id")
+                     ->join("group as gr", "upg.group_group_id","gr.group_id")
+                     ->get(); //Added
+                //get tran_id approve
+            $approve = DB::table("transaction as t")
+                                ->where("t.document_doc_id",$id)
+                                ->join("log","t.tran_id","log.tran_id")
+                                ->where("log.status","approved")
+                                ->get();
+
+
+        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$id.'.docx');
+        $variable = $templateProcessor->getVariables();
+
+       
+       foreach($signature as $signatures)
+        {
+            foreach($variable as $variables)
+            {
+                if($variables == $signatures->posName."-Name")
+                {
+                    if($signatures->signature == NULL)
+                    {
+                        foreach($approve as $approves)
+                        {
+                            if($approves->tran_id == $signatures->tran_id)
+                            {
+                                $string = explode("-",$variables);
+                                $templateProcessor->setValue($string[0]."-Name","(SGD), ".$signatures->lastname.", ".$signatures->firstname);
+                                $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);
+                            }
+                              
+                        }
+                    }
+                    else
+                    {
+                        //Image Resize
+                        $img = Image::make($signatures->signature);
+                        $img->resize(100, 100);
+                        $img->save($signatures->signature);
+                        $templateProcessor->setImg($variables, ["src"=>$signatures->signature]);
+                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
+                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
+                    }
+                    $string = explode("-",$variables);
+                    $templateProcessor->setValue($string[0]."-Name",$signatures->lastname.", ".$signatures->firstname);
+                    $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);  
+                }
+            }
+        }
+
+         $templateProcessor->saveAs('temp/'.$id.'.docx');
+
+
+
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$id.'.docx'); 
+        $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
+        $htmlWriter->save('temp/'.$id.'.html');
+        $getContent = file_get_contents('temp/'.$id.'.html');
+        //Change name
+        $replaceTitle = str_replace("PHPWord","DocTrack | Preview",$getContent);
+        file_put_contents('temp/'.$id.'.html', $replaceTitle);
+
+        //View using DOMPDF
+        $dompdf= new Dompdf();
+        $dompdf->set_option("chroot","temp/");
+        $dompdf->load_html_file('temp/'.$id.'.html');
+        $dompdf->render();
+        $output = $dompdf->output();
+        file_put_contents("temp/".$id.".pdf", $output);
+
+
+
      if(file_exists($_SERVER['DOCUMENT_ROOT'].'/temp/'.$id.'.pdf'))      
         $pdf = "/temp/".$id.".pdf";   
      else

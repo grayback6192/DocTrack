@@ -149,7 +149,7 @@
        
             {{-- Variable Form --}}
             {{ csrf_field() }}
-            <div class = "row">
+          
               @foreach($variable as $variables)
                 @if(str_contains($variables,'Body') || str_contains($variables,'body'))
                   <div class = "form-group" style = "padding-right: 15px;width: 200px;">
@@ -164,7 +164,7 @@
                 @elseif(str_contains($variables,'Sender') || str_contains($variables,'sender'))
                   @foreach($sender as $senders)
                     <div hidden>
-                      <input type = "text" name = "{{ $variables }}" class="form-control" placeholder = "{{ $variables }}" value = '{{$senders->lastname}}, {{$senders->firstname}}' hidden >
+                      <input type = "text" name = "{{ $variables }}" class="form-control" placeholder = "{{ $variables }}" value = '(SGD), {{$senders->lastname}}, {{$senders->firstname}}' hidden >
                     </div>
                   @endforeach
                 @else
@@ -182,6 +182,7 @@
               @endif
                 <br><input class="btn btn-primary" style = "background-color:green"type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
                 <input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}/{{$upgid}}' value = "Preview Document">
+
               </div>
             </div>
           </div>

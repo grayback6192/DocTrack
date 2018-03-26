@@ -350,7 +350,7 @@ class DocumentController extends Controller
                             if($approves->tran_id == $signatures->tran_id)
                             {
                                 $string = explode("-",$variables);
-                                $templateProcessor->setValue($string[0]."-Name","SGD, ".$signatures->lastname.", ".$signatures->firstname);
+                                $templateProcessor->setValue($string[0]."-Name","(SGD), ".$signatures->lastname.", ".$signatures->firstname);
                                 $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);
                             }
                               
