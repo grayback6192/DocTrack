@@ -53,7 +53,6 @@
 
   <script type="text/javascript">
     $(document).ready(function(){
-
       var rows = $('.temp');
       $('#tempsearch').on('keyup',function(){
         var value = $(this).val();
@@ -133,56 +132,65 @@
 {{-- Input Type --}}
 @if(isset($variable))
 <div class="container">
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" style = " background-color:orange; margin-left:62px; position:absolute" >Open Template</button>
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" style = " background-color:orange; margin-left:62px; position:absolute">Open Template</button><br><br>
 
 <div class="row">
   <div class="media">
     <form method = "post">
-      <div class = "flex-container">
-        <div class="col-md-offset-1" style="padding-top: 60px;">
-          <div class = "form-group">
+      <div>
+        <div>
+          <div class = "form-group" style = "margin-left:79px">
             <label for="subject"><h4><b>Subject</b></h4></label>
               <div class = "form-group">
                 <input class="form-control" id = "subject" type="text" name="subject" value="{{$templatename}}" placeholder="Subject"><br>
               </div>
-
-       
-            {{-- Variable Form --}}
-            {{ csrf_field() }}
-          
-              @foreach($variable as $variables)
-                @if(str_contains($variables,'Body') || str_contains($variables,'body'))
-                  <div class = "form-group" style = "padding-right: 15px;width: 200px;">
-                    <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-                    <textarea id = "textarea" class="form-control" rows = 5 cols = 40 name = "{{ str_replace(" ","_",$variables) }}" style = "margin-top:0px"></textarea><br>
-                  </div>
-                @elseif(str_contains($variables,'Date') || str_contains($variables,"date"))
-                  <div class = "form-group" style = "padding-right: 15px;width: 200px;">
-                    <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-                      <input type = "text" class="form-control date"  placeholder = "{{$variables}}" name = "{{ str_replace(" ","_",$variables) }}"><br>
-                  </div>
-                @elseif(str_contains($variables,'Sender') || str_contains($variables,'sender'))
-                  @foreach($sender as $senders)
-                    <div hidden>
-                      <input type = "text" name = "{{ $variables }}" class="form-control" placeholder = "{{ $variables }}" value = '(SGD), {{$senders->lastname}}, {{$senders->firstname}}' hidden >
-                    </div>
+              {{csrf_field()}}
+              <div class = "input-container">
+                @foreach($variable as $variables)
+                  @php $count = $loop->index; @endphp
+                  @if($count%3 == 0)
+                    </ul>
+                    <ul>
+                  @endif
+                    @if(str_contains($variables,'Body') || str_contains($variables,'body'))
+                      <li>
+                        <div class = "form-group" style = "padding-right: 15px;width: 200px;">
+                          <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
+                          <textarea id = "textarea" class="form-control" rows = 5 cols = 40 name = "{{ str_replace(" ","_",$variables) }}" style = "margin-top:0px"></textarea></div>
+                        </div>
+                      </li>
+                    @elseif(str_contains($variables,'Date') || str_contains($variables,"date"))
+                      <li>
+                        <div class = "form-group" style = "padding-right: 15px;width: 200px;">
+                         <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
+                         <input type = "text" class="form-control date"  placeholder = "{{$variables}}" name = "{{ str_replace(" ","_",$variables) }}">
+                        </div>
+                    </li>
+                    @elseif(str_contains($variables,'Sender') || str_contains($variables,'sender'))
+                      @foreach($sender as $senders)
+                        <div hidden>
+                          <input type = "text" name = "{{ $variables }}" class="form-control" placeholder = "{{ $variables }}" value = '(SGD), {{$senders->lastname}}, {{$senders->firstname}}' hidden >
+                        </div>
+                      @endforeach
+                    @else
+                      <li>
+                        <div class = "form-group" style = "padding-right: 15px;width: 200px;">
+                          <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
+                          <input type = "text" name = "{{ str_replace(" ","_",$variables) }}" class="form-control" placeholder = "{{ $variables }}">
+                        </div>
+                      </li>
+                    @endif
                   @endforeach
-                @else
-                  <div class = "form-group" style = "padding-right: 15px;width: 200px;">
-                    <label for="{{ $variables }}"><b>{{ $variables }}</b></label>
-                    <input type = "text" name = "{{ str_replace(" ","_",$variables) }}" class="form-control" placeholder = "{{ $variables }}"><br>
-                  </div>
+                </ul>
+              </div>
+                  <small class="form-text text-muted"><i>Values written in ${} will be replaced in the form. Please refer by opening the template button above.</i></small>
+                  @if(isset($position))
+                    @foreach($position as $positions)
+                      <input type = "text" id = "positions" name = "{{ $positions }}" placeholder = "{{ $positions }}" value = "<?php echo '${'.$positions.'}' ?>" hidden><br>
+                  @endforeach
                 @endif
-              @endforeach
-              <small class="form-text text-muted"><i>Values written in ${} will be replaced in the form. Please refer by opening the template button above.</i></small>
-              @if(isset($position))
-                @foreach($position as $positions)
-                  <input type = "text" id = "positions" name = "{{ $positions }}" placeholder = "{{ $positions }}" value = "<?php echo '${'.$positions.'}' ?>" hidden><br>
-                @endforeach
-              @endif
-                <br><input class="btn btn-primary" style = "background-color:green"type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
-                <input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}/{{$upgid}}' value = "Preview Document">
-
+                  <br><input class="btn btn-primary" style = "background-color:green"type = "submit" formaction = "{{route('postDoc',['id'=>$id->template_id])}}" value = "Send">
+                  <input class="btn btn-primary" type = "submit" formaction = '/templateView/{{ $id->template_id }}/{{$upgid}}' value = "Preview Document">
               </div>
             </div>
           </div>
@@ -278,11 +286,11 @@
 </div>
 
 <style type="text/css">
-  .flex-container
+  .form-group ul 
   {
-
+    display:inline-block;
+    list-style-type:none;
   }
-
 </style>
 
 @endsection
