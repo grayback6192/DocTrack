@@ -1,0 +1,19 @@
+{
+  "name": "Christopher Maspara",
+  "upgid": "5631",
+  "positions": "President",
+  "children": [
+    {
+      "name": "Bumangabang James",
+      "upgid": "87294",
+      "positions": "VP-Academics",
+      "children": [
+        {
+          "name": "Lim Duint",
+          "upgid": "15996",
+          "positions": "Registrar"
+        }
+      ]
+    }
+  ]
+}

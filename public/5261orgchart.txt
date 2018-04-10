@@ -1,0 +1,8 @@
+{
+  "name": "President",
+  "children": [
+    {
+      "name": "VP-Welfare"
+    }
+  ]
+}
