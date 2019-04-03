@@ -1,53 +1,47 @@
 @extends('mastertemplate')
 @section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">face</i>
                <p>Users</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">business</i>
                <p>Departments</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">event_seat</i>
                 <p>Positions</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">group</i>
                <p>Workflows</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">description</i>
                 <p>Templates</p>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
-              </a>
- </li>
 @endsection
 
 @section('main_content')
 
 <div class="content">
 <div id="view" class="row">
-<input type="button" class="btn btn-primary" id="addwf" value="Add Workflow">
+<input type="button" class="btn btn-info" id="addwf" value="Add Workflow">
 
  <!-- The Modal -->
 <div id="myModal" class="modal">
@@ -72,7 +66,7 @@
 </div>
 </div>
         <div class="modal-footer">
-          <input type="submit" class="btn btn-primary" name="addNewAssign" value="Add New Workflow">
+          <input type="submit" class="btn btn-info" name="addNewAssign" value="Add New Workflow">
         </div>
     </form>
   </div>
@@ -126,23 +120,26 @@ window.onclick = function(event) {
 <div class="row" style="margin-left: 60px;">
 @if(isset($workflows))
 @foreach($workflows as $workflow)
- <div class="col-sm-4" style="margin-top: 20px;">
-    <a href="{{route('AddWf',['upgid'=>$upgid,'id'=>$workflow->w_id])}}">
-      <div class="card col-sm-10" style="border: none;">
-        <div class="card-header" data-background-color="orange"  style="text-align: center;">
+
+ <div class="col-md-4">
+    
+      <div class="card card-profile">
+        <div class="card-body">
           <i class="material-icons" style="font-size: 50px;">group</i>
+           <h6 class="card-category">Workflow</h6>
+            <h4 class="card-title">{{$workflow->workflowName}}</h4>
+            <a href="{{route('AddWf',['upgid'=>$upgid,'id'=>$workflow->w_id])}}" class="btn btn-info btn-round">Open</a>
         </div>
-      <div class="card-block">
-        <h3 class="title text-center" style="margin-top: 1rem">{{$workflow->workflowName}}</h3>
-      </div>
-    </div></a>
+        
+
+    </div>
     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
            <div class="btn-group mr-2" role="group" aria-label="First group">
-              <input type="button" class="btn btn-primary" name="editWf" id="editWf-{{$workflow->w_id}}" value="Edit" onclick="openEditModal({{$workflow->w_id}})">
+              <input type="button" class="btn btn-info" name="editWf" id="editWf-{{$workflow->w_id}}" value="Edit" onclick="openEditModal({{$workflow->w_id}})">
           </div>
           <div class="btn-group mr-2" role="group" aria-label="First group">
-              {{-- <input type="button" class="btn btn-primary" name="delWf" value="Delete" onclick="window.location='{{route('DelWf',['upgid'=>$upgid,'id'=>$workflow->w_id])}}'"> --}}
-              <input type="button" class="btn btn-primary" name="delWf" value="Delete" onclick="openDeleteModal({{$workflow->w_id}})">
+              {{-- <input type="button" class="btn btn-info" name="delWf" value="Delete" onclick="window.location='{{route('DelWf',['upgid'=>$upgid,'id'=>$workflow->w_id])}}'"> --}}
+              <input type="button" class="btn btn-danger" name="delWf" value="Delete" onclick="openDeleteModal({{$workflow->w_id}})">
           </div>
         </div>
         <!-- The Modal -->
@@ -158,8 +155,8 @@ window.onclick = function(event) {
     <input type="hidden" name="id" value="{{$workflow->w_id}}"><br>
     Workflow Name: <input type="text" name="wfname" value="{{$workflow->workflowName}}"><br><br>
 
-          <input type="submit" class="btn btn-primary" name="editWfName" value="Save">&nbsp;&nbsp;
-          <input type="button" class="btn btn-primary" id="cancel-{{$workflow->w_id}}" value="Cancel" onclick="closeEditModal({{$workflow->w_id}})">
+          <input type="submit" class="btn btn-info" name="editWfName" value="Save">&nbsp;&nbsp;
+          <input type="button" class="btn btn-danger" id="cancel-{{$workflow->w_id}}" value="Cancel" onclick="closeEditModal({{$workflow->w_id}})">
     </form>
   </div>
   </div>
@@ -201,7 +198,7 @@ window.onclick = function(event) {
         <div class="modal-body">
           <div class="btn-toolbar">
             <div class="btn-group">
-              <a href="{{route('DelWf',['upgid'=>$upgid,'id'=>$workflow->w_id])}}" class="btn btn-primary">YES</a>
+              <a href="{{route('DelWf',['upgid'=>$upgid,'id'=>$workflow->w_id])}}" class="btn btn-info">YES</a>
             </div>
             <div class="btn-group">
               <button type="button" class="btn btn-danger" onclick="closeDeleteModal({{$workflow->w_id}})">NO</button>

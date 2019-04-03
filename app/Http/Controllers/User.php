@@ -54,8 +54,14 @@ class User extends Controller
         $numunread = getNumberOfUnread($upgid);
         $numinprogress = getNumberofInProgress($upgid);
 
+        $numNotifications = getNumberOfNotification($upgid);
+        if($numNotifications>0)
+          $notificationsList = getNotificationsList($upgid);
+        else
+          $notificationsList = "";
+
         // return view("user/test",['inbox'=>$inbox,'User'=>$user,'numUnread'=>$numunread,'upgid'=>$upgid,'numinprogress'=>$numinprogress]);
-        return view("user/test",['inboxArray'=>$inboxArray,'User'=>$user,'numUnread'=>$numunread,'upgid'=>$upgid,'numinprogress'=>$numinprogress]);
+        return view("user/test",['inboxArray'=>$inboxArray,'User'=>$user,'numUnread'=>$numunread,'upgid'=>$upgid,'numinprogress'=>$numinprogress,'numNotifications'=>$numNotifications,'notificationsList'=>$notificationsList]);
         // echo "<pre>";
         // var_dump($inboxArray);
     }
@@ -139,9 +145,9 @@ class User extends Controller
              {
 
                 //update status to approve if cc
-              DB::table('transaction')->where('tran_id','=',$nextstep->tran_id)->update(['status'=>'approved',
-                                                                                        'date'=>$date,
-                                                                                        'time'=>$time]);
+              // DB::table('transaction')->where('tran_id','=',$nextstep->tran_id)->update(['status'=>'approved',
+              //                                                                           'date'=>$date,
+              //                                                                           'time'=>$time]);
 
 
                 // $randLog = rand(1,9999);
@@ -285,12 +291,6 @@ class User extends Controller
               
        }
 
-
-        // echo "<pre>";
-        // var_dump($nextarray);
-       // $totalTrans = $this->getTotalTrans($docid);
-       //  $currentNumApprove = $this->getTotalApprove($docid); 
-
         $transaction = DB::table("transaction")->where("document_doc_id",$docid)->get();
         $transactionTotal = DB::table("archive")->where("docid",$docid)->count();
         
@@ -429,6 +429,19 @@ class User extends Controller
                                             'inbox_id'=>$inbox_id,
                                             'status'=>'unread',
                                             'datetime'=>$datetime]);
+                //get document name
+                $documentInfos = DB::table('document')->where('doc_id','=',$docid)->get();
+                foreach ($documentInfos as $documentInfo) {
+                  $documentName = $documentInfo->docname;
+                }
+                $userReject = $user->firstname." ".$user->lastname; 
+                $notificationMessage = $documentName." has been rejected by ".$userReject.". Document is sent back to you.";
+                DB::table('notification')->insert(['from_upg_id'=>$upgid,
+                                                    'message'=> $notificationMessage,
+                                                    'to_upg_id'=>$prevReceiver->upg_id,
+                                                    'not_status'=>'unread',
+                                                    'not_datetime'=>$datetime,
+                                                    'doc_id'=>$docid]);
             }
            
         }
@@ -603,6 +616,7 @@ class User extends Controller
                
         $arr = array();
         $user = Auth::user();
+        $commentprof = $user->profilepic;
         $name= \DB::table("transaction")
                     ->where('document_doc_id','=',$id)
                     ->join('userpositiongroup','transaction.upg_id','=','userpositiongroup.upg_id')
@@ -699,7 +713,8 @@ class User extends Controller
 
     $comments = \DB::table('comment as c')->where('c.comment_doc_id','=',$id)
                                      ->join('userpositiongroup as upg','c.comment_upg_id','=','upg.upg_id')
-                                     ->join('user','upg.user_user_id','=','user.user_id') 
+                                     ->join('user','upg.user_user_id','=','user.user_id')
+                                     ->orderBy('comment_time','asc') 
                                      ->get();
   
      //view document logs
@@ -746,7 +761,7 @@ class User extends Controller
 
 
     //return $latestStatus." and ".$latestSeen;
-    return view("user/archive",["name"=>$name,"statuss"=>$statuss,'User'=>$user,"pdf"=>$pdf,'docinfos'=>$docInfo,'upgid'=>$upgid,'lastOrder'=>$last_order,'numUnread'=>$numunread,'numinprogress'=>$numinprogress,'docwf'=>$docwf,'comments'=>$comments,'statusarray'=>$statusarray,'logsArray'=>$readApproveArray]);
+    return view("user/archive",["name"=>$name, 'commentprof'=>$commentprof,"statuss"=>$statuss,'User'=>$user,"pdf"=>$pdf,'docinfos'=>$docInfo,'upgid'=>$upgid,'lastOrder'=>$last_order,'numUnread'=>$numunread,'numinprogress'=>$numinprogress,'docwf'=>$docwf,'comments'=>$comments,'statusarray'=>$statusarray,'logsArray'=>$readApproveArray]);
 
       // echo "<pre>";
       // var_dump($readApproveArray);
@@ -756,6 +771,7 @@ class User extends Controller
         
         $arr = array();
         $user = Auth::user();
+        $userprof = $user->profilepic;
         $name= \DB::table("transaction")
                     ->where('document_doc_id','=',$id)
                     ->join('userpositiongroup','transaction.upg_id','=','userpositiongroup.upg_id')
@@ -765,11 +781,8 @@ class User extends Controller
 
      $statuss=\DB::table("transaction")
      ->where('transaction.document_doc_id','=',$id)
-    //->join('document','transaction.document_doc_id','=','document.doc_id')
-    //->join('log','transaction.tran_id','log.tran_id')
     ->join('userpositiongroup','transaction.upg_id','=','userpositiongroup.upg_id')
     ->join('user','userpositiongroup.user_user_id','=','user.user_id')
-    //->select('log.status','user.lastname','user.firstname','log.datetime','document.template_template_id','transaction.order','userpositiongroup.upg_id')
     ->orderBy('transaction.order')
     ->get();
 
@@ -840,6 +853,86 @@ class User extends Controller
    //order status 
     $docInfo = \DB::table("document")->where("doc_id",'=',$id)->get();
 
+        //Read upon opening the file.
+    $signature = DB::table('transaction as t')
+                     ->where('t.document_doc_id','=',$id)
+                     // ->where("t.status","=","approved")
+                     // ->join("log","t.tran_id","log.tran_id")
+                     // ->where("log.status","approved")
+                     ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
+                     ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
+                     ->join("user as u","upg.user_user_id","=","u.user_id")
+                     ->join("group as gr", "upg.group_group_id","gr.group_id")
+                     ->get(); //Added
+                //get tran_id approve
+            $approve = DB::table("transaction as t")
+                                ->where("t.document_doc_id",$id)
+                                ->join("log","t.tran_id","log.tran_id")
+                                ->where("log.status","approved")
+                                ->get();
+
+
+        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('file/'.$id.'.docx');
+        $variable = $templateProcessor->getVariables();
+
+       
+       foreach($signature as $signatures)
+        {
+            foreach($variable as $variables)
+            {
+                if($variables == $signatures->posName."-Name")
+                {
+                    if($signatures->signature == NULL)
+                    {
+                        foreach($approve as $approves)
+                        {
+                            if($approves->tran_id == $signatures->tran_id)
+                            {
+                                $string = explode("-",$variables);
+                                $templateProcessor->setValue($string[0]."-Name","(SGD), ".$signatures->lastname.", ".$signatures->firstname);
+                                $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);
+                            }
+                              
+                        }
+                    }
+                    else
+                    {
+                        //Image Resize
+                        $img = Image::make($signatures->signature);
+                        $img->resize(100, 100);
+                        $img->save($signatures->signature);
+                        $templateProcessor->setImg($variables, ["src"=>$signatures->signature]);
+                        $templateProcessor->setValue($variables."-Name",$signatures->lastname.", ".$signatures->firstname);
+                        $templateProcessor->setValue($variables."-Position",$signatures->posName);
+                    }
+                    $string = explode("-",$variables);
+                    $templateProcessor->setValue($string[0]."-Name",$signatures->lastname.", ".$signatures->firstname);
+                    $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);  
+                }
+            }
+        }
+
+         $templateProcessor->saveAs('temp/'.$id.'.docx');
+
+
+
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $phpWord = \PhpOffice\PhpWord\IOFactory::load('temp/'.$id.'.docx'); 
+        $htmlWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord , 'HTML');
+        $htmlWriter->save('temp/'.$id.'.html');
+        $getContent = file_get_contents('temp/'.$id.'.html');
+        //Change name
+        $replaceTitle = str_replace("PHPWord","DocTrack | Preview",$getContent);
+        file_put_contents('temp/'.$id.'.html', $replaceTitle);
+
+        //View using DOMPDF
+        $dompdf= new Dompdf();
+        $dompdf->set_option("chroot","temp/");
+        $dompdf->load_html_file('temp/'.$id.'.html');
+        $dompdf->render();
+        $output = $dompdf->output();
+        file_put_contents("temp/".$id.".pdf", $output);
+
      if(file_exists($_SERVER['DOCUMENT_ROOT'].'/temp/'.$id.'.pdf'))      
         $pdf = "/temp/".$id.".pdf";   
      else
@@ -855,7 +948,8 @@ class User extends Controller
 
     $comments = \DB::table('comment as c')->where('c.comment_doc_id','=',$id)
                                      ->join('userpositiongroup as upg','c.comment_upg_id','=','upg.upg_id')
-                                     ->join('user','upg.user_user_id','=','user.user_id') 
+                                     ->join('user','upg.user_user_id','=','user.user_id')
+                                     ->orderBy('comment_time','asc') 
                                      ->get();
 
     //view document logs
@@ -903,13 +997,8 @@ class User extends Controller
     });
      
 
-    return view("user/fileStatus",["name"=>$name,"statuss"=>$statuss,'User'=>$user,"pdf"=>$pdf,'docinfos'=>$docInfo,'upgid'=>$upgid,'lastOrder'=>$last_order,'numUnread'=>$numunread,'numinprogress'=>$numinprogress,'docwf'=>$docwf,'comments'=>$comments,'statusarray'=>$statusarray,'logsArray'=>$readApproveArray]);
-
-          // echo "<pre>";
-          // var_dump($readApproveArray);
-  
+    return view("user/fileStatus",["name"=>$name,"statuss"=>$statuss,'User'=>$user,"pdf"=>$pdf,'docinfos'=>$docInfo,'upgid'=>$upgid,'lastOrder'=>$last_order,'numUnread'=>$numunread,'numinprogress'=>$numinprogress,'docwf'=>$docwf,'comments'=>$comments,'statusarray'=>$statusarray,'logsArray'=>$readApproveArray, 'commentprof'=>$userprof]);
   }
-
     public function addFile(Request $request)
     {
          $name = Auth::user();
@@ -950,18 +1039,26 @@ class User extends Controller
     public function chooseGroups($userid)
     {
         $name = Auth::user();
+        $userprof = $name->profilepic;
         $groups = DB::table('userpositiongroup as upg')->where('upg.user_user_id','=',$userid)
                     ->where('upg.upg_status','=','active')
                     ->join('group as g','upg.group_group_id','=','g.group_id')
                     ->join('rights as r','upg.rights_rights_id','=','r.rights_id')
                     ->join('position as p','upg.position_pos_id','=','p.pos_id')
                     ->get();
+        $groups2 = DB::table('userpositiongroup as upg')->where('upg.user_user_id','=',$userid)
+                    ->where('upg.upg_status','=','active')
+                    ->join('group as g','upg.group_group_id','=','g.group_id')
+                    ->join('rights as r','upg.rights_rights_id','=','r.rights_id')
+                    ->join('deppos as dp','upg.position_pos_id','=','dp.deppos_id')
+                    ->join('position as p','dp.pos_id','p.pos_id')
+                    ->get();
         //get client id
         $userClient = DB::table('userpositiongroup')->where('user_user_id','=',$userid)->get();
         foreach ($userClient as $clientId) {
           $userClientId = $clientId->client_id;
         }
-        return view('user/chooseGroup',['User'=>$name,'usergroups'=>$groups,'clientId'=>$userClientId]);
+        return view('user/chooseGroup',['User'=>$name,'userprof'=>$userprof,'usergroups'=>$groups,'usergroups2'=>$groups2,'clientId'=>$userClientId]);
     }
     
     public function index($upgid)

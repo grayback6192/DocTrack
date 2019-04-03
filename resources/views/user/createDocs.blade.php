@@ -1,14 +1,14 @@
 @extends('mastertemplate')
 @section('menu')
-<li class="active">
-              <a href="{{route('Template',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item active">
+              <a class="nav-link" href="{{route('Template',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">send</i>
                <p>Send File</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">mail</i>
                 <p>
                   Inbox
@@ -19,8 +19,8 @@
               </a>
  </li>
 
-<li>
-              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">drafts</i>
                 <p>
                   In progress
@@ -31,8 +31,8 @@
               </a>
  </li>
 
-   <li>
-              <a href="{{route('complete',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+   <li class="nav-item">
+              <a class="nav-link" href="{{route('complete',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">drafts</i>
                 <p>
                   Archive</p>
@@ -68,7 +68,7 @@
               html+="<div class='card'>";
               for(var y=0;y<=(Object.keys(data[x].length));y++)
               {
-                html+="<div class='card-content'>";
+                html+="<div class='card-content text-light'>";
                  html+=data[x][y].posName+"<br>";
 
                 html+="</div>";
@@ -78,7 +78,7 @@
               {
               //   html+="<div class='media-right'>";
                //  html+="<div style='margin-top: 40px;'>";
-                 html+="<i class='material-icons' style='margin-top: 50px;'>forward</i>";
+                 html+="<i class='material-icons' style='margin-top: 30px;'>forward</i>";
                //  html+="<div></div>";
                }
               //html+="</div>";
@@ -146,10 +146,10 @@
   <textarea name = "text" id = "textarea"></textarea>
   <div class="btn-toolbar">
     <div class="btn-group">
-      <input class="btn btn-primary" type = "submit" value = "Save" name = "submit">
+      <input class="btn btn-info" type = "submit" value = "Save" name = "submit">
     </div>
     <div class="btn-group">
-      <a class="btn btn-primary" href="{{route('Template',['upgid'=>$upgid])}}">Back</a>
+      <a class="btn btn-danger" href="{{route('Template',['upgid'=>$upgid])}}">Back</a>
     </div>
   </div>
  

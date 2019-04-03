@@ -3,47 +3,41 @@
 
 
 @section('menu')
- <li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">face</i>
                <p>Users</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">business</i>
                <p>Departments</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">event_seat</i>
                 <p>Positions</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">group</i>
                <p>Workflows</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">description</i>
                 <p>Templates</p>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
-              </a>
- </li>
 
 @endsection
 
@@ -53,7 +47,7 @@
   <div class="row justify-content-center">
     <div class="card" style="width: 700px; padding: 10px;">
       <div class="card-header" data-background-color="orange">
-        <h4>Edit Department Profile</h4>
+        <h4 class="text-light">Edit Department Profile</h4>
       </div>
       <div class="card-content">
         @if(count($errors)>0)

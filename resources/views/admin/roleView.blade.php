@@ -1,46 +1,40 @@
 @extends('mastertemplate')
 @section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">face</i>
                <p>Users</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">business</i>
                <p>Departments</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">event_seat</i>
                 <p>Positions</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">group</i>
                <p>Workflows</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">description</i>
                 <p>Templates</p>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
-              </a>
- </li>
 
 @endsection
 
@@ -119,36 +113,39 @@ $.ajaxSetup({
 <div class="row" role="toolbar" aria-label="Toolbar with button groups">
 
 <div class="col-lg-9" role="group" aria-label="First Group">
-	<button type="button" class="btn btn-primary" onclick="showAddPosModal()">Add New Position</button>
+	<button type="button" class="btn btn-info" onclick="showAddPosModal()">Add Position Title</button>
 
 	<div class="modal" id="addPosModal">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<button type="button" class="close" onclick="closeAddPosModal()"><span>&times;</span></button>
+					
         				<h4 class="modal-title">Add New Position</h4>
+        				<button type="button" class="close" onclick="closeAddPosModal()"><span>&times;</span></button>
       				</div>
-      				<form method="post" action="{{route('AddRole',['upgid'=>$upgid])}}">
+      				<form method="post" action="{{route('addnewrole',['upgid'=>$upgid])}}">
       					<div class="modal-body">
       						{{csrf_field()}}
       						<label>Position Name</label>
       						<input type="text" class="form-control" data-toggle="tooltip" title="Add New Position"  name="newrole" id="newroleid" placeholder="Position Name"> 
 
-      						<input type="checkbox" name="motherdep" id="motherdep" onclick="showMotherDep()"> Please check if this position has a certain hierarchy.
+      						{{-- <input type="checkbox" name="motherdep" id="motherdep" onclick="showMotherDep()"> Please check if this position has a certain hierarchy.
       						<div id="motherdeps" style="display: none;">
 							    <div class="form-group">
 							  	<label>Parent Position:</label> 
 							    <select class="form-control" name="motherpos">
 							  	<option value=""></option>
 							  	@foreach($positionlist as $position)
+							  	@if($position->posName!="Admin" && $position->posName!="masteradmin")
 							  	<option value="{{$position->pos_id}}">{{$position->posName}}</option>
+							  	@endif
 							  	@endforeach	
 							  	</select> 
 							    </div> 
-							 </div>
+							 </div><br> --}}
       					</div>
       					<div class="modal-footer">
-      						<input type="submit" class="btn btn-primary" name="addNewPos" value="Add New Position">
+      						<input type="submit" class="btn btn-info" name="addNewPos" value="Add New Position">
       					</div>
       				 </form>
 				</div>
@@ -186,10 +183,26 @@ $.ajaxSetup({
 		var addPosModal = document.getElementById('addPosModal');
 		addPosModal.style.display = "none";
 	}
+
+	function showPosDeps()
+	{
+		var chooseDepPos = document.getElementById('posdeps');
+		var checkbox = document.getElementById('posdep');
+		var checkedDepPos = checkbox.checked;
+
+		if(checkedDepPos){
+			chooseDepPos.style.display = "block";
+		}
+		else
+		{
+			chooseDepPos.style.display = "none";
+		}
+		
+	}
 </script>
 
 <div class="col-sm-3" role="group" aria-label="Second Group" style="margin-top: 27px;">
-	<a class="btn btn-primary" href="{{route('viewAssignments',['upgid'=>$upgid])}}">Position Assignments</a>
+	<a class="btn btn-info" href="{{route('viewAssignments',['upgid'=>$upgid])}}">Position Assignments</a>
 </div> 
 </div>
 
@@ -204,7 +217,7 @@ $.ajaxSetup({
 		<th colspan="2"></th>
 	</tr>
 	</thead>
-	@foreach($roles as $role)
+ 	@foreach($positionlist as $role)
 	@if($role->posName!="masteradmin" && $role->posName!="Admin")
 	<tbody>
 	<tr id="{{$role->pos_id}}-row">
@@ -222,12 +235,12 @@ $.ajaxSetup({
 		</td>
 		<td>
 				<a href="javascript:editMode({{$role->pos_id}})" id="{{$role->pos_id}}-edit"><i class="material-icons">mode_edit</i></a>
-				<input type="submit" class="btn btn-primary" id="{{$role->pos_id}}-save" name="save" value="Save" style="display: none">
+				<input type="submit" class="btn btn-info" id="{{$role->pos_id}}-save" name="save" value="Save" style="display: none">
 		</td>
 
 		<td>
 				<a href="javascript:showRemoveModal({{$role->pos_id}})" id="{{$role->pos_id}}-delete"><i class="material-icons">delete</i></a>
-				<input type="button" class="btn btn-primary" id="{{$role->pos_id}}-cancel" value="Cancel" style="display: none;" onclick="viewMode({{$role->pos_id}})">
+				<input type="button" class="btn btn-danger" id="{{$role->pos_id}}-cancel" value="Cancel" style="display: none;" onclick="viewMode({{$role->pos_id}})">
 		</td>
 		</form>
 
@@ -236,13 +249,12 @@ $.ajaxSetup({
 			<div class="modal-dialog modal-sm" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						{{-- <button type="button" class="close" onclick="closeRemoveModal({{$role->pos_id}})"><span aria-hidden="true">&times;</span></button> --}}
 						<h4 class="modal-title">Remove Position?</h4>
 					</div>
 					<div class="modal-body">
 						<div class="btn-toolbar">
 							<div class="btn-group">
-								<a href="{{route('DelRole',['upgid'=>$upgid,'roleid'=>$role->pos_id])}}" class="btn btn-primary">YES</a>
+								<a href="{{route('DelPos',['upgid'=>$upgid,'roleid'=>$role->pos_id])}}" class="btn btn-info">YES</a>
 							</div>
 							<div class="btn-group">
 								<a href="javascript:closeRemoveModal({{$role->pos_id}})" class="btn btn-danger">NO</a>

@@ -1,15 +1,15 @@
 @extends('mastertemplate')
 
 @section('menu')
-<li>
-              <a href="{{route('Template',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('Template',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">send</i>
                <p>Send File</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">mail</i>
                 <p>
                   Inbox
@@ -21,8 +21,8 @@
               </a>
  </li>
 
-<li class="active">
-              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item active">
+              <a class="nav-link" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">drafts</i>
                 <p>
                   In progress
@@ -33,8 +33,8 @@
               </a>
  </li>
 
-   <li>
-              <a href="{{route('complete',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+   <li class="nav-item">
+              <a class="nav-link" href="{{route('complete',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">drafts</i>
                 <p>
                   Archive</p>
@@ -48,9 +48,16 @@
 @section('main_content')
 
 <div class="content">
+  <div class="container-fluid">
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-warning">
+                  <h4 class="card-title ">Inbox</h4>
+                  <p class="card-category"> Here is your inbox that is in progress</p>
+                </div>
 
-
-<div class="panel-body">
+<div class="card-body">
     <table class="table" id="sent-table">
       <thead>
   <tr>
@@ -76,7 +83,10 @@
 </table>      
 </div>
 </div>
-
+</div>
+</div>
+</div>
+</div>
 @endsection
 
 {{-- @section('js')

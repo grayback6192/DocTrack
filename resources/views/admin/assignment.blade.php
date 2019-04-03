@@ -1,47 +1,39 @@
 @extends('mastertemplate')
 @section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">face</i>
                <p>Users</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">business</i>
                <p>Departments</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">event_seat</i>
                 <p>Positions</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">group</i>
                <p>Workflows</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">description</i>
                 <p>Templates</p>
               </a>
  </li>
-
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
-              </a>
- </li>
-
 @endsection
 
 @section('main_content')
@@ -63,19 +55,32 @@
           url:'http://localhost:8000/admin/group/'+groupid, 
           data: groupid,
           success: function(data){
-            console.log(data);
+            //console.log(data);
+
+            var positions = data.positions;
+            var users = data.users;
+            console.log(positions);
+
+            
             // $('#user').empty(); 
             ($('#userslist-table tbody')).empty(); 
            // var html = "<ul id='depusers'>";
            // var html = "<tr>";
            var html = "";
-            for(var x=0; x<data.length;x++){
+            for(var x=0; x<users.length;x++){
             // html += "<a href='javascript:submitUser("+data[x].user_id+")'><li id="+data[x].user_id+">"+data[x].lastname+", "+data[x].firstname+"</li></a>";
-             html += "<tr><td id="+data[x].user_id+"><a href='javascript:submitUser("+data[x].user_id+")' id='link'>"+data[x].lastname+", "+data[x].firstname+"</a></td></tr>";
+             html += "<tr><td id="+users[x].user_id+"><a href='javascript:submitUser("+users[x].user_id+")' id='link'>"+users[x].lastname+", "+users[x].firstname+"</a></td></tr>";
           }
           // html+="</ul>";
           // html+="</tr>";
+          ($('#user-position option')).remove();
+          html2 = "";
+           for (var i = 0; i < positions.length; i++) {
+              html2+="<option value="+positions[i].pos_id+">"+positions[i].posName+"</option>";
+            }
+
           ($('#userslist-table tbody')).append(html);
+          ($('#user-position')).append(html2);
           }
         });
     });
@@ -147,9 +152,9 @@
   <form id="list" name="depList">
   <input type="hidden" name="_token" value="{{csrf_token()}}">
     <select name="dept" id="dept" class="form-control">
-    <option value="all" selected>All</option>
+    <option class="bg-secondary" value="all" selected>All</option>
       @foreach($groups as $group)
-        <option value="{{$group->group_id}}">{{$group->groupName}}</option>
+        <option class="bg-secondary" value="{{$group->group_id}}">{{$group->groupName}}</option>
       @endforeach
     </select>
   </form>
@@ -226,13 +231,13 @@
   		 <span class="close">&times;</span>
   		 </button>
   	</div>
-  	<div class="modal-body">
+  	<div class="modal-body bg-secondary">
     <form method="post" action="{{route('newAssign',['upgid'=>$upgid])}}">
     {{csrf_field()}}
     <div class="form-group row">
     	<label class="col-2 col-form-label">Department</label>
     	<div class="col-10">
-    		<select class="form-control" name="group" id="selgroup">
+    		<select class="form-control bg-secondary" name="group" id="selgroup">
           <option value="none">--Select a department--</option>
     				@foreach($groups as $group)
     					<option value="{{$group->group_id}}">{{$group->groupName}}</option>
@@ -244,11 +249,11 @@
     <div class="form-group row">
     	<label class="col-2 col-form-label">Position</label>
     	<div class="col-10">
-    	 	<select class="form-control" name="position" id="user-position">
-          <option value="none">--Select a position--</option>
-    				@foreach($positions as $position)
+    	 	<select class="form-control bg-secondary" name="position" id="user-position">
+          <option value="none">--Select a department first--</option>
+    			{{-- 	@foreach($positions as $position)
     					<option value="{{$position->pos_id}}">{{$position->posName}}</option>
-    				@endforeach
+    				@endforeach --}}
     			</select><br><br>
     	</div>
     </div>
@@ -261,7 +266,7 @@
 
           <div class="modal" id="searchuser">
             <div class="modal-dialog" role="document">
-              <div class="modal-content">
+              <div class="modal-content bg-secondary">
                 <div class="modal-header">
                   Choose a user 
                  {{--  <div>

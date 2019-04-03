@@ -2,9 +2,13 @@
 /public/hot
 /public/storage
 /storage/*.key
+/public/templates
+/public/pdf
+/public/file
 /vendor
 /.idea
 /.vagrant
+/public/temp
 Homestead.json
 Homestead.yaml
 npm-debug.log

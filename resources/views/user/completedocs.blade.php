@@ -1,26 +1,25 @@
 @extends('mastertemplate')
 @section('menu')
-<li>
-              <a href="{{route('Template',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('Template',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">send</i>
                <p>Send File</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">mail</i>
-                <p>
-                  Inbox
+                <p>Inbox
                    @if($numUnread>0)
                      ({{$numUnread}})
-                    @endif 
+                   @endif 
                 </p>
               </a>
  </li>
 
-<li>
-              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">drafts</i>
                 <p>
                   In progress
@@ -31,8 +30,8 @@
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('complete',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('complete',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">drafts</i>
                 <p>
                   Archive</p>
@@ -41,10 +40,15 @@
 @endsection
 
 @section('main_content')
-
-
-
 <div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+<div class="card-header card-header-warning">
+                  <h4 class="card-title ">Archive</h4>
+                  <p class="card-category"> Here is your archive</p>
+                </div>
   <div class="row justify-content-end">
     <div class="form-group col-sm-2">
 
@@ -94,10 +98,17 @@
 
   
   @endforeach
+</tbody>
 </table>      
 </div>
+</div>
+</div>
+</div>
+</div>
 
+</div>
 @endsection
+
 
 
 @section('js')

@@ -49,7 +49,8 @@ Route::get('/home', function(){
 //Admin Routes
 Route::get('/admin/{upgid}', function($upgid){
 	$name = Auth::user();
-    return view('admin/admindash',["User"=>$name,"upgid"=>$upgid]);
+	$userprof = $name->profilepic;
+    return view('admin/admindash',["User"=>$name,'userprof'=>$userprof,"upgid"=>$upgid]);
 })->name('AdminDash');
 //User Management
 Route::get('admin/{upgid}/usermanagement','User@index')->name('UserManage');
@@ -119,6 +120,7 @@ $clientid = \Session::get('client');
 Route::get('admin/{upgid}/department/depID={id}','Department@showDep')->name('showDep');
 Route::post('admin/{upgid}/department/depID={id}', 'Department@editDep')->name('saveDep');
 Route::get('admin/{upgid}/department/depID={id}/edit', 'Department@showDepInfo')->name('editDep');
+Route::post('admin/{upgid}/department/{depid}/edit','Department@editDepartment')->name('editDepartment');
 Route::get('admin/{upgid}/department/{depid}/add',function($upgid,$depid){
 	$name = Auth::user();
 	 $clients = DB::table('userpositiongroup as upg')->where('upg.user_user_id','=',$name->user_id)
@@ -139,13 +141,19 @@ Route::get('admin/{upgid}/department/{depid}/add',function($upgid,$depid){
 	return view('admin/addDep',['motherGroups'=>$motherGroups,'User'=>$name,'upgid'=>$upgid,'admingroup'=>$admingroup,'depid'=>$depid,'motherDepName'=>$motherDepName]);
 })->name('regDep');
 Route::post('admin/{upgid}/department/{depid}/add', 'Department@addDep')->name('addDep');
-Route::get('admin/{upgid}/department/{id}','Department@deleteDep')->name('deleteDep');
+Route::get('admin/{upgid}/department/{depid}/{currentdepid}','Department@deleteDep')->name('deleteDep');
 Route::get('admin/depactive/{depid}','Department@setToActive');
 Route::get('admin/depinactive/{depid}','Department@setToInactive');
 //End Department Management
 //roles
 Route::get('admin/{upgid}/roles', 'Role@viewRoles')->name('viewRolePage');
+Route::post('admin/{upgid}/addroles', 'Role@addNewRole')->name('addnewrole');
 Route::post('admin/{upgid}/roles', 'Role@addRole')->name('AddRole');
+Route::post('admin/{upgid}/existing/{depid}', 'Role@addExistingPosToDepartment')->name('addExistingPos');
+Route::get('admin/{upgid}/deppos/{depid}/{posid}','Role@removeDeppos')->name('DelDeppos');
+Route::get('admin/{upgid}/depposdel/{depid}/{posid}','Role@removeDepposOrg')->name('DelDepposOrg');
+Route::post('admin/{upgid}/existingUndefine/{depid}', 'Role@addExistingPosToDepartmentUndefine')->name('addExistingPosUndefine');
+Route::get('admin/{upgid}/roles/{id}/remove', 'Role@deletePosition')->name('DelPos');
 Route::get('admin/{upgid}/roles/{id}', 'Role@deleteRole')->name('DelRole');
 Route::post('admin/{upgid}/roles/edit={id}', 'Role@editRole')->name('UpdateRole');
 Route::get('admin/{upgid}/assignment', function($upgid){
@@ -163,9 +171,11 @@ Route::get('admin/{upgid}/assignment', function($upgid){
     if($clientId==$admingroup)
     {
 		$groups = DB::table('group')->where('client_id','=',$clientId)->where('status','=','active')->orderBy('groupName')->get();
-		$allupgs = DB::table('userpositiongroup as upg')->where('upg.client_id','=',$clientId)->where('upg.upg_status','=','active')
+		$allupgs = DB::table('userpositiongroup as upg')->where('upg.client_id','=',$clientId)
+					->where('upg.upg_status','=','active')
 					->join('group as dep','upg.client_id','dep.group_id')
-					->join('position as p','upg.position_pos_id','=','p.pos_id')
+					->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+					->join('position as p','dp.pos_id','=','p.pos_id')
 					->join('rights as r','upg.rights_rights_id','=','r.rights_id')
 					->join('user as u','upg.user_user_id','=','u.user_id')
 					->get();
@@ -173,12 +183,14 @@ Route::get('admin/{upgid}/assignment', function($upgid){
 	else
 	{
 		$groups = DB::table('group')->where('group_id','=',$admingroup)->where('status','=','active')->orderBy('groupName')->get();
-		$allupgs = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$admingroup)->where('upg.upg_status','=','active')
-			->join('group as dep','upg.client_id','dep.group_id')
-					->join('position as p','upg.position_pos_id','=','p.pos_id')
+		$allupgs = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$admingroup)
+					->where('upg.upg_status','=','active')
+					->join('group as dep','upg.client_id','dep.group_id')
+					->join('deppos as dp','upg.position_pos_id','=','dp.deppos_id')
+					->join('position as p','dp.pos_id','=','p.pos_id')
 					->join('rights as r','upg.rights_rights_id','=','r.rights_id')
 					->join('user as u','upg.user_user_id','=','u.user_id')
-			->get();
+					->get();
 	}
 
 	$positions = DB::table('position')->where('status','=','active')->where('client_id','=',$clientid)->orderBy('posName')->get();	
@@ -187,29 +199,39 @@ Route::get('admin/{upgid}/assignment', function($upgid){
 	$admingroup = getAdminGroup($upgid);
 
 	return view('admin/assignment',['User'=>$user, 'groups'=>$groups, 'positions'=>$positions,'allupgs'=>$allupgs,'roles'=>$roles,'upgid'=>$upgid,'admingroup'=>$admingroup]);
+
 })->name('viewAssignments');
+
 Route::get('admin/group/user/find/{groupid}/{string}/','User@findUser')->name('findUser');
-Route::get('admin/group/{groupid}', function($groupid){ //for assignment 
+Route::get('admin/group/{groupid}', function($groupid){ //for assignment
+	
 	$users = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$groupid)
 			->join('user','upg.user_user_id','=','user.user_id')
 			->select('user.lastname','user.firstname','user.user_id')
 			->distinct()
 			->get();
-	return Response::json($users);
+
+	$positions = DB::table('position as p')->join('deppos as dp','p.pos_id','dp.pos_id')
+										->where('dp.pos_group_id','=',$groupid)
+										->get();
+	return Response::json(['users'=>$users,'positions'=>$positions]);
 });
 Route::post('admin/{upgid}/assignment/add', 'UserPositionGroup@addNewAssignment')->name('newAssign'); //add new admin
 Route::post('admin/{upgid}/assignment/delete', 'UserPositionGroup@removeAdmin')->name('removeAdmin'); //remove admin
+Route::post('admin/{upgid}/department/edit','UserPositionGroup@editAssignment')->name('editAssign'); //edit assignment
 Route::get('admin/assignment/{upgid}/{depid}', function($upgid,$depid){
 
 	$results = DB::table('group as g')->where('g.group_id','=',$depid)
 				->join('userpositiongroup as upg','g.group_id','=','upg.group_group_id')
-				->join('position as p','upg.position_pos_id','=','p.pos_id')
+				//->where('upg.upg_status','=','active')
+				->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+				->join('position as p','dp.pos_id','=','p.pos_id')
 				->join('rights as r','upg.rights_rights_id','=','r.rights_id')
 				->join('user as u','upg.user_user_id','=','u.user_id')
 				->get();
 	return Response::json($results);
 });
-Route::post('admin/assignment/delete/','UserPositionGroup@removeAssignment')->name('removeUPG');
+Route::post('admin/assignment/delete/{depid}','UserPositionGroup@removeAssignment')->name('removeUPG');
 //end role
 Route::post('admin/template', 'Template@addTemplate')->name('SubmitTemplate');
 Route::get('admin/{upgid}/template1', 'Template@viewTemplateOwners')->name('viewOwners'); //testUI
@@ -288,7 +310,7 @@ Route::get('/{groupid}/{rightid}','User@goToGroup')->name('gotogroup');
 Route::get('/viewTemplate','Template@viewTemplate')->name('viewTemplate');
 Route::post('/entergroup','UserPositionGroup@enterGroup')->name('enterGroup');
 Route::get('/createDoc',"user@readFile");
-//Route::get('/user/{upgid}/send','Department@viewServiceOwners')->name('serviceowners');
+// Route::get('/user/{upgid}/send','Department@viewServiceOwners')->name('serviceowners');
 Route::get('/user/{upgid}/send',function($upgid)//needed fixing
 {
 	$name = Auth::user();
@@ -308,9 +330,11 @@ Route::get('/user/{upgid}/send',function($upgid)//needed fixing
 
 
         //get if upgid is a student or employee
-        $upgrole = DB::table('userpositiongroup')->where('upg_id','=',$upgid)->get();
+        $upgrole = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$upgid)
+        												->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+        												->get();
         foreach ($upgrole as $role) {
-        	$roleupg = $role->position_pos_id;
+        	$roleupg = $role->pos_id;
         }
 
         if($roleupg==$studentposid)
@@ -360,6 +384,8 @@ Route::get("/templateEdit/{id}","TemplateController@editFile");
 
 Route::get('/number','User@countAllApproved');
 
+Route::get('user/{upgid}/notification/{id}','DocumentController@viewNotification')->name('viewNotification');
+
 Route::get("user/{upgid}/inbox/documentView/{id}","DocumentController@viewdocs")->name('docView');
 
   Route::get("/user/{upgid}/inbox","user@viewInbox")->name('viewInbox');
@@ -385,6 +411,9 @@ Route::post('/user/{upgid}/comment/{id}','DocumentController@comment')->name("co
 
 //Org Chart
 
+Route::get('/admin/{upgid}/vieworgchart/{groupid}','OrgChartController@getGroupOrgChart')->name('vieworgchart');
+Route::get('/admin/{upgid}/vieworgchartdep/{groupid}','OrgChartController@getGroupOrgChartDep')->name('vieworgchartdep');
+
 // Route::get('/admin/{upgid}/addOrgChart/{groupid}', function ($upgid,$groupid) {
 // 	$user = Auth::user();
 // 	$clientid = Session::get('client');
@@ -405,7 +434,7 @@ Route::get('/admin/{upgid}/addorg','OrgChart@store');
  Route::get("admin/readOrgChart/{groupid}","OrgChart@show");
  Route::get('admin/{upgid}/editOrgChart/{groupid}','OrgChart@edit')->name('editOrgChart');
  Route::get('/admin/{upgid}/updateOrgChart','OrgChart@update');
-Route::get('/admin/{upgid}/vieworgchart/{groupid}','OrgchartController@vieworg')->name('vieworgchart');
+//Route::get('/admin/{upgid}/vieworgchart/{groupid}','OrgchartController@vieworg')->name('vieworgchart');
  //new
  Route::get('/admin/{upgid}/addOrgChart/{depid}','OrgChartController@addOrgChart')->name('addneworgchart');
 

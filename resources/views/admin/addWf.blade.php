@@ -1,42 +1,42 @@
 @extends('mastertemplate')
 @section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">face</i>
                <p>Users</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">business</i>
                <p>Departments</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">event_seat</i>
                 <p>Positions</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">group</i>
                <p>Workflows</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">description</i>
                 <p>Templates</p>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="#" data-placement="right" title="Inbox">
                 <i class="material-icons">archive</i>
                 <p>Archive</p>
               </a>
@@ -45,7 +45,7 @@
 
 @section('main_content')
 <div class="row" style="margin-left: 60px; margin-top: 20px">
-  <a class="btn btn-primary" href="{{route('viewWorkflow',['upgid'=>$upgid])}}">Back</a>
+  <a class="btn btn-info" href="{{route('viewWorkflow',['upgid'=>$upgid])}}">Back</a>
 </div>
 <div class="row" style="margin-left: 60px; margin-top: 20px;">
     @foreach($workflow as $flow)
@@ -59,7 +59,7 @@
     {{-- <input type="button" id="addstep" value="Add Step" onclick="openAdd()"> --}}
   
   @if(count($steps)==0) 
-    <a class="btn btn-primary" href="#" onclick="openAdd()">Add Step</a>
+    <a class="btn btn-info" href="#" onclick="openAdd()">Add Step</a>
   @endif
   
 </div>
@@ -385,7 +385,7 @@
           </div>
         </div>
         <div class="modal-footer">
-           <input class="btn btn-primary" type="submit" name="addNext" value="Submit"> <a class="btn btn-primary" href="javascript:closeEditModal({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
+           <input class="btn btn-info" type="submit" name="addNext" value="Submit"> <a class="btn btn-info" href="javascript:closeEditModal({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
         </div>
       </form>
     </div>
@@ -460,7 +460,7 @@
         </div>
       </div>
       <div class="modal-footer">
-          <input class="btn btn-primary" type="submit" name="addNext" value="Save"> <a class="btn btn-primary" href="javascript:closeRecList({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
+          <input class="btn btn-info" type="submit" name="addNext" value="Save"> <a class="btn btn-info" href="javascript:closeRecList({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
       </div>
       </form>
     </div>
@@ -482,9 +482,16 @@
           <div class="col-sm-10">
             <select id="fornextpos-{{$steps2[$a][$b]['ws_id']}}" name="fornextpos" class="form-control">
                 <option value="none">--Choose position--</option>
+                @if(isset($positions))
                 @foreach($positions as $pos)
+                @if($pos->posName!="Admin" && $pos->posName!="masteradmin" && $pos->posName!="Student")
                     <option value="{{$pos->pos_id}}">{{$pos->posName}}</option>
+                @endif
                 @endforeach
+                @endif
+                {{--  @for($a=0;$a<count($posarray);$a++)
+                  <option value="{{$posarray[$a]['pos_id']}}">{{$posarray[$a]['posName']}}</option>
+                @endfor --}}
                 </select>
           </div>
         </div>
@@ -500,7 +507,7 @@
       
       </div>
       <div class="modal-footer">
-        <input class="btn btn-primary" type="submit" name="addNext" value="Submit"> <a class="btn btn-primary" href="javascript:closeForNext({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
+        <input class="btn btn-info" type="submit" name="addNext" value="Submit"> <a class="btn btn-info" href="javascript:closeForNext({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
       </div>
       </form>
     </div>
@@ -523,9 +530,16 @@
             <div class="col-sm-10">
               <select id="forprevpos-{{$steps2[$a][$b]['ws_id']}}" name="forprevpos" class="form-control">
                  <option value="none">--Choose position--</option>
+                 @if(isset($positions))
                 @foreach($positions as $pos)
+                 @if($pos->posName!="Admin" && $pos->posName!="masteradmin" && $pos->posName!="Student")
                     <option value="{{$pos->pos_id}}">{{$pos->posName}}</option>
+                @endif
                 @endforeach
+                @endif
+                 {{-- @for($a=0;$a<count($posarray);$a++)
+                  <option value="{{$posarray[$a]['pos_id']}}">{{$posarray[$a]['posName']}}</option>
+                @endfor --}}
               </select>
             </div>
           </div>
@@ -542,7 +556,7 @@
 
       </div>
         <div class="modal-footer">
-        <input class="btn btn-primary" type="submit" name="addPrev" value="Submit"> <a class="btn btn-primary" href="javascript:closeForPrev({{$steps2[$a][$b]['ws_id']}})" id="cancelForPrev">Cancel</a>
+        <input class="btn btn-info" type="submit" name="addPrev" value="Submit"> <a class="btn btn-info" href="javascript:closeForPrev({{$steps2[$a][$b]['ws_id']}})" id="cancelForPrev">Cancel</a>
       </div>
     </form>
     </div>
@@ -565,9 +579,16 @@
             <div class="col-sm-10">
               <select id="sameorderpos-{{$steps2[$a][$b]['ws_id']}}" name="sameorderpos" class="form-control">
                  <option value="none">--Choose position--</option>
+                 @if(isset($positions))
                 @foreach($positions as $pos)
+                 @if($pos->posName!="Admin" && $pos->posName!="masteradmin" && $pos->posName!="Student")
                     <option value="{{$pos->pos_id}}">{{$pos->posName}}</option>
+                  @endif
                 @endforeach
+                @endif
+               {{--   @for($a=0;$a<count($posarray);$a++)
+                  <option value="{{$posarray[$a]['pos_id']}}">{{$posarray[$a]['posName']}}</option>
+                @endfor --}}
               </select>
             </div>
           </div>
@@ -584,7 +605,7 @@
 
       </div>
         <div class="modal-footer">
-        <input class="btn btn-primary" type="submit" name="addSameOrder" value="Submit"> <a class="btn btn-primary" href="javascript:closeSameOrderModal({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
+        <input class="btn btn-info" type="submit" name="addSameOrder" value="Submit"> <a class="btn btn-info" href="javascript:closeSameOrderModal({{$steps2[$a][$b]['ws_id']}})">Cancel</a>
       </div>
     </form>
     </div>
@@ -681,8 +702,8 @@ function closeDeleteModal(wsid)
           
             <input type="hidden" name="wsid" value="{{$steps2[$a][$b]['ws_id']}}">
             <div class="btn-toolbar justify-content-between">
-            <input class="btn btn-primary" type="submit" name="deleteWs" value="YES">
-            <input class="btn btn-primary" type="button" id="no" onclick = "closeDeleteModal({{$steps2[$a][$b]['ws_id']}})" value="NO">
+            <input class="btn btn-info" type="submit" name="deleteWs" value="YES">
+            <input class="btn btn-info" type="button" id="no" onclick = "closeDeleteModal({{$steps2[$a][$b]['ws_id']}})" value="NO">
             </div>
       
       </div>
@@ -694,13 +715,14 @@ function closeDeleteModal(wsid)
     <?php $currstep = $steps2[$a][$b]['order']; ?>
     
     @endfor
+
 </div>
-  @if($currstep!=count($steps2))
+  </div>
+    @if($currstep!=count($steps2))
 <div>
-  <i class="material-icons" style="font-size: 30px; margin: auto;">forward</i>
+  <i class="material-icons" style="font-size: 30px; margin-top:60px;">forward</i>
 </div>
 @endif
-  </div>
 {{--end of card div--}} 
 {{-- @if($steps2[$a] != (count($steps2)-1))
 <div>
@@ -732,9 +754,13 @@ function closeDeleteModal(wsid)
       <div class="col-sm-10">
         <select id="pos" name="pos" class="form-control">
                 <option value="none">--Choose position--</option>
+                @if(isset($positions))
                 @foreach($positions as $pos)
+                @if($pos->posName!='Admin' && $pos->posName!='masteradmin' && $pos->posName!='Student')
                     <option value="{{$pos->pos_id}}">{{$pos->posName}}</option>
+                @endif
                 @endforeach
+                @endif
                 </select><br><br>
       </div>
      <div class="form-group">
@@ -746,7 +772,7 @@ function closeDeleteModal(wsid)
       Action: <input type="radio" name="action" value="sign" checked="checked"> Sign
               <input type="radio" name="action" value="cc"> Carbon Copy<br>
             <div class="modal-footer">
-                <input class="btn btn-primary" type="submit" name="addNewStep" value="Add"> <a class="btn btn-primary" href="javascript:closeAdd()">Cancel</a>
+                <input class="btn btn-info" type="submit" name="addNewStep" value="Add"> <a class="btn btn-info" href="javascript:closeAdd()">Cancel</a>
             </div>
     </form>
     </div>

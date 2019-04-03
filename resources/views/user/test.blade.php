@@ -1,15 +1,31 @@
 @extends('mastertemplate')
+@section('notifNumber')
+  @if($numNotifications > 0)
+    <span class="notification">{{$numNotifications}}</span>
+  @endif
 
+@endsection
+@section('notifList')
+  @if($notificationsList)
+  @foreach($notificationsList as $notification)
+    @if($notification->not_status=="unread")
+      <li><a href={{route('viewNotification',['upgid'=>$upgid,'docid'=>$notification->doc_id])}} style="font-weight: bold">{{$notification->message}}</a></li>
+    @else
+      <li><a href="#">{{$notification->message}}</a></li>
+    @endif
+  @endforeach
+  @endif
+@endsection
 @section('menu')
-<li>
-              <a href="{{route('Template',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('Template',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">send</i>
                <p>Send File</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('viewInbox',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">mail</i>
                 <p>
                   Inbox
@@ -24,8 +40,8 @@
               </a>
  </li>
 
-<li>
-              <a href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('viewSent',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">drafts</i>
                 <p>
                   In progress
@@ -36,8 +52,8 @@
               </a>
  </li>
 
-   <li>
-              <a href="{{route('complete',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+   <li class="nav-item">
+              <a class="nav-link" href="{{route('complete',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                  <i class="material-icons">drafts</i>
                 <p>
                   Archive</p>
@@ -49,6 +65,14 @@
 @section('main_content')
 
 <div class="content">
+  <div class="container-fluid">
+    <div class="row">
+       <div class="col-md-12">
+              <div class="card">
+                <div class="card-header card-header-warning">
+                  <h4 class="card-title ">Inbox</h4>
+                  <p class="card-category"> Here is your inbox</p>
+                </div>
   <div class="row justify-content-end">
     <div class="form-group col-sm-2">
 
@@ -84,7 +108,7 @@
 <tbody>
 @for($inbox = 0; $inbox<count($inboxArray); $inbox++)
   @if($inboxArray[$inbox]->status=="unread")
-    <tr style="background-color: #e6e6e6">
+    <tr class="bg-light text-dark">
     <td style="text-align: center; font-weight: bold">
        <?php 
         // $date = new DateTime($inboxArray[$inbox]->datetime, new DateTimeZone('Asia/Manila'));
@@ -97,7 +121,7 @@
     <td style="text-align: center; font-weight: bold">{{ $inboxArray[$inbox]->docname }}</td>
     <td style="text-align: center; font-weight: bold">{{ $inboxArray[$inbox]->lastname }}, {{$inboxArray[$inbox]->firstname}}</td>
     <td style="text-align: center; font-weight: bold">{{ $inboxArray[$inbox]->groupName }}</td>
-    <td style="text-align: center"><a href="{{URL::route('docView',['upgid'=>$upgid,'id'=>$inboxArray[$inbox]->doc_id])}}">View</a></td>
+    <td style="text-align: center;" class="bg-secondary"><a href="{{URL::route('docView',['upgid'=>$upgid,'id'=>$inboxArray[$inbox]->doc_id])}}">View</a></td>
     </tr> 
     @else
       <tr>
@@ -134,6 +158,10 @@
 </form>
 @endif
 {{-- </form> --}}      
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 

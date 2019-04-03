@@ -1,54 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png" />
-    <link rel="icon" type="image/png" href="{{URL::asset('img/logos.png')}}" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>DocTrack</title>
-    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
-    <meta name="viewport" content="width=device-width" />
-  
-    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap-grid.min.css')}}">
-  {{--   <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap-reboot.min.css')}}"> --}}
-    
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/material-dashboard.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/datatables/dataTables.bootstrap4.css')}}">
-   
-    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/demo.css') }}">
-    <link href="{{ URL::asset('css/fresh-bootstrap-table.css')}}" type="text/css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/fonts.css') }}">
-    <link rel='stylesheet' type='text/css' href="{{ URL::asset('css/googlefonts.css') }}">
+  <title>DocTrack</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <!-- Material Kit CSS -->
+  <link href="{{ URL::asset('NEWUI/css/material-dashboard.css?v=2.1.0')}}" rel="stylesheet" />
 </head>
 
-  <body>
+  <body class="dark-edition">
      <div class="main-panel1" style="margin-left: 60px; margin-right: 50px;">
-            <nav class="navbar navbar-transparent">
+            <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top">
                 <div class="container-fluid">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        {{-- <a class="navbar-brand" href="#"> Dashboard </a> --}}
-                    </div>
-                    <div class="collapse navbar-collapse">
-                        <ul class="nav navbar-nav navbar-right">
-                           {{--  <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <i class="material-icons">notifications</i> --}}
-                                    {{-- <span class="notification">5</span> --}}
-                                   {{--  <p class="hidden-lg hidden-md">Notifications</p>
-                                </a>
-                            </li> --}}
+                    <div class="collapse navbar-collapse justify-content-end">
+                        <ul class="navbar-nav">
                             <li class="dropdown">
-                                <a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     {{Auth::user()->lastname}}
                                     <i class="material-icons">person</i>
-                                    <p class="hidden-lg hidden-md">Profile</p>
                                 </a>
                                  <ul class="dropdown-menu">
                                     <li>
@@ -57,54 +31,113 @@
                                 </ul>
                             </li>
                         </ul>
-                       {{--  <form class="navbar-form navbar-right" role="search">
-                            <div class="form-group  is-empty">
-                                <input type="text" class="form-control" placeholder="Search">
-                                <span class="material-input"></span>
-                            </div>
-                            <button type="submit" class="btn btn-white btn-round btn-just-icon">
-                                <i class="material-icons">search</i>
-                                <div class="ripple-container"></div>
-                            </button>
-                        </form> --}}
                     </div>
                 </div>
             </nav>
 
 <!--CONTENT HERE-->
 <div class="content">
-  <div class="card">
-    <div class="card-header" data-background-color="orange">
-    <h4 class="title">Choose a Department</h4>
-    <p class="category">Choose a department you wish to log in as.</p>
-   </div>
-  </div>  
-  <a class="btn btn-warning" href="{{route('addGroup',['id'=>$User->user_id,'depid'=>$clientId])}}">Choose Department</a>
+  <br><br><br>
+              <div class="">
+              <div class="card card-profile">
+                <div class="card-avatar">
+                  <a href="#">
+                    <img class="img" src="/users/pictures/{{$userprof}}" />
+                  </a>
+                </div>
+                <div class="card-body">
+                 
+                  <h4 class="card-title">{{Auth::user()->firstname}} {{Auth::user()->lastname}}</h4>
+                   <h6 class="card-category">{{Auth::user()->email}}</h6>
+                  <p class="card-description">
+                   My address is {{Auth::user()->address}}.<br>My contact number is {{Auth::user()->contactnum}}.<br>This account is {{Auth::user()->status}}
+                  </p>
+                </div>
+              </div>
+            </div>
+
 </div>
    <div class="row"> <!--First Row-->
   @if(isset($usergroups))
   @foreach($usergroups as $usergroup)
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <a href="{{route('gotogroup',['groupid'=>$usergroup->group_id,'rightid'=>$usergroup->rights_rights_id])}}">
-      <div class="card card-stats" style="border: none;">
-         <div class="card-header" data-background-color="orange">
-                                    <i class="material-icons">business</i>
-                                </div>
 
-       <div class="card-content">
-                                    <h3 class="title">{{$usergroup->groupName}}</h3>
-                                    <p class="category">{{$usergroup->posName}}</p>
-                                </div>
-    </div></a>
-  </div>
+  <div class="col-6 col-md-4">
+    <div class="card card-profile">
+      <div class="card-body">
+       <a href="#">
+         <i class="material-icons" style="font-size: 50px">business</i>
+       </a>
+       <h6 class="card-category">{{$usergroup->posName}}</h6>
+       <h4 class="card-title">{{$usergroup->groupName}}</h4>
+       <a href="{{route('gotogroup',['groupid'=>$usergroup->group_id,'rightid'=>$usergroup->rights_rights_id])}}" class="btn btn-info btn-round">Open</a>
+     </div>
+   </div>
+ </div>
+
   @endforeach
   @endif
-</div>
+
+  @if(isset($usergroups2))
+  @foreach($usergroups2 as $usergroup)
+  <div class="col-6 col-md-4">
+    <div class="card card-profile">
+      <div class="card-body">
+       <a href="#">
+         <i class="material-icons" style="font-size: 50px">business</i>
+       </a>
+       <h6 class="card-category">{{$usergroup->posName}}</h6>
+       <h4 class="card-title">{{$usergroup->groupName}}</h4>
+       <a href="{{route('gotogroup',['groupid'=>$usergroup->group_id,'rightid'=>$usergroup->rights_rights_id])}}" class="btn btn-info btn-round">Open</a>
+     </div>
+   </div>
+ </div>
+  @endforeach
+  @endif
 
 </div>
-   </div>  
+<br>
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+              <div class="card card-stats">
+                <a href="{{route('addGroup',['id'=>$User->user_id,'depid'=>$clientId])}}">
+                <div class="card-header card-header-warning card-header-icon">
+                  <div class="card-icon">
+                    <i class="material-icons">business</i>
+                  </div>
+                  <p class="card-category">New</p>
+                  <h4 class="card-title">Choose Department</h4>
+                </div>
+                <div class="card-footer">
+                  <div class="stats">
+                    <i class="material-icons">add_box</i> Add New Department
+                  </div>
+                </div>
+              </a>
+              </div>
+            </div>
+
+</div>
+
   </body>
    <script src="{{URL::asset('js/jquery-3.2.1.min.js')}}" type="text/javascript"></script>  
 <script src="{{URL::asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
 <script src="{{URL::asset('js/perfect-scrollbar.jquery.min.js')}}"></script>
+
+
+
+<script src="{{ URL::asset('NEWUI/js/jquery.min.js')}}"></script>
+  <script src="{{ URL::asset('NEWUI/js/popper.min.js')}}"></script>
+  <script src="{{ URL::asset('NEWUI/js/bootstrap-material-design.min.js')}}"></script>
+  <script src="https://unpkg.com/default-passive-events"></script>
+  <script src="{{ URL::asset('NEWUI/js/perfect-scrollbar.jquery.min.js')}}"></script>
+  <!-- Place this tag in your head or just before your close body tag. -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+ 
+  <!-- Chartist JS -->
+  <script src="{{ URL::asset('NEWUI/js/chartist.min.js')}}"></script>
+  <!--  Notifications Plugin    -->
+  <script src="{{ URL::asset('NEWUI/js/bootstrap-notify.js')}}"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="  {{ URL::asset('NEWUI/js/material-dashboard.js?v=2.1.0')}}"></script>
+  <!-- Material Dashboard DEMO methods, don't include it in your project! -->
+  <script src="{{ URL::asset('NEWUI/js/demo.js')}}"></script>
 </html>

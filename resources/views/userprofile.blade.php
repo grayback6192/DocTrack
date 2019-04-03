@@ -49,7 +49,7 @@
 	
 @foreach($userinfos as $userinfo)
   <div class="row justify-content-start" style="margin-left: 10px">
-    <a class="btn btn-primary" href="{{route('viewInbox',['upgid'=>$upgid])}}">Back</a>
+    <a class="btn btn-warning" href="{{route('viewInbox',['upgid'=>$upgid])}}">Back</a>
   </div>
 
   <div class="row justify-content-center">
@@ -63,7 +63,7 @@
   
     <div class="card" style="width: 700px;">
        <div class="text-right" style="margin-right: 2px;">
-          <a class="btn btn-primary" href="{{route('userprofedit',['upgid'=>$upgid])}}">
+          <a class="btn btn-info" href="{{route('userprofedit',['upgid'=>$upgid])}}">
             <i class="material-icons" style="width: 20px;">edit_mode</i> Edit Profile
           </a>
         </div>

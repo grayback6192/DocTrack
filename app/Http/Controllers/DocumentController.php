@@ -242,11 +242,22 @@ class DocumentController extends Controller
 
     }
 
+    public function viewNotification($upgid,$docid)
+    {
+
+        DB::table('notification')->where('doc_id','=',$docid)
+                                ->where('to_upg_id','=',$upgid)
+                                ->update(['not_status'=>'read']);
+
+        return redirect()->route('docView',['upgid'=>$upgid,'id'=>$docid]);
+    }
+
      public function viewdocs(Request $request,$upgid,$id)
      {    
         $user = Auth::user();
         $authSignature = $user->signature;
         $userid = $user->user_id;
+        $userprof = $user->profilepic;
         $upg_user = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$upgid)
                                                         ->where('upg.user_user_id','=',$userid)
                                                         ->get();
@@ -321,7 +332,8 @@ class DocumentController extends Controller
                      // ->join("log","t.tran_id","log.tran_id")
                      // ->where("log.status","approved")
                      ->join("userpositiongroup as upg",'t.upg_id',"=",'upg.upg_id')
-                     ->join('position as p','upg.position_pos_id',"=",'p.pos_id')
+                     ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+                     ->join('position as p','dp.pos_id',"=",'p.pos_id')
                      ->join("user as u","upg.user_user_id","=","u.user_id")
                      ->join("group as gr", "upg.group_group_id","gr.group_id")
                      ->get(); //Added
@@ -350,7 +362,7 @@ class DocumentController extends Controller
                             if($approves->tran_id == $signatures->tran_id)
                             {
                                 $string = explode("-",$variables);
-                                $templateProcessor->setValue($string[0]."-Name","SGD, ".$signatures->lastname.", ".$signatures->firstname);
+                                $templateProcessor->setValue($string[0]."-Name","(SGD), ".$signatures->lastname.", ".$signatures->firstname);
                                 $templateProcessor->setValue($string[0]."-Position",$signatures->groupName.", ".$signatures->posName);
                             }
                               
@@ -431,6 +443,7 @@ class DocumentController extends Controller
     $comments = \DB::table('comment as c')->where('c.comment_doc_id','=',$id)
                                      ->join('userpositiongroup as upg','c.comment_upg_id','=','upg.upg_id')
                                      ->join('user','upg.user_user_id','=','user.user_id') 
+                                     ->orderBy('comment_time','asc')
                                      ->get();
 
     $numunread = getNumberOfUnread($upgid);
@@ -526,7 +539,8 @@ class DocumentController extends Controller
 
     $comments = \DB::table('comment as c')->where('c.comment_doc_id','=',$id)
                                      ->join('userpositiongroup as upg','c.comment_upg_id','=','upg.upg_id')
-                                     ->join('user','upg.user_user_id','=','user.user_id') 
+                                     ->join('user','upg.user_user_id','=','user.user_id')
+                                     ->orderBy('comment_time','asc') 
                                      ->get();
 
     //view document logs
@@ -572,7 +586,7 @@ class DocumentController extends Controller
     usort($readApproveArray,function($item1, $item2){
       return $item2['log_id'] - $item1['log_id'];
     });
-       return view("user/viewDocs",["pdf"=>$pdf, 'User'=>$user, 'status'=>$status, 'datetime'=>$datetime, 'docInfos'=>$docInfo,'receivedatetime'=>$receivedatetime,'docStatus'=>$docStatus,'upgid'=>$upgid,'id'=>$id,'docworkflows'=>$docworkflows, 'comments'=>$comments,'numUnread'=>$numunread,'docwf'=>$docwf,'logsArray'=>$readApproveArray]);
+       return view("user/viewDocs",["pdf"=>$pdf, 'User'=>$user, 'status'=>$status, 'datetime'=>$datetime, 'docInfos'=>$docInfo,'receivedatetime'=>$receivedatetime,'docStatus'=>$docStatus,'upgid'=>$upgid,'id'=>$id,'docworkflows'=>$docworkflows, 'comments'=>$comments,'numUnread'=>$numunread,'docwf'=>$docwf,'logsArray'=>$readApproveArray, 'commentprof' =>$userprof]);
         
     }
 

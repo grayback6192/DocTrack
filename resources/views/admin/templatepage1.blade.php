@@ -3,47 +3,41 @@
 
 
 @section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">face</i>
                <p>Users</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">business</i>
                <p>Departments</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">event_seat</i>
                 <p>Positions</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">group</i>
                <p>Workflows</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">description</i>
                 <p>Templates</p>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
-              </a>
- </li>
 
 @endsection
 
@@ -51,7 +45,7 @@
 <div class="content">
   <div class="row justify-content-start">
       <form method = "get" action = "{{route('AddTemplate',['upgid'=>$upgid])}}">
-        <input class="btn btn-primary" type = "submit" value = "Create Template" name = "submit">
+        <input class="btn btn-info" type = "submit" value = "Create Template" name = "submit">
       </form>
   </div>
 
@@ -60,19 +54,19 @@
 
     @if(isset($departments))
       @foreach($departments as $department)
-       <div class="col-lg-3 col-md-6 col-sm-6">
-          <div class="card card-stats">
-            <a href="{{route('getGroupTemplates',['upgid'=>$upgid,'groupid'=>$department->group_id])}}">
-              
-              <div class="card-header" data-background-color="orange">
-                <i class="material-icons">folder_open</i>
-            </div>
-        <div class="card-content">
-            <h3 class="title">{{$department->groupName}}</h3>
-        </div>
-      </a>
-        </div>
-      </div>
+
+
+
+ <div class="col-md-4">
+      <div class="card card-profile">
+        <div class="card-body">
+          <i class="material-icons" style="font-size: 50px;">folder_open</i>
+           <h6 class="card-category">Template</h6>
+            <h4 class="card-title">{{$department->groupName}}</h4>
+            <a href="{{route('getGroupTemplates',['upgid'=>$upgid,'groupid'=>$department->group_id])}}" class="btn btn-primary btn-round">Open</a>
+        </div> 
+    </div>
+  </div>
       @endforeach
     @endif 
 

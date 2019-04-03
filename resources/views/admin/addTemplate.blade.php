@@ -1,46 +1,40 @@
 @extends('mastertemplate')
 @section('menu')
- <li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">face</i>
                <p>Users</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">business</i>
                <p>Departments</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">event_seat</i>
                 <p>Positions</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">group</i>
                <p>Workflows</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">description</i>
                 <p>Templates</p>
               </a>
  </li>
 
- <li>
-              <a href="#" data-placement="right" title="Inbox">
-                <i class="material-icons">archive</i>
-                <p>Archive</p>
-              </a>
- </li>
 
 @endsection
 
@@ -71,7 +65,7 @@
               html+="<div class='card'>";
               for(var y=0;y<=(Object.keys(data[x].length));y++)
               {
-                html+="<div class='card-content'>";
+                html+="<div class='card-content text-light'>";
                  html+=data[x][y].posName+"<br>";
 
                 html+="</div>";
@@ -81,7 +75,7 @@
               {
               //   html+="<div class='media-right'>";
                //  html+="<div style='margin-top: 40px;'>";
-                 html+="<i class='material-icons' style='margin-top: 50px;'>forward</i>";
+                 html+="<i class='material-icons' style='margin-top: 30px;'>forward</i>";
                //  html+="<div></div>";
                }
               //html+="</div>";
@@ -123,9 +117,9 @@
 <div class="form-group">
     Workflow:
     <select name="wf" id="workflow" class="form-control">
-      <option value="none">--Select Workflow--</option>
+      <option  value="none">--Select Workflow--</option>
     @foreach($workflow as $flow)
-      <option value="{{$flow->w_id}}">{{$flow->workflowName}}</option>
+      <option  value="{{$flow->w_id}}">{{$flow->workflowName}}</option>
     @endforeach
     </select>
     <div class="panel panel-default">
@@ -140,9 +134,9 @@
  <div class="form-group"> 
     Service Owner</td>
     <select name="group" class="form-control">
-      <option value="none">--Select Service Owner--</option>
+      <option  value="none">--Select Service Owner--</option>
     @foreach($groups as $group)
-      <option value="{{$group->group_id}}">{{$group->groupName}}</option>
+      <option  value="{{$group->group_id}}">{{$group->groupName}}</option>
     @endforeach
     </select>
  </div>
@@ -171,10 +165,10 @@
   <textarea name = "text" id = "textarea"></textarea>
   <div class="btn-toolbar">
     <div class="btn-group">
-      <input class="btn btn-primary" type = "submit" value = "Save" name = "submit">
+      <input class="btn btn-info" type = "submit" value = "Save" name = "submit">
     </div>
     <div class="btn-group">
-      <a class="btn btn-primary" href="{{route('viewOwners',['upgid'=>$upgid])}}">Back</a>
+      <a class="btn btn-danger" href="{{route('viewOwners',['upgid'=>$upgid])}}">Back</a>
     </div>
   </div>
  
@@ -276,7 +270,7 @@ Dela Cruz, Juan</P>
 </HTML>
       </div>
       <div class="modal-footer">
-      <a class="btn btn-info" href="javascript:closeInstructions()">Close</a>
+      <a class="btn btn-danger" href="javascript:closeInstructions()">Close</a>
       </div>
     </div>
   </div>

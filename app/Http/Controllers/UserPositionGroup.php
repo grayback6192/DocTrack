@@ -27,19 +27,23 @@ class UserPositionGroup extends Controller
     	$rand = rand(100,9999);
         $found = $this->findNull($request['userid']);
 
-        foreach ($found as $key) {
-            $newassignupgid = $key->upg_id;
-        }
+        // foreach ($found as $key) {
+        //     $newassignupgid = $key->upg_id;
+        // }
 
 
 
          if(count($found)==1){
+              foreach ($found as $key) {
+            $newassignupgid = $key->upg_id;
+        }
              DB::table('userpositiongroup')->where('user_user_id','=',$request['userid'])
                                         ->where('group_group_id','=',$request['group'])
                                             ->update(['position_pos_id'=>$request['position'],
                                                         'upg_status'=>'active']);
         }
         else if(count($found)==0){
+            $newassignupgid = $rand;
     	 DB::table('userpositiongroup')->insert(['upg_id'=>$rand,
     	 										'position_pos_id'=>$request['position'],
     	 										'rights_rights_id'=>$request['role'],
@@ -50,7 +54,6 @@ class UserPositionGroup extends Controller
     }
 
         $orgchartcontroller = new OrgChartController();
-        //check if $request['group'] has an org chart already
 
     
         if($request['role']==2)
@@ -85,9 +88,15 @@ class UserPositionGroup extends Controller
             return redirect()->route('addGroup',['userid'=>$user->user_id,'depid'=>$motherGroup])->with('wrongkey','Incorrect Department Key');
         }
 
-        $studpos = DB::table('position')->where('posName','=','Student')->where('client_id','=',$request['clientid'])->get();
+        $studentpos = DB::table('position')->where('posName','=','Student')->where('client_id','=',$request['clientid'])->get();
+        
+        $studpos = DB::table('deppos as dp')->where('dp.pos_group_id','=',$request['groupid'])
+                                            ->join('position as p','dp.pos_id','p.pos_id')
+                                            ->where('p.posName','=','Student')
+                                            ->get();
 
-        if(count($studpos)==0)
+
+        if(count($studentpos)==0)
         {
             $posrand = rand(1000,99999);
             DB::table('position')->insert(['pos_id'=>$posrand,
@@ -100,7 +109,7 @@ class UserPositionGroup extends Controller
         else
         {
              foreach ($studpos as $key) {
-                $studposid = $key->pos_id;
+                $studposid = $key->deppos_id;
             }
         }
 
@@ -139,12 +148,34 @@ class UserPositionGroup extends Controller
         return redirect()->route('gotogroup',['groupid'=>$request['groupid'],'rightid'=>2]);
     }
 
-    public function removeAssignment(Request $request)
+    public function removeAssignment(Request $request, $depid)
     {
+
         DB::table("userpositiongroup")->where("upg_id",$request['upgid'])->update(['upg_status'=>'inactive']);
 
         $orgchartcontroller = new OrgChartController();
 
-        return $orgchartcontroller->removeOrgChartNode($request['loginupgid'],$request['upgid']); 
+        return $orgchartcontroller->removeOrgChartNode($request['loginupgid'],$request['upgid'],$depid);
+        
     } //set it to inactive
+
+
+    public function editAssignment(Request $request,$upgid){
+        // DB::table("userpositiongroup")->where("upg_id",$request['upgid'])->update(['user_user_id'=> $request['userid']]);
+
+
+        DB::table('userpositiongroup')->where('user_user_id','=',$request['userid'])
+                                      ->where('upg_id','=',$request['upgid'])
+                                      ->where('group_group_id','=',$request['group'])
+                                      ->update(['position_pos_id'=>$request['position'],
+                                                'upg_status'=>'active',
+                                                'user_user_id'=> $request['userid']]);
+
+        $orgchartcontroller = new OrgChartController();
+
+    
+    return $orgchartcontroller->addOrgChartNode($upgid,$request['group'],$request['upgid']);
+
+        // return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$request['group']]);
+    }
 }

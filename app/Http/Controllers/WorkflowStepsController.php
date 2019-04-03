@@ -609,42 +609,58 @@ class WorkflowStepsController extends Controller
         // }
         $clientid = \Session::get('client');
         $workflow = DB::table('workflow')->where('w_id','=',$wfid)->get();
-        $positions = DB::table('position')->where('status','=','active')->where('client_id','=',$clientid)->get();
+        $positions = DB::table('position')->where('status','=','active')
+                                        ->where('client_id','=',$clientid)
+                                        ->orderBy('posName')
+                                        ->get();
+
+        $posArray = array();
+        foreach ($positions as $position) {
+                $posInfos = DB::table('position')->where('posName','=',$position->posName)
+                                            ->where('client_id','=',$clientid)
+                                            ->where('status','=','active')
+                                            ->first();
+                if(count($posInfos) > 0)
+                {
+                    $sameposcount = 0;
+                    for($i=0;$i<count($posArray);$i++)
+                        {
+                            if($posArray[$i]['posName'] == $posInfos->posName)
+                                $sameposcount++;
+                        }
+
+                        if($sameposcount == 0)
+                        {
+                            $posInfos = json_decode(json_encode($posInfos),true);
+                            $posArray[] = $posInfos;
+                        }
+                }
+            }
+
+             //sort array alphabetically
+       usort($posArray, array($this,"compareByName"));
+
+
         foreach ($workflow as $flow) {
         $wid = $flow->w_id;
     }
     $steps = DB::table('workflowsteps as ws')->where('ws.workflow_w_id','=',$wid)
              ->join('position as p','ws.position_pos_id','=','p.pos_id')
              ->get();
-    //          foreach ($steps as $step) {
-    //              $prevstep = $step->prev;
-    //              //$prevarr2[] = $step->ws_id;
-
-    //               // $prevarr = array();
-    //         if(strpos($prevstep,',')!==false)
-    //          {
-    //             $prevarr = explode(',',$prevstep);
-    //             //array_push($prevarr2, array($step->ws_id,$prevarr));
-    //          }
-    //          else
-    //          {
-                
-    //             $prevarr[] = $prevstep;
-              
-    //          }
-    //          array_push($prevarr2, array($step->ws_id,$prevarr));
-    //          //$prevarr2[] = $prevarr;
-    //          }
-            
+  
         $steps2 = $this->sortStep($wfid);
         $admingroup = getAdminGroup($upgid);
         
-          return view("admin/addWf",['User'=>$user, 'positions'=>$positions, 'workflow'=>$workflow, 'steps'=>$steps, 'steps2'=>$steps2,'upgid'=>$upgid,'admingroup'=>$admingroup]);
+          return view("admin/addWf",['User'=>$user, 'positions'=>$positions,'workflow'=>$workflow, 'steps'=>$steps, 'steps2'=>$steps2,'upgid'=>$upgid,'admingroup'=>$admingroup]);
         
          // echo "<pre>";
          // var_dump($steps2);
 
     }
+
+     function compareByName($a, $b){
+            return $a['posName'] > $b['posName'];
+        }
 
     public function sortStep($wfid)
     {
@@ -699,11 +715,16 @@ class WorkflowStepsController extends Controller
 
     public function getPosUsers($posid)
     {
-        $posusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$posid)
-                    ->where('upg.upg_status','=','active')
-                    ->join('user as u','upg.user_user_id','u.user_id')
-                    ->join('group as g','upg.group_group_id','g.group_id')
-                    ->get();
+        // $posusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$posid)
+        //             ->where('upg.upg_status','=','active')
+        //             ->join('user as u','upg.user_user_id','u.user_id')
+        //             ->join('group as g','upg.group_group_id','g.group_id')
+        //             ->get();
+        $posusers = DB::table('deppos as dp')->where('dp.pos_id','=',$posid)
+                                            ->join('userpositiongroup as upg','dp.deppos_id','upg.position_pos_id')
+                                             ->join('user as u','upg.user_user_id','u.user_id')
+                                            ->join('group as g','upg.group_group_id','g.group_id')
+                                            ->get();
 
         return response()->json($posusers);
     }

@@ -115,29 +115,35 @@ function getWorkflow2($upgid,$groupid,$templateid)
             if($recipient->receiver=="All")
             {
                 $usergroup = getUserGroup($upgid);
-                $depposusers = DB::table('userpositiongroup as upg')->where('upg.position_pos_id','=',$recipient->position_pos_id)
-                                                                ->where('upg.upg_status','=','active')
-                                                                ->where('upg.group_group_id','=',$usergroup)
-                                                                ->join('user as u','upg.user_user_id','u.user_id')
-                                                                ->join('position as p','upg.position_pos_id','p.pos_id')
-                                                                ->join('group as g','upg.group_group_id','g.group_id')
-                                                                ->get();
+                $depposusers = DB::table('userpositiongroup as upg')
+                                ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+                                ->where('dp.pos_id','=',$recipient->position_pos_id)
+                                 ->where('upg.upg_status','=','active')
+                                 // ->where('upg.group_group_id','=',$usergroup)
+                                ->join('position as p','dp.pos_id','p.pos_id')
+                                ->join('user as u','upg.user_user_id','u.user_id')
+                                ->join('group as g','upg.group_group_id','g.group_id')
+                                ->get();
+                // echo "<pre>";
+                //  var_dump($depposusers); 
                  //get from org chart                                                
                 $deporgchart = DB::table('orgchart as o')->where('o.group_id','=',$usergroup)
                                                         ->join('orgchartnode as on','o.orgchart_id','on.orgchart_id')
                                                         ->join('userpositiongroup as upg','on.upg_id','upg.upg_id')
-                                                        ->join('position as p','upg.position_pos_id','p.pos_id')
+                                                        ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+                                                        //->where('dp.pos_group_id','=',$usergroup)
+                                                        ->join('position as p','dp.pos_id','p.pos_id')
                                                         ->where('p.pos_id','=',$recipient->position_pos_id)
                                                             ->get();
-                 //   echo "<pre>";
-                 // var_dump($deporgchart);                                          
+                                         
                 if(count($deporgchart)>0)
                  {
                     foreach ($deporgchart as $orgchartupg) {
                         $orgchartupgs = DB::table('userpositiongroup as upg')
                                         ->where('upg.upg_id','=',$orgchartupg->upg_id)
                                         ->join('user as u','upg.user_user_id','u.user_id')
-                                        ->join("position as pos","pos.pos_id","upg.position_pos_id")
+                                        ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+                                        ->join("position as pos","pos.pos_id","dp.pos_id")
                                         ->join("group as gr", "gr.group_id","upg.group_group_id")
                                         ->get();
 
@@ -192,8 +198,8 @@ function getWorkflow2($upgid,$groupid,$templateid)
        
    }
     // echo "<pre>";
-    //              var_dump($storestep);
-   return $storestep;
+    // var_dump($storestep);
+    return $storestep;
 }
 
 function getWorkflowForCustom($upgid,$wfid)
@@ -395,6 +401,23 @@ function insertInbox2($receiverupgid,$docid,$senderupgid)
 
 
         return redirect()->route('Template',['upgid'=>$senderupgid]);
+}
+
+function getNumberofNotification($upgid)
+{
+    $numNotifications = DB::table('notification')->where('to_upg_id','=',$upgid)
+                                                ->where('not_status','=','unread')
+                                                ->count();
+
+    return $numNotifications;
+}
+
+function getNotificationsList($upgid)
+{
+    $notificationsList = DB::table('notification')->where('to_upg_id','=',$upgid)
+                                                ->orderBy('not_datetime','desc')
+                                                ->get();
+    return $notificationsList;
 }
 
 ?>

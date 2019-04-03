@@ -1,71 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png" />
-    <link rel="icon" type="image/png" href="../assets/img/favicon.png" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>DocTrack</title>
-    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
-    <meta name="viewport" content="width=device-width" />
-  
-    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap-grid.min.css')}}">
-  {{--   <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/bootstrap-reboot.min.css')}}"> --}}
-    
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/material-dashboard.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{URL::asset('css/datatables/dataTables.bootstrap4.css')}}">
-   
-    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/demo.css') }}">
-    <link href="{{ URL::asset('css/fresh-bootstrap-table.css')}}" type="text/css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="{{ URL::asset('css/fonts.css') }}">
-    <link rel='stylesheet' type='text/css' href="{{ URL::asset('css/googlefonts.css') }}">
+  <title>DocTrack</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <!-- Material Kit CSS -->
+  <link href="{{ URL::asset('NEWUI/css/material-dashboard.css?v=2.1.0')}}" rel="stylesheet" />
 </head>
-  <body>
-     <div class="main-panel">
-            <nav class="navbar navbar-transparent navbar-absolute">
+  <body class="dark-edition">
+     <div class="main-panel1" style="margin-left: 60px; margin-right: 50px;">
+            <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top">
                 <div class="container-fluid">
                     <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
                         <a class="navbar-brand" href="#"> Admin </a>
                     </div>
-                    <div class="collapse navbar-collapse">
+                    <div class="collapse navbar-collapse justify-content-end">
                         <ul class="nav navbar-nav navbar-right">
-
                             <li class="dropdown">
-                               {{--  <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <i class="material-icons">notifications</i>
-                                    <span class="notification">5</span>
-                                    <p class="hidden-lg hidden-md">Notifications</p>
-                                </a> --}}
-                               {{--  <ul class="dropdown-menu">
-                                    <li>
-                                        <a href="#">Mike John responded to your email</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">You have 5 new tasks</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">You're now friend with Andrew</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Another Notification</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Another One</a>
-                                    </li>
-                                </ul> --}}
-                            </li>
-                            <li class="dropdown">
-                                <a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                   {{Auth::user()->lastname}}
                                     <i class="material-icons">person</i>
-                                    <p class="hidden-lg hidden-md">Profile</p>
                                 </a>
                                  <ul class="dropdown-menu">
                                     <li>
@@ -77,84 +36,116 @@
                                 </ul>
                             </li>
                         </ul>
-                        {{-- <form class="navbar-form navbar-right" role="search">
-                            <div class="form-group  is-empty">
-                                <input type="text" class="form-control" placeholder="Search">
-                                <span class="material-input"></span>
-                            </div>
-                            <button type="submit" class="btn btn-white btn-round btn-just-icon">
-                                <i class="material-icons">search</i>
-                                <div class="ripple-container"></div>
-                            </button>
-                        </form> --}}
                     </div>
                 </div>
             </nav>
 
 <!--CONTENT HERE-->
 <div class="content">
+<br><br><br><br><br>
+                  <div class=".col-6 .col-md-4">
+              <div class="card card-profile">
+                <div class="card-avatar">
+                  <a href="#">
+                    <img class="img" src="/users/pictures/{{$userprof}}" />
+                  </a>
+                </div>
+                <div class="card-body">
+                 
+                  <h4 class="card-title">{{Auth::user()->firstname}} {{Auth::user()->lastname}}</h4>
+                   <h6 class="card-category">ADMIN</h6>
+                  <p class="card-description">
+                   My address is {{Auth::user()->address}}.<br>My contact number is {{Auth::user()->contactnum}}.<br>This account is {{Auth::user()->status}}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-   <div class="row" style="margin-top: 40px;"> <!--First Row-->
-  <div class="col-sm-3">
-    <a href="{{route('UserManage',['upgid'=>$upgid])}}">
-    <div class="card text-center border-0" style="background-color: transparent;">
-      <i class="material-icons" style="font-size: 100px;">face</i>
-      <div class="card-block">
-        <h3 class="card-title" style="margin-top: 1rem;">Users</h3>
-      </div>
-    </div></a>
-  </div>
-  <div class="col-sm-3">
-    <a href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}">
-      <div class="card text-center border-0" style="background-color: transparent;">
-       <i class="material-icons" style="font-size: 100px">business</i>
-      <div class="card-block">
-        <h3 class="card-title" style="margin-top: 1rem">Departments</h3>
-      </div>
-    </div></a>
+<div class="row" style="margin-top: 40px;"> <!--First Row-->
+
+<div class="col-6">
+
+              <div class="card card-profile">
+                <div class="card-body">
+                   <a href="#pablo">
+                     <i class="material-icons" style="font-size: 100px;">group</i>
+                  </a>
+                  <h4 class="card-title">Workflows</h4>
+                  <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" class="btn btn-info btn-round">Open</a>
+                </div>
+              </div>
   </div>
 
-  <div class="col-sm-3">
-    <a href="{{route('viewRolePage',['upgid'=>$upgid])}}">
-    <div class="card text-center border-0" style="background-color: transparent;">
-       <i class="material-icons" style="font-size: 100px;">event_seat</i>
-      <div class="card-block">
-        <h3 class="card-title" style="margin-top: 1rem">Positions</h3>
-      </div>
-    </div></a>
+
+
+
+
+
+  <div class="col-6">
+    <div class="card card-profile">
+                <div class="card-body">
+                   <a href="#pablo">
+                     <i class="material-icons" style="font-size: 100px;">description</i>
+                  </a>
+                  <h4 class="card-title">Templates</h4>
+                  <a href="{{route('viewOwners',['upgid'=>$upgid])}}" class="btn btn-info btn-round">Open</a>
+                </div>
+              </div>
+  </div>
+
+</div>
+
+   <div class="row"> <!--Second Row-->
+
+
+
+
+
+  <div class="col-6 col-md-4">
+       <div class="card card-profile">
+                <div class="card-body">
+                   <a href="#pablo">
+                     <i class="material-icons" style="font-size: 100px;">face</i>
+                  </a>
+                  <h4 class="card-title">Users</h4>
+                  <a href="{{route('UserManage',['upgid'=>$upgid])}}" class="btn btn-info btn-round">Open</a>
+                </div>
+              </div>
+  </div>
+
+
+
+
+  <div class="col-6 col-md-4">
+    <div class="card card-profile">
+                <div class="card-body">
+                   <a href="#pablo">
+                     <i class="material-icons" style="font-size: 100px;">business</i>
+                  </a>
+                  <h4 class="card-title">Departments</h4>
+                  <a href="{{route('showDep',['upgid'=>$upgid,'id'=>Session::get('groupid')])}}" class="btn btn-info btn-round">Open</a>
+                </div>
+              </div>
+  </div>
+
+
+
+
+
+  <div class="col-6 col-md-4">
+    <div class="card card-profile">
+                <div class="card-body">
+                   <a href="#pablo">
+                     <i class="material-icons" style="font-size: 100px;">event_seat</i>
+                  </a>
+                  <h4 class="card-title">Positions</h4>
+                  <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" class="btn btn-info btn-round">Open</a>
+                </div>
+              </div>
   </div>
 </div>
 
-<div class="row mt-2"> <!--Second Row-->
-<div class="col-sm-3">
-    <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}">
-      <div class="card text-center border-0 hvr-underline-from-center" style="background-color: transparent;">
-       <i class="material-icons" style="font-size: 100px;">group</i>
-      <div class="card-block">
-        <h3 class="card-title" style="margin-top: 1rem">Workflows</h3>
-      </div>
-    </div></a>
-  </div>
 
-  <div class="col-sm-3">
-    <a href="{{route('viewOwners',['upgid'=>$upgid])}}">
-      <div class="card text-center border-0 hvr-underline-from-center" style="background-color: transparent;">
-       <i class="material-icons" style="font-size: 100px;">description</i>
-      <div class="card-block">
-        <h3 class="card-title" style="margin-top: 1rem">Templates</h3>
-      </div>
-    </div></a>
-  </div>
-
- {{--  <div class="col-sm-3">
-    <a href="#"><div class="card text-center border-0 hvr-underline-from-center" style="background-color: transparent;">
-       <i class="material-icons" style="font-size: 100px;">archive</i>
-      <div class="card-block">
-        <h3 class="card-title" style="margin-top: 1rem">Archive</h3>
-      </div>
-    </div></a>
-  </div> --}}
-</div>
 
 </div>
  </div>    

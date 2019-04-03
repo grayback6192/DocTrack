@@ -22,8 +22,8 @@ class Department extends Controller
     {
         $name = Auth::user(); 
         $admingroup = getAdminGroup($upgid);
-    	$depInfo = DB::table('group')->where(['group_id'=>$depid])->get();
-        $subgroups = DB::table('group')->where('group_group_id','=',$depid)->get();
+    	$depInfo = DB::table('group')->where(['group_id'=>$depid])->where('status','=','active')->get();
+        $subgroups = DB::table('group')->where('group_group_id','=',$depid)->where('status','=','active')->get();
         $clientid = getAdminClient($upgid);
 
         //get org chart file only
@@ -103,6 +103,77 @@ class Department extends Controller
             $adminusersarray[] = $adminuser->user_user_id;
         }
 
+        // $depPositions = DB::table('deppos')->where('pos_group_id','=',$depid)->where('deppos_status','=','active')->get();
+        $depPositions = DB::table('deppos as dp')->where('dp.pos_group_id','=',$depid)
+                        ->where('dp.deppos_status','=','active')
+                        ->join('position as p','dp.pos_id','p.pos_id')
+                        ->get();
+
+        //to view all positions
+        $allpositions = DB::table('position')->where('client_id','=',$clientid)
+                                            ->where('status','=','active')
+                                            ->orderBy('posName')
+                                            ->get();
+
+        //depPos with department
+        $departmentPositions = DB::table('deppos as dp')
+                                ->join('position as p','dp.pos_id','p.pos_id')
+                                ->where('p.client_id','=',$clientid)
+                                ->join('group as g','dp.pos_group_id','g.group_id')
+                                ->orderBy('p.posName')
+                                ->get();
+
+        //array to store position infos
+        $posArray = array();
+
+         $depPos = DB::table('deppos as dp')->where('dp.pos_group_id','=',$depid)
+                                            ->where('dp.deppos_status','=','active')
+                                            ->join('position as p','dp.pos_id','p.pos_id')
+                                            ->get();
+            if(count($depPos)>0)
+            {
+                foreach ($depPos as $pos) {
+                    $pos = json_decode(json_encode($pos),true);
+                    $posArray[] = $pos;
+                }
+            }
+
+            foreach ($allpositions as $allposition) {
+ 
+                $sameposcount = 0;
+                for ($i=0; $i < count($posArray); $i++) { 
+                    if($posArray[$i]['pos_id'] == $allposition->pos_id)
+                        $sameposcount++;
+                }
+
+                if($sameposcount == 0)
+                {
+                    $allposition = json_decode(json_encode($allposition),true);
+                    $posArray[] = $allposition;
+                }
+            }
+
+        //sort array alphabetically
+       usort($posArray, array($this,"compareByName"));
+
+
+        //assignments of department
+        $depAssignments = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$depid)
+                                                        ->where('upg.upg_status','=','active')
+                                                        // ->join('position as p','upg.position_pos_id','=','p.pos_id')
+                                                        ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+                                                        ->join('position as p','dp.pos_id','p.pos_id')
+                                                        ->join('rights as r','upg.rights_rights_id','=','r.rights_id')
+                                                        ->join('user as u','upg.user_user_id','=','u.user_id')
+                                                        ->get();
+        //get positions of department
+        // $departmentPos = DB::table('position')->where('pos_group_id','=',$depid)
+        //                                     ->where('status','=','active')
+        //                                     ->get();
+        //get people that belongs to the department
+        $depUsers = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$depid)
+                                                        ->join('user as u','upg.user_user_id','u.user_id')
+                                                        ->get();
 
         return view('admin/depProfile',['depid'=>$depid, 
                                         'depinfos'=>$depInfo, 
@@ -115,10 +186,30 @@ class Department extends Controller
                                         'admins'=>$admins,
                                         'members'=>$members,
                                         'upgid'=>$upgid,
-                                        'admingroup'=>$admingroup]);
+                                        'admingroup'=>$admingroup,
+                                        'depAssignments'=>$depAssignments,
+                                        'users'=>$depUsers,
+                                        'positions'=>$allpositions,
+                                        'posArray'=>$posArray,
+                                        'depPositions'=>$depPositions,
+                                        'posHeads'=>$departmentPositions]);
+
+      
+
         // echo "<pre>";
-        // var_dump($clientid);
+        // var_dump($depAssignments);
     }
+
+    function editDepartment($upgid, $depid){
+        $user = Auth::user();
+        $depInfo = request()->all();
+        
+
+
+    }
+     function compareByName($a, $b){
+            return $a['posName'] > $b['posName'];
+        }
 
     function showDepInfo($upgid,$depid)
     {
@@ -212,7 +303,78 @@ class Department extends Controller
                                     'creator_user_id'=>$user->user_id,
                                     'businessKey'=>$dep['depKey']]);
 
+
+        //vieworgchart when adding department
+
+         $orgchartid = rand(10,1000);
+
+        DB::table('orgchart')->insert(['orgchart_id'=>$orgchartid,
+                                        'group_id'=>$rand]);
+
+
+         $depparent = (new Department)->getMotherGroup($upgid,$rand);
+        if($depparent!=NULL)
+        {
+                $ancestornodes = DB::table('orgchart as o')->where('o.group_id','=',$depparent)
+                                                        ->join('orgchartnode as on','o.orgchart_id','on.orgchart_id')
+                                                        ->get();
+                if((count($ancestornodes))>0){
+                     foreach ($ancestornodes as $ancestornode) {
+                    DB::table('orgchartnode')->insert(['orgchart_id'=>$orgchartid,
+                                                    'upg_id'=>$ancestornode->upg_id]);
+                }
+               
+                }
+        }
+
+
+
+        // // TO BE DETERMINED
+        $randUPG = rand(10,10000);
+        $randPOSID = rand(10,1000);
+        DB::table('userpositiongroup')->insert(['upg_id'=>$randUPG,
+                                                'position_pos_id'=> $randPOSID,
+                                                'rights_rights_id'=>'2',
+                                                'user_user_id'=>'999999',
+                                                'client_id'=>$clientId,
+                                                'group_group_id'=>$rand,
+                                                'upg_status'=>'active']);
+
+        $motherposDets= DB::table('group')->where('group.group_id','=',$rand)
+                                         ->join('deppos','group.group_group_id','deppos.pos_group_id')
+                                         ->get();
+
+            if($motherposDets->isEmpty()){
+
+   DB::table('deppos')->insert(['deppos_id'=>$randPOSID,
+                                        'pos_id'=>'12345',
+                                        'pos_group_id'=>$rand,
+                                        'deppos_status'=>'active',
+                                        'posLevel'=>'2']);
+        }
+        else
+        {
+                        foreach ($motherposDets as $motherposDet) {
+                   $motherpositiondepartment = $motherposDet->deppos_id;
+                }
+        // $nulltext = "null";
+
+            DB::table('deppos')->insert(['deppos_id'=>$randPOSID,
+                                        'pos_id'=>'12345',
+                                        'pos_group_id'=>$rand,
+                                        'deppos_status'=>'active',
+                                        'posLevel'=>'2',
+                                        'motherPos'=>$motherpositiondepartment]);
+        }
+
+
+
         $admingroup = getAdminGroup($upgid);
+
+
+          $orgchartcontroller = new OrgChartController();
+
+              return $orgchartcontroller->addOrgChartNode($upgid,$rand,$randUPG);
      
         return redirect()->route('addneworgchart',['upgid'=>$upgid,'depid'=>$rand]);
 
@@ -221,11 +383,34 @@ class Department extends Controller
  
     }
 
-    function deleteDep($upgid,$depid)
+    function deleteDep($upgid,$depid,$currentdepid)
     {
-        DB::table('group')->where('group_id',$depid)->update(['status'=>'inactive']);
+        $subgroups = DB::table('group')->where('group_group_id','=',$depid)->where('status','=','active')->get();
+        $upgidOrg = DB::table('userpositiongroup')->where('group_group_id','=',$depid)->join('orgchartnode','userpositiongroup.upg_id','orgchartnode.upg_id')->get();
+        foreach ($upgidOrg as $upgidOrgs) {
+                   $orgupgid = $upgidOrgs->orgchartnode_id;
+                }
+        // dd($subgroups)
+        if($subgroups->isEmpty()){
+// return redirect()->back()->with('alert','hello');
+            // dd($orgupgid);
 
-        return $this->viewDep($upgid);
+            DB::table('deppos')->where('pos_group_id','=',$depid)->delete();
+            DB::table('orgchartnode')->where('orgchartnode_id','=',$orgupgid)->delete();
+            DB::table('userpositiongroup')->where('group_group_id','=',$depid)->update(['upg_status'=> 'inactive', 'position_pos_id' => NULL,'group_group_id'=> NULL]);
+            DB::table('group')->where('group_id','=',$depid)->delete();
+
+
+            return redirect()->route('showDep',['upgid'=>$upgid,'depid'=>$currentdepid])->with('alert','successfully deleted the department');
+        }
+        else{
+            // dd($subgroups);
+        // DB::table('group')->where('group_id',$depid)->update(['status'=>'inactive']);
+        // return $OrgChartController->getGroupOrgChartDel($upgid,$currentdepid);
+
+        return redirect()->route('showDep',['upgid'=>$upgid,'depid'=>$currentdepid])->with('info','Delete subgroup/s first before deleting this department.');
+        // return $this->showDep($upgid,$depid);
+    }
     }
 
      function viewGroups($userid,$depid)
@@ -323,6 +508,7 @@ class Department extends Controller
         function getGroupChildren($upgid,$depid,$array)
         {
             //get descendants of group
+            $temparray = array();
             $childrengroup = DB::table('group')->where('group_group_id','=',$depid)->get();
 
             if((count($childrengroup)) > 0)
@@ -330,14 +516,51 @@ class Department extends Controller
                   foreach ($childrengroup as $children) 
                   {
                     $childId = $children->group_id;
-                    }
-
-                $array[] = $childId;
-                return $this->getGroupChildren($upgid,$childId,$array);
-            }
-            else
+                    $array[] = $childId;
+                    $temparray[] = $childId;
+                }
+                    return $this->getAllChildren($upgid,$childId,$array,$temparray); 
+             }
+             else
                 return $array;
           
+        }
+
+        function getAllChildren($upgid,$depid,$array,$temparray)
+        {
+            //$temparray = array();
+            $countNullChildren = 0;
+
+            for ($i=0; $i < count($temparray); $i++) { 
+                $childrengroup = DB::table('group')->where('group_group_id','=',$temparray[$i])->get();
+
+                if((count($childrengroup))==0)
+                    $countNullChildren++;
+                else if((count($childrengroup))>0)
+                {
+                    foreach ($childrengroup as $children) {
+                        $childId = $children->group_id;
+                        $array[] = $childId;
+                        $temparray[] = $childId;
+                    }
+                }
+            }
+
+            $array = array_unique($array);
+
+            $countTempElements = count($temparray);
+
+            if($countNullChildren == $countTempElements)
+            {
+                return $array;
+            }
+            else{
+                $temparray = array();
+                return $this->getAllChildren($upgid,$depid,$array,$temparray);  
+            }
+
+             
+
         }
 
         function getDepartmentChildrenLevel($upgid,$depid)

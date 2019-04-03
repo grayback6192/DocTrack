@@ -1,36 +1,36 @@
 {{-- @if(Auth::check()) --}}
 @extends('mastertemplate')
 @section('menu')
-<li>
-              <a href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+<li class="nav-item">
+              <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">face</i>
                <p>Users</p>
               </a>
  </li>
 
- <li class="active">
-              <a href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
+ <li class="nav-item active">
+              <a class="nav-link" href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">business</i>
                <p>Departments</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewRolePage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">event_seat</i>
                 <p>Positions</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewWorkflow',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">group</i>
                <p>Workflows</p>
               </a>
  </li>
 
- <li>
-              <a href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
+ <li class="nav-item">
+              <a class="nav-link" href="{{route('viewOwners',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
                 <i class="material-icons">description</i>
                 <p>Templates</p>
               </a>
@@ -45,15 +45,16 @@
 <div class="content" style="margin-top: 20px;">
 <div class="card" style="width: 800px;">
 <div class="card-header" data-background-color="orange">
-  <h4>Add New Department</h4>
+  <h4 class="text-light">Add New Department</h4>
 </div>
-<div class="card-content">
+<div class="card-content" style="padding-left: 20px;">
 <form action="{{route('addDep',['upgid'=>$upgid,'depid'=>$depid])}}" method="post">
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
  <div class="form-group">
       <label>The newly added department will be under: </label>
       <input type="hidden" name="motherDep" value="{{$depid}}">
-      <input readonly name="motherDepName" value="{{$motherDepName}}" class="form-control">
+      <br>
+      <input readonly name="motherDepName" value="{{$motherDepName}}" class="form-control text-light bg-secondary">
     </div>
 <div class="form-group">
   <label>Department Name</label>
@@ -119,9 +120,9 @@ function showSub()
   <div class="row justify-content-end">
   <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
      <div class="input-group">
-    <input type="submit" name="save" value="Add" class="btn btn-primary">
+    <input type="submit" name="save" value="Add" class="btn btn-info">
   </div>
-  <div class="btn-group" role="group" aria-label="First group">
+  <div class="btn-group" role="group" aria-label="First group" style="padding-right: 20px;">
     <a href="{{route('showDep',['upgid'=>$upgid,'id'=>$admingroup])}}" class="btn btn-danger">Cancel</a>
   </div>
 </div> 
