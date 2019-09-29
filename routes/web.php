@@ -232,6 +232,7 @@ Route::get('admin/assignment/{upgid}/{depid}', function($upgid,$depid){
 	return Response::json($results);
 });
 Route::post('admin/assignment/delete/{depid}','UserPositionGroup@removeAssignment')->name('removeUPG');
+Route::post('admin/assignment/edit/{depid}','UserPositionGroup@editAssignmentUPG')->name('editUPG');
 //end role
 Route::post('admin/template', 'Template@addTemplate')->name('SubmitTemplate');
 Route::get('admin/{upgid}/template1', 'Template@viewTemplateOwners')->name('viewOwners'); //testUI

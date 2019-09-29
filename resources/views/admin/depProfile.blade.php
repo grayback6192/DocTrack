@@ -1,7 +1,4 @@
 @extends('mastertemplate')
-
-
-
 @section('menu')
  <li class="nav-item">
               <a class="nav-link" href="{{route('UserManage',['upgid'=>$upgid])}}" data-placement="right" title="Inbox">
@@ -141,7 +138,21 @@
         {!! session()->get('alert') !!}
     </div>
     <br>
+@endif
+@if(session()->has('alertupg'))
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        {!! session()->get('alertupg') !!}
+    </div>
+    <br>
 @endif 
+@if(session()->has('delDepHaveChild'))
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        {!! session()->get('delDepHaveChild') !!}
+    </div>
+    <br>
+@endif   
 <div class="card col-md-10 offset-md-1">
 
       <div class="m-3">
@@ -332,7 +343,6 @@ window.onclick = function(event) {
 
         {{-- </div> --}}
         {{--Admin Here--}}
-
          <div class="row p-4" style="margin-left: 60px; margin-top: 10px;">
           @if(isset($admins))
           @foreach($admins as $admin)
@@ -409,8 +419,6 @@ window.onclick = function(event) {
         <div class="row" style="margin-left: 60px; margin-top: 10px;">
           @if(isset($subgroups))
             @foreach($subgroups as $subgroup)
-
-
                         <div class="col-md-4">
               <div class="card card-profile">
                 
@@ -495,82 +503,86 @@ window.onclick = function(event) {
 
                 <div class="modal-body" style="float: left">
                           @if(isset($depPositions))
-                      @foreach($depPositions as $depPosition)
-                      @if($depPosition->posName == "Undefine")
-                            {{-- window.location.href = "{{route('DelDepposOrg',['upgid'=>$upgid,'depid'=>$depid,'posid'=>'12345'])}}"; --}}
-                      @foreach($depAssignments as $depAssignment)
-                      @if($depAssignment->posName == 'Undefine')
-                    <form method="post" action="{{route('addExistingPosUndefine',['upgid'=>$upgid,'depid'=>$depid])}}">
-                    {{csrf_field()}}                       
-                     <input type="hidden" name="assupgidund" value="{{$depAssignment->upg_id}}">
-                    Choose from Existing Positions<br>
-                   <div class="form-group">
-                      <label>Position:</label>
-                         <select class="form-control text-dark" name="depPos" id="user-position">
-                          <option value="none">--Select a position--</option>
-                           @foreach($positions as $position)
-                            @if($position->posName!="Admin" && $position->posName!="masteradmin")
-                              <option value="{{$position->pos_id}}">{{$position->posName}}</option>
-                            @endif
-                            @endforeach
-                          </select>
-                    </div>
-                      <div class="form-group">
-                          <label>Choose Immediate Head</label>
-                          <select class="form-control text-dark" name="headpos" id="user-position">
-                          <option value="none">--Select a position--</option>
-                           @foreach($posHeads as $posHead)
-                              <option value="{{$posHead->deppos_id}}">{{$posHead->posName}} ({{$posHead->groupName}})</option>
-                            @endforeach
-                          </select>
-                      </div>
+                            
+                              @if($depPosition1 == "Undefine")
+                                @foreach($depAssignments as $depAssignment)
+                                  @if($depAssignment->posName == 'Undefine')
+                                  <form method="post" action="{{route('addExistingPosUndefine',['upgid'=>$upgid,'depid'=>$depid])}}">
+                                  {{csrf_field()}}                       
+                                  <input type="hidden" name="assupgidund" value="{{$depAssignment->upg_id}}">
+                                  Choose from Existing Positions<br>
+                                  <div class="form-group">
+                                  <label>Position:</label>
+                                  <select class="form-control text-dark" name="depPos" id="user-position">
+                                  <option value="none">--Select Position Title--</option>
+                                    @foreach($positions as $position)
+                                      @if($position->posName!="Admin" && $position->posName!="masteradmin")
+                                      <option value="{{$position->pos_id}}">{{$position->posName}}</option>
+                                      @endif
+                                    @endforeach
+                                  </select>
+                                  </div>
+                                  <div class="form-group">
+                                  <label>Choose Immediate Head</label>
+                                  <select class="form-control text-dark" name="headpos" id="user-position">
+                                  <option value="none">--Select Position Title--</option>
+                                  @if($posHeadFirstUndefine!="")
+                                    @foreach($posHeadFirstUndefine as $posHead)
+                                      <option value="{{$posHead->deppos_id}}">{{$posHead->posName}} ({{$posHead->groupName}})</option>
+                                    @endforeach
+                                   @else
+                                    @foreach($posHeads as $posHead)
+                                      <option value="{{$posHead->deppos_id}}">{{$posHead->posName}} ({{$posHead->groupName}})</option>
+                                    @endforeach                                    
+                                    @endif
+                                  </select>
+                                  </div>
 
 
-                    <input type="hidden" name="deppos" value="{{$depid}}">
-                <input type="submit" class="btn btn-info" name="addNewPos" value="Add Selected Positions">
-                </form>
-                      @endif
-                      @endforeach
+                                  <input type="hidden" name="deppos" value="{{$depid}}">
+                                  <input type="submit" class="btn btn-info" name="addNewPos" value="Add Selected Positions">
+                                  </form>
+                                  @endif
+                                @endforeach
+                              
+                              @elseif($depPosition1 != 'Undefine')
+                                <form method="post" action="{{route('addExistingPos',['upgid'=>$upgid,'depid'=>$depid])}}">
+                                {{csrf_field()}}
+                                Choose from Existing Positions<br>
+                                <div class="form-group">
+                                <label>Position:</label>
+                                <select class="form-control text-dark" name="depPos" id="user-position">
+                                <option value="none">--Select Position Title--</option>
+                                  @foreach($positions as $position)
+                                    @if($position->posName!="Admin" && $position->posName!="masteradmin")
+                                    <option value="{{$position->pos_id}}">{{$position->posName}}</option>
+                                    @endif
+                                  @endforeach
+                                </select>
+                                </div>
+                                <div class="form-group">
+                                <label>Choose Immediate Head</label>
+                                <select class="form-control text-dark" name="headpos" id="user-position">
+                                <option value="none">--Select Position Title--</option>
+                                  @foreach($posHeads as $posHead)
+                                    <option value="{{$posHead->deppos_id}}">{{$posHead->posName}} ({{$posHead->groupName}})</option>
+                                  @endforeach
+                                </select>
+                                </div>
 
-                @else
-                                      <form method="post" action="{{route('addExistingPos',['upgid'=>$upgid,'depid'=>$depid])}}">
-                    {{csrf_field()}}
-                    Choose from Existing Positions<br>
-                   <div class="form-group">
-                      <label>Position:</label>
-                         <select class="form-control text-dark" name="depPos" id="user-position">
-                          <option value="none">--Select a position--</option>
-                           @foreach($positions as $position)
-                            @if($position->posName!="Admin" && $position->posName!="masteradmin")
-                              <option value="{{$position->pos_id}}">{{$position->posName}}</option>
-                            @endif
-                            @endforeach
-                          </select>
-                    </div>
-                      <div class="form-group">
-                          <label>Choose Immediate Head</label>
-                          <select class="form-control text-dark" name="headpos" id="user-position">
-                          <option value="none">--Select a position--</option>
-                           @foreach($posHeads as $posHead)
-                              <option value="{{$posHead->deppos_id}}">{{$posHead->posName}} ({{$posHead->groupName}})</option>
-                            @endforeach
-                          </select>
-                      </div>
 
+                                <input type="hidden" name="deppos" value="{{$depid}}">
+                                <input type="submit" class="btn btn-info" name="addNewPos" value="Add Selected Positions">
+                                </form>
+                              @endif
+                          @endif  
 
-                    <input type="hidden" name="deppos" value="{{$depid}}">
-                <input type="submit" class="btn btn-info" name="addNewPos" value="Add Selected Positions">
-                </form>
-                        @endif
-                      @endforeach
-               @endif           
-
+                                
                 </div>
 
-                <div class="modal-body" style="float: left; width: 100%;">
+{{--                 <div class="modal-body" style="float: left; width: 100%;">
                   <hr>OR<hr>
                    <form method="post" action="{{route('AddRole',['upgid'=>$upgid])}}">
-
                   Add New Position<br>
                   {{csrf_field()}}
                   <label class="text-light">Position Name</label>
@@ -596,7 +608,7 @@ window.onclick = function(event) {
                <input type="hidden" name="deppos" value="{{$depid}}">
                 <input type="submit" class="btn btn-info" name="addNewPos" value="Add New Position">
                 </form>
-                </div>
+                </div> --}}
 
             
              {{--    <div class="modal-footer">
@@ -622,9 +634,33 @@ window.onclick = function(event) {
                 </div>
                 <div class="card-body table-responsive">
                   <div class="col-md-offset-2">
-          <button type="button" class="btn btn-info" style="float: right;" onclick="openDepPosModal({{$depid}})">
-            Add Position
-          </button>
+                    @if(isset($checkundefinehead))
+                      @if(isset($depPositions))
+                        @if(count($checkundefinehead)==1)
+                          <button type="button" disabled class="btn btn-info" style="float: right;" onclick="openDepPosModal({{$depid}})">
+                          Add Position
+                          </button>
+                        @elseif(count($checkundefinehead)==0)
+                                @if($assignmentAndposition=='1')
+                                <button type="button" disabled class="btn btn-info" style="float: right;" onclick="openDepPosModal({{$depid}})">
+                                Add Position
+                                </button>
+                                @elseif($assignmentAndposition=='0')
+                                <button type="button" class="btn btn-info" style="float: right;" onclick="openDepPosModal({{$depid}})">
+                                Add Position
+                                </button>
+                                @endif
+                        @endif
+                      @endif
+                    @endif
+{{--                     @if(isset($depPositions))
+                      @if(count($depPositions)!=count($depAssignments))
+                                <button type="button" disabled class="btn btn-info" style="float: right;" onclick="openDepPosModal({{$depid}})">
+                                Add Position
+                                </button>
+                      @endif
+                    @endif --}}
+          
         </div>
                 <table class="table table-hover" id="posDep-table">
                   <thead>
@@ -640,7 +676,7 @@ window.onclick = function(event) {
                           <tr id="{{$depPosition->pos_id}}-row">
                             <form method="post" action="{{route('UpdateRole',['upgid'=>$upgid,'depid'=>$depid,'roleid'=>$depPosition->pos_id])}}">
                               {{csrf_field()}}
-                            <td>
+<td>
                               <div id="{{$depPosition->pos_id}}-namefield">
                                 <input readonly style="border: none; background-color:#dcd0c0;" name="role" id="{{$depPosition->pos_id}}-name" value="{{$depPosition->posName}}" class="cols">
                               </div>
@@ -652,10 +688,10 @@ window.onclick = function(event) {
                               </div>
                             </td>
 
-                            <td>
+{{--                             <td>
                               <a href="javascript:editMode({{$depPosition->pos_id}})" id="{{$depPosition->pos_id}}-edit"><i class="material-icons">mode_edit</i></a>
                               <input type="submit" class="btn btn-info" id="{{$depPosition->pos_id}}-save" name="save" value="Save" style="display: none">
-                            </td>
+                            </td> --}}
 
                             <td>
                               <a href="javascript:showRemoveModal({{$depPosition->pos_id}})" style=" padding: 15px 30px;" class="btn btn-danger" id="{{$depPosition->pos_id}}-delete"><i class="material-icons">delete</i></a>
@@ -776,12 +812,13 @@ window.onclick = function(event) {
           <tbody>
             @foreach($depAssignments as $depAssignment)
               @if($depAssignment->posName!='masteradmin')
-              @if($depAssignment->posName!='Undefine')
+              @if($depAssignment->firstname!='Undefine')
                 <tr id="{{$depAssignment->upg_id}}">
                   <td>{{$depAssignment->lastname}}, {{$depAssignment->firstname}}</td>
                   <td>{{$depAssignment->posName}}</td>
                   <td>{{$depAssignment->rightsName}}</td>
-                  <td><button type="button" class="btn btn-danger" data-toggle="modal" data-target="#removeupg-{{$depAssignment->upg_id}}"><i class="material-icons">delete</i></button></td>             
+                  <td><button type="button" class="btn btn-danger" data-toggle="modal" data-target="#removeupg-{{$depAssignment->upg_id}}"><i class="material-icons">delete</i></button></td>
+                  <td><button type="button" class="btn btn-info" data-toggle="modal" data-target="#edit-{{$depAssignment->upg_id}}"><i class="material-icons">edit</i></button></td>                                
                 </tr>
 
 
@@ -797,12 +834,16 @@ window.onclick = function(event) {
                           {{csrf_field()}}
                           <input type="hidden" name="group" value="{{$depid}}">
                           <input type="hidden" name="upgid" value="{{$depAssignment->upg_id}}"><input type="hidden" name="loginupgid" value="{{$upgid}}">
+                          <input type="hidden" name="posiddel" value="{{$depAssignment->position_pos_id}}">
+                          <input type="hidden" name="userposdel" value="{{$depAssignment->user_user_id}}">
+
+
                         <div class="btn-toolbar">
                           <div class="btn-group">
-                            <button type="submit" class="btn btn-info">YES</button>
+                            <button type="submit" class="btn btn-danger">YES</button>
                           </div>
                           <div class="btn-group">
-                             <button class="btn btn-danger" type="button" class="close" data-dismiss="modal" aria-label="Close">NO</button>
+                             <button class="btn btn-info" type="button" class="close" data-dismiss="modal" aria-label="Close">NO</button>
                           </div>
                         </div>
                         </form>
@@ -812,6 +853,35 @@ window.onclick = function(event) {
                 </div>
                 @endif
               @endif
+
+
+                                 {{--modal to edit upg--}}
+                <div class="modal" id="edit-{{$depAssignment->upg_id}}">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4>Edit Assignment?</h4>
+                      </div>
+                      <div class="modal-body">
+                        <form method="post" action="{{route('editUPG',['depid'=>$depid])}}">
+                          {{csrf_field()}}
+                             <input type="hidden" name="upgid" value="{{$depAssignment->upg_id}}">
+                             <input type="hidden" name='userUpgId' value="{{$depAssignment->user_id}}">
+                            <select name="positionedit" class="form-group col-11">
+                              @foreach($users as $user)
+                                <option value="{{$user->user_id}}">{{$user->lastname}}, {{$user->firstname}}
+                                </option>
+                              @endforeach
+                            </select>
+                <div class="modal-footer">
+                  <input type="submit" class="btn btn-info" name="Edit Position Assignment" value="Edit Position Assignment">
+                  <button type= "button" class="btn btn-danger" onclick="closeAddAssignment({{$depid}})">Cancel</button>
+                </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
             @endforeach
           </tbody>
         </table>
@@ -893,9 +963,11 @@ window.onclick = function(event) {
                     <tbody>
                       <ul id="depusers">
                         @foreach($users as $user)
+                        @if($user->firstname!='Undefine')
                           <a href="javascript:submitUser({{$user->user_id}})">
                             <li class="text-dark" id="{{$user->user_id}}">{{$user->lastname}}, {{$user->firstname}}</li>
                           </a>
+                          @endif
                         @endforeach
                       </ul>
                     </tbody>
@@ -930,10 +1002,11 @@ window.onclick = function(event) {
               var txt = document.getElementById('user2');
               var txt2 = document.getElementById('userid2');
               var list = document.getElementById($id);
+              
 
               txt.value = list.innerText;
               txt2.value = $id;
-
+              
               var modal = document.getElementById('searchuser2');
               modal.style.display = "none";
             }

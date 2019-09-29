@@ -578,7 +578,6 @@ class OrgChartController extends Controller
        $upg_array = array_values($upg_array);
        // $upgDep_array = array_unique($upgDep_array)l
 
-
       return $this->getUPGInfo($upgid,$groupid,$upg_array);
     }
 
@@ -591,8 +590,10 @@ class OrgChartController extends Controller
          // $test= $upgarray[1];
         // echo "<pre>";
         // var_dump($deparray);
+
         foreach($upgarray as $upgarrays)
         {
+            // dd($upgarrays);
             $upgInfos = DB::table('userpositiongroup as upg')->where('upg_id','=',$upgarrays)
                                                         ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
                                                         ->join('position as p','dp.pos_id','p.pos_id')
@@ -649,9 +650,14 @@ class OrgChartController extends Controller
                                                     ->where('upg.position_pos_id','=',$motherPosition)
                                                     ->join('user as u','upg.user_user_id','u.user_id')
                                                     ->get();
-                              
+            //PARA DLI MA DISPLAY ANG PERSON NGA WALA SA GROUP ID
+            $upgParent11 = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$upgGroup)
+                                                    ->where('upg.position_pos_id','=',$motherPosition)
+                                                    ->where('upg.group_group_id','=',$groupid)
+                                                    ->join('user as u','upg.user_user_id','u.user_id')
+                                                    ->get();                 
 
-            if(count($upgParent) > 0)
+            if(count($upgParent11) > 0)
             {
                 $parentArray = array();
                 $parentString = '';
@@ -665,6 +671,7 @@ class OrgChartController extends Controller
                 }
                  $temp = array(['Name'=>$upgFname.' '.$upgLname,'Position'=>$upgPosName,'group'=>$upgGroupName,'Mother'=>$parentString,'upgid'=>$upgid,'profilepic'=>$profpic,'upgGroup'=>$upgGroup]);
                      array_push($finalArray,$temp);
+
 
                 $parentUpgInfos = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$parentUpgId)->get();
             }
@@ -696,7 +703,7 @@ class OrgChartController extends Controller
 
                   $temp = array(['Name'=>$upgFname.' '.$upgLname,'Position'=>$upgPosName,'group'=>$upgGroupName,'Mother'=>$parentString,'upgid'=>$upgid,'profilepic'=>$profpic,'upgGroup'=>$upgGroup]);
                      array_push($finalArray,$temp);
-                 
+
             }
         }
             else
@@ -919,7 +926,14 @@ class OrgChartController extends Controller
     }
 
     public function getMotherDep($upgid,$groupid,$finalArrayDep,$motherDep){
-        $Upres = '11050';
+        $GetUpres= DB::table('userpositiongroup as upg')
+                       ->where('group_group_id','=',$groupid)
+                       ->select('client_id')
+                       ->get();
+        foreach ($GetUpres as $gups) {
+            $Upres = $gups->client_id;
+        }
+        // dd($groupid);
         $tempDep = array();
         $finalArrayDep1 = array();
         $finalArrayDep1 = $finalArrayDep;
@@ -954,7 +968,7 @@ class OrgChartController extends Controller
                $depPosAndName = $depPosName.'('.$depPosition.')';
                $posString = $depPosAndName.' '.$posString;
            }
-
+           
               $tempDep = array(['groupid'=>$ids1,'depName'=>$gname1,'motherDep'=>$mother1,'depPos'=>$posString]);
                          array_push($finalArrayDep1,$tempDep);
              $posString = '';

@@ -6,6 +6,7 @@ use App\Http\Controllers\OrgChartController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+// use Carbon\Carbon;
 
 class UserPositionGroup extends Controller
 {
@@ -22,28 +23,75 @@ class UserPositionGroup extends Controller
 
     public function addNewAssignment(Request $request,$upgid)
     {
+        // $date = Carbon::now()->timestamp;
         $clientid = \Session::get('client');
         $user = Auth::user();
     	$rand = rand(100,9999);
         $found = $this->findNull($request['userid']);
+        $orgchartParent = DB::table('deppos as dp')->where('pos_id','!=','12345')->where('motherPos','=',$request['position'])->get();
+        $foundDeleted = DB::table('userpositiongroup')
+                            ->where('user_user_id','=',$request['userid'])
+                            ->where('rights_rights_id','=',2)
+                            ->whereNotNull('position_pos_id')
+                            ->get();
+//finding undefine name and changing it
+        $findUnd= DB::table('userpositiongroup as upg')
+                        ->where('user_user_id','=','999999')
+                        ->where('group_group_id','=',$request['group'])
+                        ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+                        ->where('dp.deppos_id','=',$request['position'])
+                        ->get();
 
+        if(count($orgchartParent)>1){
+            // dd('greater 1 parent');
+         return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$request['group']])->with("alertupg","Cannot add two or more parent.");
+    }
         // foreach ($found as $key) {
         //     $newassignupgid = $key->upg_id;
         // }
 
+else{
+    // dd('not greater 1 parent');
+        if(count($findUnd)==1){
+            DB::table('userpositiongroup as upg')->where('user_user_id','=','999999')
+                                          ->where('group_group_id','=',$request['group'])
+                                          ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+                                          ->where('dp.deppos_id','=',$request['position'])
+                                          ->update(['user_user_id'=>$request['userid']]);
 
+            DB::table('userpositiongroup')->where('user_user_id','=',$request['userid'])
+                                          ->where('group_group_id','=',$request['group'])
+                                          ->where('position_pos_id','=',NULL)
+                                          ->update(['user_user_id'=>'999999']);
+ return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$request['group']]);
+        }
+        else{
 
          if(count($found)==1){
               foreach ($found as $key) {
             $newassignupgid = $key->upg_id;
         }
+        // dd('nagupdate sa dli deleted');
              DB::table('userpositiongroup')->where('user_user_id','=',$request['userid'])
                                         ->where('group_group_id','=',$request['group'])
                                             ->update(['position_pos_id'=>$request['position'],
                                                         'upg_status'=>'active']);
         }
         else if(count($found)==0){
-            $newassignupgid = $rand;
+            
+            if(count($foundDeleted)==1){
+                foreach ($foundDeleted as $key) {
+                            $newassignupgid = $key->upg_id;
+                }
+                // dd($newassignupgid);
+                DB::table('userpositiongroup')->where('user_user_id','=',$request['userid'])
+                                        ->where('group_group_id','=',$request['group'])
+                                            ->update(['position_pos_id'=>$request['position'],
+                                                        'upg_status'=>'active']);
+            }
+            else{
+                $newassignupgid = $rand;
+                // dd('naghimo bag.o');
     	 DB::table('userpositiongroup')->insert(['upg_id'=>$rand,
     	 										'position_pos_id'=>$request['position'],
     	 										'rights_rights_id'=>$request['role'],
@@ -52,6 +100,8 @@ class UserPositionGroup extends Controller
                                                 'client_id'=>$clientid,
                                                 'upg_status'=>'active']);
     }
+}
+
 
         $orgchartcontroller = new OrgChartController();
 
@@ -61,6 +111,8 @@ class UserPositionGroup extends Controller
         else
             return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$request['group']]);
     }
+}
+}
 
     public function removeAdmin($upgid, Request $request)
     {
@@ -92,10 +144,10 @@ class UserPositionGroup extends Controller
         
         $studpos = DB::table('deppos as dp')->where('dp.pos_group_id','=',$request['groupid'])
                                             ->join('position as p','dp.pos_id','p.pos_id')
-                                            ->where('p.posName','=','Student')
+                                            ->where('p.posName','=','Undefine')
                                             ->get();
 
-
+// dd($request['groupid']);
         if(count($studentpos)==0)
         {
             $posrand = rand(1000,99999);
@@ -116,9 +168,11 @@ class UserPositionGroup extends Controller
         if($request['position']=="Employee")
         {
             if(count($found)==1){
+                // dd($request['groupid']);
              DB::table('userpositiongroup')->where('user_user_id','=',$user->user_id)
             ->update(['group_group_id'=>$request['groupid']]);
         }else if(count($found)==0){
+            // dd($request['groupid']);
             DB::table('userpositiongroup')->insert(['upg_id'=>$rand,
                                                     'position_pos_id'=>NULL,
                                                     'rights_rights_id'=>2,
@@ -132,9 +186,11 @@ class UserPositionGroup extends Controller
         else if($request['position']=="Student")
         {
             if(count($found)==1){
+
              DB::table('userpositiongroup')->where('user_user_id','=',$user->user_id)
             ->update(['group_group_id'=>$request['groupid'],'position_pos_id'=>$studposid, 'upg_status'=>'active']);
         }else if(count($found)==0){
+
             DB::table('userpositiongroup')->insert(['upg_id'=>$rand,
                                                     'position_pos_id'=>$studposid,
                                                     'rights_rights_id'=>2,
@@ -150,15 +206,69 @@ class UserPositionGroup extends Controller
 
     public function removeAssignment(Request $request, $depid)
     {
+        $getPos_pos_id= DB::table('userpositiongroup')->where('upg_id','=',$request['upgid'])->select('position_pos_id')->get();
+        $getPosId='';
+        foreach ($getPos_pos_id as $getPosPosId) {
+            $getPosId = $getPosPosId->position_pos_id;
+        }
+        $orgchartParents = DB::table('deppos as dp')->where('pos_id','!=','12345')->where('motherPos','=',$getPosId)->get();
+        $ParentOrgchart='';
+      foreach ($orgchartParents as $orgchartParent) {
+        $ParentOrgchart = $orgchartParent->deppos_id;
+      }
 
-        DB::table("userpositiongroup")->where("upg_id",$request['upgid'])->update(['upg_status'=>'inactive']);
+      if($ParentOrgchart==''){
+        // dd($request['posiddel']);
 
-        $orgchartcontroller = new OrgChartController();
+//change active to inactive
+        DB::table('userpositiongroup as upg')->where('upg_id','=',$request['upgid'])
+                                          ->where('group_group_id','=',$request['group'])
+                                          ->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
+                                          ->where('dp.deppos_id','=',$request['posiddel'])
+                                          ->update(['user_user_id'=>'999999']);
+//change inactive to active
+        $changefirsts=DB::table('userpositiongroup')->where('user_user_id','=','999999')
+                                          ->where('group_group_id','=',$request['group'])
+                                          ->where('position_pos_id','=',NULL)
+                                          ->select()
+                                          ->get();
+                                          
+        foreach ($changefirsts as $changefirst) {
+            $changeFirstUpgId = $changefirst->upg_id;
+            
+        }
+        DB::table('userpositiongroup')->where('upg_id','=',$changeFirstUpgId)
+                                      ->update(['user_user_id'=>$request['userposdel']]);
 
-        return $orgchartcontroller->removeOrgChartNode($request['loginupgid'],$request['upgid'],$depid);
+        // DB::table("userpositiongroup")->where("upg_id",$request['upgid'])->update(['upg_status'=>'inactive']);
+
+        // $orgchartcontroller = new OrgChartController();
+
+        // return $orgchartcontroller->removeOrgChartNode($request['loginupgid'],$request['upgid'],$depid);
+
+        return redirect()->route('showDep',['upgid'=>$request['upgid'],'id'=>$depid]);
+      }
+      else{
+        dd('naay subdepartment');
+        return redirect()->route('showDep',['upgid'=>$request['upgid'],'id'=>$depid]);
+      }
         
     } //set it to inactive
+    public function editAssignmentUPG(Request $request, $depid){
+        DB::table('userpositiongroup as upg')
+            ->where('upg.group_group_id','=',$depid)
+            ->where('upg.upg_id','=',$request['upgid'])
+            ->update(['upg.user_user_id'=>$request['positionedit']]);
 
+        DB::table('userpositiongroup as upg')
+            ->where('upg.group_group_id','=',$depid)
+            ->where('upg.user_user_id','=',$request['positionedit'])
+            ->where('upg.upg_status','=','inactive')
+            ->update(['upg.user_user_id'=>$request['userUpgId']]);
+
+        return redirect()->route('showDep',['upgid'=>$request['upgid'],'id'=>$depid]);                   
+
+    }
 
     public function editAssignment(Request $request,$upgid){
         // DB::table("userpositiongroup")->where("upg_id",$request['upgid'])->update(['user_user_id'=> $request['userid']]);
