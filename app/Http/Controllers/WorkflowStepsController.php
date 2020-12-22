@@ -620,7 +620,7 @@ class WorkflowStepsController extends Controller
                                             ->where('client_id','=',$clientid)
                                             ->where('status','=','active')
                                             ->first();
-                if(count($posInfos) > 0)
+                if(count($posInfos)>0)
                 {
                     $sameposcount = 0;
                     for($i=0;$i<count($posArray);$i++)

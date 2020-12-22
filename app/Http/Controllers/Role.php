@@ -150,7 +150,18 @@ class Role extends Controller
 
     function addExistingPosToDepartment(Request $request,$upgid,$depid)
     {
-
+      
+      $user = Auth::user();
+      $clients = $this->getClientId($user->user_id);
+        foreach ($clients as $client) {
+            $clientId = $client->client_id;
+        }
+      $dpGroupName = DB::table('deppos as dp')
+                        ->where('dp.pos_group_id','=',$depid)
+                        ->where('dp.pos_id','=',$request['depPos'])
+                        ->join('position as p','dp.pos_id','p.pos_id')
+                        ->get();
+      if(count($dpGroupName)==0){      
         // for($i=0;$i<count($request['depPos']);$i++)
         // {
             $newDepPos = $request['depPos'];
@@ -188,6 +199,60 @@ class Role extends Controller
                     }
                     $posLevel = $motherposlvl + 1;
             }
+// dd($request->all());
+          // $posDescrip= DB::table('position')->where($request['depPos'],'=',$requ)
+$posStud= DB::table('position')->where('pos_id','=',$request['depPos'])->pluck('posName');
+
+foreach ($posStud as  $posStude) {
+    $posStudent = $posStude;
+}
+if($posStudent == 'Student')
+{
+                  DB::table('deppos')->insert(['deppos_id'=>$posIdRand,
+                                                'pos_id'=>$request['depPos'],
+                                                'pos_group_id'=>$request['deppos'],
+                                                'deppos_status'=>'active',
+                                                'posLevel'=>$posLevel,
+                                                'motherPos'=>$motherposition]);
+
+              // $orgchartcontroller = new OrgChartController();
+
+              // return $orgchartcontroller->addOrgChartNode($upgid,$depPos,$randUPG);
+              return redirect()->route('showDep',['upgid'=>$userupgid,'id'=>$depid]);
+              }
+
+
+else{
+//IF STUDENT DLI NALANG MAG ADD UG UNDEFINE UG INSERT PD SA DEPPOS NGA TABLE
+//get position id sa student ($request['depPos'])
+//find nga nag enroll ug student nga same ug group
+// $enrolledstud= DB::table('userpositiongroup as upg')->where('group_group_id','=',$request['deppos']);
+              // if nakita na{
+                // DB::table('deppos')->insert(['deppos_id'=>$posIdRand,
+//                                                 'pos_id'=>$request['depPos'],
+//                                                 'pos_group_id'=>$request['deppos'],
+//                                                 'deppos_status'=>'active',
+//                                                 'posLevel'=>$posLevel,
+//                                                 'motherPos'=>$motherposition]);
+
+//               $orgchartcontroller = new OrgChartController();
+
+//               return $orgchartcontroller->addOrgChartNode($upgid,$depPos,$randUPG);
+              // }
+
+
+
+// TO BE DETERMINED
+        $randUPG = rand(10,10000);
+        $randPOSID = rand(10,1000);
+        DB::table('userpositiongroup')->insert(['upg_id'=>$randUPG,
+                                                'position_pos_id'=> $posIdRand,
+                                                'rights_rights_id'=>'2',
+                                                'user_user_id'=>'999999',
+                                                'client_id'=>$clientId,
+                                                'group_group_id'=>$depPos,
+                                                'upg_status'=>'active']);
+
 
             //get positions of dep
             //$depPositions = DB::table('position')->where('pos_group_id','=',$depid)->get();
@@ -211,6 +276,11 @@ class Role extends Controller
                                                 'deppos_status'=>'active',
                                                 'posLevel'=>$posLevel,
                                                 'motherPos'=>$motherposition]);
+
+              $orgchartcontroller = new OrgChartController();
+
+              return $orgchartcontroller->addOrgChartNode($upgid,$depPos,$randUPG);
+            }
             //}
             // else if(count($depPositions)>0)
             // {
@@ -250,9 +320,13 @@ class Role extends Controller
         //}
 
         //return $this->setPosToInactive($upgid,$existingDepPos,$request['depPos'],$depid);
-        return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$depid]);
+        // return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$depid]);
 
     }
+    else{
+      return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$depid]);
+    }
+  }
 
     function setPosToInactive($upgid,$existingPosArray,$checkedPosArray,$depid)
     {
@@ -282,10 +356,55 @@ class Role extends Controller
 
     function removeDeppos($upgid,$depid,$posid)
     {
+      //only for 1 group
+      $orgchartParents = DB::table('deppos as dp')->where('pos_id','!=','12345')->where('pos_group_id','=',$depid)->where('pos_id','=',$posid)->get();
+      foreach ($orgchartParents as $orgchartParent) {
+        $ParentOrgchart = $orgchartParent->deppos_id;
+      }
+      // dd($orgchartParents);
+      $findParents = DB::table('deppos as dp')->where('pos_id','!=','12345')->where('motherPos','=',$ParentOrgchart)->get();
+      // dd(count($findParents);
+      if(count($findParents)==0){
+        // dd('madelete');
+      //deleting data on table
+        $getdepposIDs=DB::table('deppos')->where('pos_id','=',$posid)->where('pos_group_id','=',$depid)->get();
+        foreach ($getdepposIDs as $gdID) {
+          $getdepposID = $gdID->deppos_id;
+        }
+        $getUpgIdDelNodes = DB::table('userpositiongroup as upg')
+                               ->where('upg.position_pos_id','=',$getdepposID)
+                               ->join('orgchartnode as on','upg.upg_id','on.upg_id')
+                               ->get();
+        
         DB::table('deppos')->where('pos_id','=',$posid)->where('pos_group_id','=',$depid)
-                            ->update(['deppos_status'=>'inactive']);
+                            ->delete();
+                            
+        DB::table("userpositiongroup")->where("position_pos_id",'=',$getdepposID)->where('user_user_id','!=','999999')->update(['upg_status'=>'inactive']);
+        DB::table("userpositiongroup")->where("position_pos_id",'=',$getdepposID)->where('user_user_id','=','999999')->delete();
 
+        foreach ($getUpgIdDelNodes as $gUPGDN) {
+            $getUpgIdDelNode = $gUPGDN->upg_id;
+             DB::table('orgchartnode')->where('upg_id','=',$getUpgIdDelNode)->delete();
+        }
+        // $orgchartcontroller = new OrgChartController();
+
+        // return $orgchartcontroller->removeOrgChartNode($upgid,$getUpgIdDelNode,$depid);
         return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$depid]);
+      }
+      else{
+        //getting parent title
+        // dd($findParents);
+        foreach ($findParents as $findP) {
+          $findParent = $findP->pos_id;
+        }
+        $findParentTitles = DB::table('position')->where('pos_id','=',$findParent)->select('posName')->get();
+
+        foreach ($findParentTitles as $findPT) {
+          $findParentTitle= $findPT->posName;
+        }
+        // dd($findParentTitle[0]);
+        return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$depid])->with("delDepHaveChild","Delete '".$findParentTitle."' (Position Title) first before deleting this Position Title.");
+      }
     }
 
     //     function removeDepposOrg(Request $upgid,$depid,$posid)
@@ -299,11 +418,15 @@ class Role extends Controller
         function addExistingPosToDepartmentUndefine(Request $request,$upgid,$depid)
     {
 
-                 DB::table("userpositiongroup")->where("upg_id",$request['assupgidund'])->update(['upg_status'=>'inactive']);
-                 DB::table('orgchartnode')->where('upg_id','=',$request['assupgidund'])->delete();
 
-                DB::table('deppos')->where('pos_id','=','12345')->where('pos_group_id','=',$depid)
-                            ->update(['deppos_status'=>'inactive']);
+      //for editing undefine position assignment
+
+              //for deleteing and inactive for undefine position assignment
+                 // DB::table("userpositiongroup")->where("upg_id",$request['assupgidund'])->update(['upg_status'=>'inactive']);
+                 // DB::table('orgchartnode')->where('upg_id','=',$request['assupgidund'])->delete();
+
+                // DB::table('deppos')->where('pos_id','=','12345')->where('pos_group_id','=',$depid)
+                            // ->update(['deppos_status'=>'inactive']);
 
 
                 // foreach ($depposChanges as $depposChange) {
@@ -316,8 +439,10 @@ class Role extends Controller
         // for($i=0;$i<count($request['depPos']);$i++)
         // {
             $newDepPos = $request['depPos'];
+            // dd($request['assupgidund']);
             $depPos = $depid;
-            $posIdRand = rand(1,9999);
+            $posIdRand = $this->groupIdRandomizeId();
+            // $posIdRand = rand(1,9999);
             //get existing info of newDepPos
             // $checkedDepPos = array(); //store checked positions
             // $checkedDepPosName = array();
@@ -367,12 +492,21 @@ class Role extends Controller
                  //                            'client_id'=>$posClient,
                  //                            'posLevel'=>$posLevel,
                  //                            'motherPos'=>$posParent]);
-                DB::table('deppos')->insert(['deppos_id'=>$posIdRand,
-                                                'pos_id'=>$newDepPos,
-                                                'pos_group_id'=>$depPos,
-                                                'deppos_status'=>'active',
-                                                'posLevel'=>$posLevel,
-                                                'motherPos'=>$motherposition]);
+                // DB::table('deppos')->insert(['deppos_id'=>$posIdRand,
+                //                                 'pos_id'=>$newDepPos,
+                //                                 'pos_group_id'=>$depPos,
+                //                                 'deppos_status'=>'active',
+                //                                 'posLevel'=>$posLevel,
+                //                                 'motherPos'=>$motherposition]);
+
+                DB::table('deppos')->where('pos_id','=','12345')->where('pos_group_id','=',$depid)
+                                   ->update(['pos_id'=>$newDepPos,
+                                             'posLevel'=>$posLevel,
+                                             'motherPos'=>$motherposition]);
+                
+                // DB::table('orgchartnode')->where('upg_id','=',$request['assupgidund'])->update(['upg_id'=>$newDepPos]);
+               
+
             //}
             // else if(count($depPositions)>0)
             // {
@@ -411,19 +545,41 @@ class Role extends Controller
 
         //}
 
+              //for changing motherposition of undefine position assignment
+                // $depposUndefine=DB::table('deppos')->where('pos_id','=','12345')->where('pos_group_id','=',$depid)->where('deppos_status','=','inactive')->get();
+                // foreach ($depposUndefine as $depposUndefines) {
+                //     $depposbago = $depposUndefines->deppos_id;
+                // }
 
-                $depposUndefine=DB::table('deppos')->where('pos_id','=','12345')->where('pos_group_id','=',$depid)->where('deppos_status','=','inactive')->get();
-                foreach ($depposUndefine as $depposUndefines) {
-                    $depposbago = $depposUndefines->deppos_id;
-                }
 
-
-                 DB::table('deppos')->where('motherPos','=',$depposbago)->update(['motherPos'=>$posIdRand]);
+                //  DB::table('deppos')->where('motherPos','=',$depposbago)->update(['motherPos'=>$posIdRand]);
 
         //return $this->setPosToInactive($upgid,$existingDepPos,$request['depPos'],$depid);
         return redirect()->route('showDep',['upgid'=>$upgid,'id'=>$depid]);
 
     }
+
+        function groupIdRandomizeId(){
+        $posIdRand=rand(1,99999);
+        $idExist= DB::table('group as g')
+                            ->where('g.group_id','=',$posIdRand)
+                            // ->where('g.group_id','=',$rand)
+                            ->get();
+
+                            
+        if(count($idExist)>0){
+            
+            $this->groupIdRandomize();
+        }
+        else
+        {
+            
+            return $posIdRand;
+        }
+
+    }
+
+
 
     function deletePosition($upgid,$roleid) //for roleView.blade.php
     {

@@ -126,7 +126,7 @@ options.onSelectionChanged = function (e, data) {
           }
           message += "<b>'" +  itemConfig.parents + "'</b>";
 
-          window.location.href = 'http://localhost:8000/admin/15635/department/depID='+itemConfig.phone;
+          window.location.href = 'http://localhost:8000/admin/83123/department/depID='+itemConfig.phone;
 
         }
         jQuery("#message").empty().append("User selected following items: " + message);

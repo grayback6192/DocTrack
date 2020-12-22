@@ -232,6 +232,7 @@ Route::get('admin/assignment/{upgid}/{depid}', function($upgid,$depid){
 	return Response::json($results);
 });
 Route::post('admin/assignment/delete/{depid}','UserPositionGroup@removeAssignment')->name('removeUPG');
+Route::post('admin/assignment/edit/{depid}','UserPositionGroup@editAssignmentUPG')->name('editUPG');
 //end role
 Route::post('admin/template', 'Template@addTemplate')->name('SubmitTemplate');
 Route::get('admin/{upgid}/template1', 'Template@viewTemplateOwners')->name('viewOwners'); //testUI
@@ -333,6 +334,13 @@ Route::get('/user/{upgid}/send',function($upgid)//needed fixing
         $upgrole = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$upgid)
         												->join('deppos as dp','upg.position_pos_id','dp.deppos_id')
         												->get();
+        // $upgrolestudent = DB::table('userpositiongroup as upg')->where('upg.upg_id','=',$upgid)
+        // 												->join('deppos as dp','upg.position_pos_id','dp.pos_id')
+        // 												->get();
+        // 												$roleupgstud='';
+        // foreach ($upgrolestudent as $rolestud) {
+        // 	$roleupgstud = $rolestud->pos_id;
+        // }								
         foreach ($upgrole as $role) {
         	$roleupg = $role->pos_id;
         }
@@ -348,6 +356,7 @@ Route::get('/user/{upgid}/send',function($upgid)//needed fixing
         }
         else if($roleupg!=$studentposid)
         {
+        	
         	echo "Employee here";
         	$template = DB::table("template as t")->where('t.status','=','active')
 									->where('t.client_id','=',$clientid)

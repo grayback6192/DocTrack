@@ -109,6 +109,11 @@ class Department extends Controller
                         ->join('position as p','dp.pos_id','p.pos_id')
                         ->get();
 
+            $depPosition1 ='';
+        foreach ($depPositions as $depPosition) {
+                $depPosition1 = $depPosition->posName;
+            }
+
         //to view all positions
         $allpositions = DB::table('position')->where('client_id','=',$clientid)
                                             ->where('status','=','active')
@@ -122,6 +127,184 @@ class Department extends Controller
                                 ->join('group as g','dp.pos_group_id','g.group_id')
                                 ->orderBy('p.posName')
                                 ->get();
+
+
+        //depPos with departmentHead Defined 
+        $positionHeadss = DB::table('deppos as dp')
+                            ->join('position as p','dp.pos_id','p.pos_id')
+                            ->where('dp.pos_group_id','=',$depid)
+                            ->where('dp.deppos_status','=','active')
+                            ->join('group as g','dp.pos_group_id','g.group_id')
+                            // ->select('dp.motherPos')
+                            // ->where('g.client_id','=',$clientid)
+                            // ->orderBy('p.posName')
+                            ->get();
+                            // dd($positionHeadss);
+        // foreach ($positionHeadss as $positionHeads) {
+        //     $positionHead = $positionHeads->group_group_id;
+        // }
+        // $positionheadfirst = DB::table('deppos as dp')
+        //                         ->where('dp.pos_group_id','=',$positionHead);
+        $positionHeadGetGroups = '';
+        $positionHeadGetGroups = DB::table('group as g')
+                                ->where('g.group_id','=',$depid)
+                                ->select('group_group_id')
+                                ->get();
+        foreach ($positionHeadGetGroups as $positionHeadGetGroup) {
+            $positionheadgroup = $positionHeadGetGroup->group_group_id;
+        }
+
+            
+        $positionHeadFirsts = '';
+        $positionHeadFirsts = DB::table('deppos as dp')
+                                ->join('position as p','dp.pos_id','p.pos_id')
+                                // ->where('dp.pos_group_id','=',$depid)
+                                ->where('dp.deppos_status','=','active')
+                                ->where('dp.pos_group_id','=',$positionheadgroup)
+                                ->select('dp.deppos_id')
+                                ->get();
+        $positionHeadFirst='';
+        foreach ($positionHeadFirsts as $phf) {
+            $positionHeadFirst = $phf->deppos_id;
+        }
+        // dd($positionHeadFirst);
+        $lastnaka='';
+        $lastnaka = DB::table('deppos as dp')
+                                ->join('position as p','dp.pos_id','p.pos_id')
+                                ->where('dp.deppos_id','=',$positionHeadFirst)
+                                ->join('group as g','dp.pos_group_id','g.group_id')
+                                ->orderBy('p.posName')
+                                ->get();
+        
+        //PARA SA immideate head ang above department nga ang iyahang motherPos kay dli nila grouptitle
+        // foreach ($lastnaka as $lastnakatest) {
+        //     $lastnka = $lastnakatest->motherPos;
+        //     $lastnkadepid = $lastnakatest->pos_group_id;
+        // }
+
+
+        // $getmothers= DB::table('deppos as dp')
+        //                     ->where('dp.deppos_id','=',$lastnka)
+        //                     ->where('dp.pos_group_id','!=',$lastnkadepid)
+        //                     ->get();
+
+        // $lastnkapost= DB::table('deppos as dp')
+        //                         ->join('position as p','dp.pos_id','p.pos_id')
+        //                         ->where('dp.motherPos','=',$lastnka)
+        //                         ->where('dp.deppos_status','=','active')
+        //                         ->join('group as g','dp.pos_group_id','g.group_id')
+        //                         ->orderBy('p.posName')
+        //                         ->get();
+
+        $positionHeadFirsts1 = '';
+        $positionHeadFirsts1 = DB::table('deppos as dp')
+                                ->join('position as p','dp.pos_id','p.pos_id')
+                                // ->where('dp.pos_group_id','=',$depid)
+                                ->where('dp.deppos_status','=','active')
+                                ->where('dp.pos_group_id','=',$positionheadgroup)
+                                ->get();
+        $positionHeadFirsts2 = DB::table('deppos as dp')
+                                ->join('position as p','dp.pos_id','p.pos_id')
+                                // ->where('dp.pos_group_id','=',$depid)
+                                ->where('dp.deppos_status','=','active')
+                                ->where('dp.pos_group_id','=',$positionheadgroup)
+                                ->select('dp.deppos_id')
+                                ->get();     
+
+              $positionHeadFirst2='';
+              $lastnka = '';                  
+            foreach ($positionHeadFirsts1 as $key => $value) {
+                $valDeppos = $value->deppos_id;
+                $valMotherpos = $value->motherPos;
+                foreach ($positionHeadFirsts2 as $phf2) {
+                    $positionHeadFirst2 = $phf2->deppos_id;
+                    if($positionHeadFirst2!=$valMotherpos){
+                        $lastnka  = DB::table('deppos as dp')
+                                ->join('position as p','dp.pos_id','p.pos_id')
+                                ->where('dp.deppos_id','=',$valDeppos)
+                                ->join('group as g','dp.pos_group_id','g.group_id')
+                                ->orderBy('p.posName')
+                                ->get();
+                }
+            }
+        }
+
+
+//for position head nga daghan position title sa upper department
+$currentGetPosHeads =DB::table('userpositiongroup as upg')
+                        ->where('upg.group_group_id','=',$depid)
+                        ->join('deppos as dp','upg.position_pos_id','dp.deppos_id') 
+                        ->get();
+$currentGetPosHead='';
+foreach ($currentGetPosHeads as $cgph) {
+    $currentGetPosHead = $cgph->motherPos;
+}
+// $getDepposIdGroup = DB::table('deppos as dp')
+//                         ->where('dp.deppos_id','=',$currentGetPosHead)
+//                         ->join('userpositiongroup as upg','dp.deppos_id','upg.position_pos_id')
+//                         // ->where('upg.user_user_id','!=','999999')
+//                         ->join('position as p','dp.pos_id','p.pos_id')
+//                         ->join('group as g','dp.pos_group_id','g.group_id')
+//                         ->orderBy('p.posName')
+//                         ->get();
+$getDepposIdGroups = DB::table('deppos as dp')
+                        ->where('dp.deppos_id','=',$currentGetPosHead)
+                        ->join('userpositiongroup as upg','dp.deppos_id','upg.position_pos_id')
+                        // ->where('upg.user_user_id','!=','999999')
+                        ->join('position as p','dp.pos_id','p.pos_id')
+                        ->join('group as g','dp.pos_group_id','g.group_id')
+                        ->orderBy('p.posName')
+                        ->get();
+                        // dd(count($getDepposIdGroups));
+if(count($getDepposIdGroups)==0){
+    $kani2 = $getDepposIdGroups;
+}
+else{
+
+            foreach ($getDepposIdGroups as $gdig) {
+                $DepposIdGroup = $gdig->pos_group_id;
+            }
+
+            $kani =DB::table('deppos as dp')->where('pos_group_id','=',$DepposIdGroup)->min('posLevel');
+            
+            $kani2 = DB::table('deppos as dp')->where('pos_group_id','=',$DepposIdGroup)->where('posLevel','<=',$kani)
+                        ->join('userpositiongroup as upg','dp.deppos_id','upg.position_pos_id')
+                        // ->where('upg.user_user_id','!=','999999')
+                        ->join('position as p','dp.pos_id','p.pos_id')
+                        ->join('group as g','dp.pos_group_id','g.group_id')
+                        ->orderBy('p.posName')
+                        ->get();
+            // dd($kani2);
+    }
+
+
+        //     $positionHeadFirst = '';
+        // $positionHeadFirst = DB::table('deppos as dp')
+        //                         ->join('position as p','dp.pos_id','p.pos_id')
+        //                         // ->where('dp.pos_group_id','=',$depid)
+        //                         ->where('dp.deppos_status','=','active')
+        //                         ->where('dp.deppos_id','=',$positionHeadFirstMotherposition)
+        //                         ->join('group as g','dp.pos_group_id','g.group_id')
+        //                         ->where('g.client_id','=',$clientid)
+        //                         ->orderBy('p.posName')
+        //                         ->get();
+
+//getHeadUndefine
+        $getundefineheadmotherposs = DB::table('deppos as dp')
+                                ->where('dp.pos_group_id','=',$depid)
+                                ->select('motherPos')
+                                ->get();
+        $getundefineheadmotherpos='';
+        foreach ($getundefineheadmotherposs as $guhmp) {
+            $getundefineheadmotherpos = $guhmp->motherPos;
+        }
+        
+        $checkundefinehead = DB::table('deppos as dp')
+                                    ->where('dp.deppos_id','=',$getundefineheadmotherpos)
+                                    ->where('dp.pos_id','=','12345')
+                                    ->get();
+
+
 
         //array to store position infos
         $posArray = array();
@@ -166,6 +349,7 @@ class Department extends Controller
                                                         ->join('rights as r','upg.rights_rights_id','=','r.rights_id')
                                                         ->join('user as u','upg.user_user_id','=','u.user_id')
                                                         ->get();
+                                                        
         //get positions of department
         // $departmentPos = DB::table('position')->where('pos_group_id','=',$depid)
         //                                     ->where('status','=','active')
@@ -173,8 +357,48 @@ class Department extends Controller
         //get people that belongs to the department
         $depUsers = DB::table('userpositiongroup as upg')->where('upg.group_group_id','=',$depid)
                                                         ->join('user as u','upg.user_user_id','u.user_id')
+                                                        ->where('upg.upg_status','=','inactive')
+                                                        ->distinct()
                                                         ->get();
+                                                        // dd($depUsers);
+ 
+ //assignment and position name must be filled
+    $getDepposId= DB::table('deppos as dp')
+                        ->where('dp.pos_group_id','=',$depid)
+                        ->where('dp.deppos_status','=','active')
+                        ->select('deppos_id')
+                        ->get();
+          
+        $getdepid='';
+        $assignmentAndposition  = '0';
+         foreach($getDepposId as $gdi) {
+        $getdepid = $gdi->deppos_id;
 
+        $getDepposIdPosition = DB::table('deppos as dp')
+                        ->where('dp.pos_group_id','=',$depid)
+                        ->where('dp.deppos_status','=','active')
+                        ->join('userpositiongroup as upg','dp.deppos_id','upg.position_pos_id')
+                        ->where('upg.position_pos_id','=',$getdepid)
+                        ->distinct()
+                        ->get();
+
+        if($getDepposIdPosition->isEmpty()){
+            $assignmentAndposition = '1';
+        }     
+
+    }
+//edit positions assignment
+    $positionHeadGetDataDP = DB::table('deppos as dp')
+                                ->where('dp.pos_group_id','=',$depid)
+                                ->where('dp.deppos_status','=','active')
+                                ->get();
+    $positionHeadGetDataUPG = DB::table('userpositiongroup as upg')
+                                ->where('upg.group_group_id','=',$depid)
+                                ->select('upg.position_pos_id')
+                                ->get();
+    
+
+// dd($departmentPositions);
         return view('admin/depProfile',['depid'=>$depid, 
                                         'depinfos'=>$depInfo, 
                                         'User'=>$name, 
@@ -192,7 +416,12 @@ class Department extends Controller
                                         'positions'=>$allpositions,
                                         'posArray'=>$posArray,
                                         'depPositions'=>$depPositions,
-                                        'posHeads'=>$departmentPositions]);
+                                        'posHeads'=>$departmentPositions,
+                                        'posHeadFirstUndefine'=>$kani2,
+                                        'posHeadFirst'=>$positionHeadss,
+                                        'checkundefinehead'=>$checkundefinehead,
+                                        'assignmentAndposition'=>$assignmentAndposition,
+                                        'depPosition1'=>$depPosition1]);
 
       
 
@@ -277,7 +506,8 @@ class Department extends Controller
     {
          $user = Auth::user(); 
          $dep = request()->all();
-    
+
+
         // if($dep['mothergroup']==''){
         //     $mothergroup = $this->getClientId($user->user_id);
         // foreach ($mothergroup as $client) {
@@ -295,7 +525,7 @@ class Department extends Controller
             $clientId = $client->client_id;
         }
 
-        $rand = rand(10,10000);
+        $rand = $this->groupIdRandomize();
         DB::table('group')->insert(['group_id'=>$rand,
                                     'groupName'=>$dep['depname'], 'groupDescription'=>$dep['depDesc'], 'status'=>'active',
                                     'group_group_id'=>$mg,
@@ -306,7 +536,7 @@ class Department extends Controller
 
         //vieworgchart when adding department
 
-         $orgchartid = rand(10,1000);
+         $orgchartid = rand(10,10000);
 
         DB::table('orgchart')->insert(['orgchart_id'=>$orgchartid,
                                         'group_id'=>$rand]);
@@ -382,11 +612,30 @@ class Department extends Controller
 
  
     }
+    function groupIdRandomize(){
+        $rand=rand(10,100);
+        $idExist= DB::table('group as g')
+                            ->where('g.group_id','=',$rand)
+                            ->get();
+
+                            
+        if(count($idExist)>0){
+            
+            $this->groupIdRandomize();
+        }
+        else
+        {
+            
+            return $rand;
+        }
+
+    }
 
     function deleteDep($upgid,$depid,$currentdepid)
     {
         $subgroups = DB::table('group')->where('group_group_id','=',$depid)->where('status','=','active')->get();
         $upgidOrg = DB::table('userpositiongroup')->where('group_group_id','=',$depid)->join('orgchartnode','userpositiongroup.upg_id','orgchartnode.upg_id')->get();
+        $orgupgid='';
         foreach ($upgidOrg as $upgidOrgs) {
                    $orgupgid = $upgidOrgs->orgchartnode_id;
                 }
@@ -396,7 +645,10 @@ class Department extends Controller
             // dd($orgupgid);
 
             DB::table('deppos')->where('pos_group_id','=',$depid)->delete();
-            DB::table('orgchartnode')->where('orgchartnode_id','=',$orgupgid)->delete();
+
+            if($orgupgid!='')
+                DB::table('orgchartnode')->where('orgchartnode_id','=',$orgupgid)->delete();
+        
             DB::table('userpositiongroup')->where('group_group_id','=',$depid)->update(['upg_status'=> 'inactive', 'position_pos_id' => NULL,'group_group_id'=> NULL]);
             DB::table('group')->where('group_id','=',$depid)->delete();
 
